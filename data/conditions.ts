@@ -1251,5 +1251,27 @@ export const conditions: Condition[] = [
       "K91.850"
     ],
     "specialty": "gastroenterology"
+  },
+  {
+    "id": "copd",
+    "nameEn": "Chronic obstructive pulmonary disease",
+    "namePl": "Przewlekła obturacyjna choroba płuc",
+    "synonymsEn": [
+      "chronic obstructive lung disease",
+      "emphysema",
+      "chronic bronchitis"
+    ],
+    "synonymsPl": [
+      "rozedma płuc",
+      "przewlekłe zapalenie oskrzeli"
+    ],
+    "abbreviations": [
+      "COPD",
+      "POChP"
+    ],
+    "icd10": [
+      "J44"
+    ],
+    "specialty": "pulmonology"
   }
 ];

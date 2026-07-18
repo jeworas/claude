@@ -13,7 +13,7 @@ import { societies } from '../data/societies';
 import { conditions } from '../data/conditions';
 import { guidelines } from '../data/guidelines';
 import { societiesSchema, conditionsSchema, guidelinesSchema } from '../src/lib/schema';
-import { countryOf, lineagesForCondition, getDosing } from '../src/lib/data';
+import { countryOf, lineagesForCondition, getDosing, getCondition } from '../src/lib/data';
 import { search } from '../src/lib/search';
 import { buildComparison } from '../src/lib/compare';
 import { answerFor } from '../src/lib/answer';
@@ -219,6 +219,16 @@ check(
     empagliflozin.conditions.some((c) => c.condition.specialty === 'diabetology' || c.condition.id.includes('diabet')),
 );
 check('“proton pump inhibitor” is found as a medicine', drugsForQuery('proton pump inhibitor').length > 0);
+
+console.log('\nCross-specialty ingestion (GOLD COPD)');
+check('COPD condition exists (pulmonology)', getCondition('copd')?.specialty === 'pulmonology');
+check('“COPD” finds the GOLD guideline', search('COPD').some((r) => r.guideline.id === 'gold-copd-2025'));
+check('Polish “POChP” finds the GOLD guideline', search('POChP').some((r) => r.guideline.id === 'gold-copd-2025'));
+check('“emphysema” (synonym) finds COPD', search('emphysema').some((r) => r.guideline.id === 'gold-copd-2025'));
+check(
+  'a COPD drug class is cross-referenced to COPD',
+  (drugsForQuery('LABA')[0]?.conditions ?? []).some((c) => c.condition.id === 'copd'),
+);
 
 console.log('');
 if (failures > 0) {

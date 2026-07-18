@@ -220,15 +220,21 @@ function dedupeRecs(recs: { topic: string; text: string }[]): { topic: string; t
   return out;
 }
 
+/** Sentence-case for names, but keep established drug-class acronyms uppercase. */
+function displayCase(s: string): string {
+  if (s.length <= 5 && s === s.toUpperCase() && /[A-Z]/.test(s)) return s; // LABA, LAMA, ICS, SABA, PPI…
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /** Prefer the English INN (the surface form equal to the canonical key). */
 function pickDisplayName(key: string, aliases: Set<string>): string {
   let best: string | null = null;
   for (const a of aliases) {
     const clean = stripParens(a);
-    if (clean.toLowerCase() === key) return titleize(clean.toLowerCase()); // exact English INN
+    if (clean.toLowerCase() === key) return displayCase(clean); // exact English INN / acronym
     if (!best || clean.length < best.length) best = clean;
   }
-  return best ? titleize(best) : titleize(key);
+  return best ? displayCase(best) : titleize(key);
 }
 
 const INDEX = buildIndex();

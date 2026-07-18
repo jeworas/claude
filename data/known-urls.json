@@ -17,9 +17,24 @@
       "indexUrl": "https://ptg-e.org.pl/wytyczne/"
     },
     {
-      "societyId": "npoa",
-      "abbreviation": "NPOA",
-      "indexUrl": "https://antybiotyki.edu.pl/rekomendacje/"
+      "societyId": "ecco",
+      "abbreviation": "ECCO",
+      "indexUrl": "https://ecco-ibd.eu/publications/guidelines"
+    },
+    {
+      "societyId": "ueg",
+      "abbreviation": "UEG",
+      "indexUrl": "https://ueg.eu/quality-of-care"
+    },
+    {
+      "societyId": "aha-acc",
+      "abbreviation": "AHA/ACC",
+      "indexUrl": "https://professional.heart.org/en/guidelines-and-statements"
+    },
+    {
+      "societyId": "ada",
+      "abbreviation": "ADA",
+      "indexUrl": "https://professional.diabetes.org/standards-of-care"
     },
     {
       "societyId": "ptd",
@@ -29,27 +44,17 @@
     {
       "societyId": "ptnt",
       "abbreviation": "PTNT",
-      "indexUrl": "https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt"
+      "indexUrl": "https://www.nadcisnienietetnicze.pl/"
     },
     {
-      "societyId": "ada",
-      "abbreviation": "ADA",
-      "indexUrl": "https://professional.diabetes.org/standards-of-care"
+      "societyId": "gold",
+      "abbreviation": "GOLD",
+      "indexUrl": "https://goldcopd.org/2025-gold-report/"
     },
     {
-      "societyId": "aha-acc",
-      "abbreviation": "AHA/ACC",
-      "indexUrl": "https://professional.heart.org/en/guidelines-and-statements"
-    },
-    {
-      "societyId": "ecco",
-      "abbreviation": "ECCO",
-      "indexUrl": "https://ecco-ibd.eu/publications/ecco-guidelines-science/published-ecco-guidelines.html"
-    },
-    {
-      "societyId": "ueg",
-      "abbreviation": "UEG",
-      "indexUrl": "https://ueg.eu/guideline"
+      "societyId": "npoa",
+      "abbreviation": "NPOA",
+      "indexUrl": "https://antybiotyki.edu.pl/rekomendacje/"
     }
   ],
   "known": [
@@ -816,6 +821,15 @@
       "title": "European Guideline on Chronic Nausea and Vomiting - A UEG and ESNM Consensus for Clinical Management",
       "titleLocal": null,
       "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/ueg2.12711",
+      "pdfUrl": null
+    },
+    {
+      "id": "gold-copd-2025",
+      "societyId": "gold",
+      "country": "INT",
+      "title": "Global Strategy for the Diagnosis, Management, and Prevention of Chronic Obstructive Pulmonary Disease (2025 Report)",
+      "titleLocal": null,
+      "url": "https://goldcopd.org/2025-gold-report/",
       "pdfUrl": null
     }
   ]
