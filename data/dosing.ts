@@ -55,4 +55,41 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Rifaximin', indication: 'IBS with diarrhea', regimen: '550 mg orally three times daily for 14 days' },
     { drug: 'Eluxadoline', indication: 'IBS with diarrhea', regimen: '100 mg orally twice daily (75 mg if not tolerated)' },
   ],
+
+  // European (ECCO) and Polish (PTG-E, NPOA) flagship guidelines. Regimens are
+  // the same standard agents; drug names given as English generics.
+  'ecco-uc-medical-2022': [
+    { drug: 'Mesalamine (oral)', indication: 'Mild-to-moderate UC, induction & maintenance', regimen: '≥2.4 g/day orally (once-daily dosing acceptable)' },
+    { drug: 'Mesalamine (rectal)', indication: 'Proctitis / left-sided disease', regimen: '1 g suppository or enema daily; combine with oral for left-sided disease' },
+    { drug: 'Infliximab', indication: 'Moderate-to-severe', regimen: '5 mg/kg IV at weeks 0, 2, 6, then every 8 weeks' },
+    { drug: 'Vedolizumab', indication: 'Moderate-to-severe', regimen: '300 mg IV at weeks 0, 2, 6, then every 8 weeks' },
+    { drug: 'Tofacitinib', indication: 'Moderate-to-severe', regimen: '10 mg orally twice daily induction, then 5 mg twice daily maintenance' },
+  ],
+  'ecco-cd-medical-2024': [
+    { drug: 'Budesonide', indication: 'Mild ileocecal Crohn’s, induction', regimen: '9 mg orally once daily for up to 8 weeks' },
+    { drug: 'Infliximab', indication: 'Moderate-to-severe', regimen: '5 mg/kg IV at weeks 0, 2, 6, then every 8 weeks' },
+    { drug: 'Adalimumab', indication: 'Moderate-to-severe', regimen: '160 mg SC week 0, 80 mg week 2, then 40 mg every other week' },
+    { drug: 'Ustekinumab', indication: 'Moderate-to-severe', regimen: '~6 mg/kg IV induction, then 90 mg SC every 8 weeks' },
+  ],
+  'ptge-wzjg-2023': [
+    { drug: 'Mesalamine (mesalazyna)', indication: 'Mild-to-moderate UC', regimen: 'Oral ≥2–3 g/day plus rectal 1 g/day; combined dosing preferred' },
+    { drug: 'Budesonide MMX (budezonid MMX)', indication: 'Mild-to-moderate, induction', regimen: '9 mg orally once daily for up to 8 weeks' },
+    { drug: 'Infliximab (infliksymab)', indication: 'Moderate-to-severe / refractory', regimen: '5 mg/kg IV at weeks 0, 2, 6, then every 8 weeks' },
+  ],
+  'ptge-crohn-2021': [
+    { drug: 'Budesonide (budezonid)', indication: 'Mild ileocecal, induction', regimen: '9 mg orally once daily for up to 8 weeks' },
+    { drug: 'Azathioprine (azatiopryna)', indication: 'Maintenance', regimen: '2–2.5 mg/kg/day orally' },
+    { drug: 'Infliximab (infliksymab)', indication: 'Moderate-to-severe / fistulizing', regimen: '5 mg/kg IV at weeks 0, 2, 6, then every 8 weeks' },
+  ],
+  'ptge-h-pylori-2023': [
+    { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy (first-line in PL)', regimen: 'Standard dose orally twice daily for 14 days' },
+    { drug: 'Bismuth (bizmut)', indication: 'Bismuth quadruple therapy', regimen: 'Standard bismuth salt four times daily for 14 days' },
+    { drug: 'Tetracycline (tetracyklina)', indication: 'Bismuth quadruple therapy', regimen: '500 mg orally four times daily for 14 days' },
+    { drug: 'Metronidazole (metronidazol)', indication: 'Bismuth quadruple therapy', regimen: '500 mg orally three times daily for 14 days' },
+  ],
+  'npoa-c-difficile-2018': [
+    { drug: 'Vancomycin (wankomycyna)', indication: 'First-line', regimen: '125 mg orally four times daily for 10 days' },
+    { drug: 'Fidaxomicin (fidaksomycyna)', indication: 'First-line (lower recurrence)', regimen: '200 mg orally twice daily for 10 days' },
+    { drug: 'Metronidazole (metronidazol)', indication: 'Mild disease if preferred agents unavailable', regimen: '500 mg orally three times daily for 10 days' },
+  ],
 };

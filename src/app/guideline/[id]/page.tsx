@@ -14,6 +14,7 @@ import {
 import { CountryBadge, SocietyBadge, SpecialtyBadge, FreshnessBadge } from '@/components/badges';
 import RecommendationList from '@/components/RecommendationList';
 import DosingTable from '@/components/DosingTable';
+import PrintButton from '@/components/PrintButton';
 import { T } from '@/components/i18n';
 
 export function generateStaticParams() {
@@ -149,6 +150,7 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
               PDF ↗
             </a>
           )}
+          <PrintButton />
         </div>
         <p className="mt-3 text-xs text-slate-500">
           <T k="guideline.lastverified" /> {guideline.lastVerified} · <T k="guideline.sourceofrecord" />{' '}

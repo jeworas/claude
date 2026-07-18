@@ -147,6 +147,7 @@ const en: Dict = {
   'guideline.dosing.indication': 'Indication',
   'guideline.dosing.regimen': 'Regimen',
   'guideline.read': 'Read the full guideline',
+  'guideline.print': 'Print / Save PDF',
   'guideline.lastverified': 'Last verified',
   'guideline.sourceofrecord': 'Source of record:',
   'guideline.demo.warn':
@@ -321,6 +322,7 @@ const pl: Dict = {
   'guideline.dosing.indication': 'Wskazanie',
   'guideline.dosing.regimen': 'Schemat',
   'guideline.read': 'Przeczytaj pełną wytyczną',
+  'guideline.print': 'Drukuj / Zapisz PDF',
   'guideline.lastverified': 'Ostatnio zweryfikowano',
   'guideline.sourceofrecord': 'Źródło:',
   'guideline.demo.warn':
