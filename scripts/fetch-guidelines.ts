@@ -19,6 +19,11 @@
  *               extracting links. Needed for JavaScript-rendered sites and to
  *               get past many bot blocks (403 / connection reset). Install once:
  *               npm install -D playwright && npx playwright install chromium
+ *   --deep      Follow each discovered HTML guideline page one hop and pull the
+ *               PDF linked from it — reaches guidelines published as a web page
+ *               that links to the PDF (e.g. KDIGO), not a direct PDF on the index.
+ *   --all       Download every PDF, including ones whose name looks like noise
+ *               (forms, flyers, brochures). By default those are skipped.
  *
  * Filters: --specialty=<slug> --region=<US|EU|UK|PL|INT> --society=<id>
  *          --limit=<n> --json
@@ -49,6 +54,8 @@ const flags = {
   fetch: flag('fetch') || flag('download'),
   download: flag('download'),
   browser: flag('browser'),
+  deep: flag('deep'),
+  all: flag('all'),
   json: flag('json'),
   specialty: opt('specialty'),
   region: opt('region'),
@@ -211,29 +218,54 @@ interface FetchResult {
   downloaded: number;
 }
 
+/** Fetch a page's HTML via headless browser (--browser) or plain fetch. */
+async function getPage(url: string): Promise<{ html: string; status: number }> {
+  if (flags.browser) return fetchHtmlViaBrowser(url);
+  const res = await fetch(url, { headers: BROWSER_HEADERS, signal: AbortSignal.timeout(15000) });
+  return { html: res.ok ? await res.text() : '', status: res.status };
+}
+
+/**
+ * With --deep, follow each discovered HTML guideline page one hop and pull any
+ * PDF linked from it — this reaches guidelines that are published as a web page
+ * that links to the PDF (e.g. KDIGO), not as a direct PDF on the index.
+ */
+async function followForPdfs(docs: DiscoveredDoc[]): Promise<DiscoveredDoc[]> {
+  const pages = docs.filter((d) => !d.isPdf).slice(0, 30); // bound the crawl
+  const found: DiscoveredDoc[] = [];
+  const seen = new Set(docs.map((d) => d.url));
+  for (const page of pages) {
+    try {
+      const { html, status } = await getPage(page.url);
+      if (status >= 400 || !html) continue;
+      for (const a of parse(html).querySelectorAll('a')) {
+        const href = (a.getAttribute('href') || '').trim();
+        if (!href) continue;
+        let u: URL;
+        try {
+          u = new URL(href, page.url);
+        } catch {
+          continue;
+        }
+        if (extname(u.pathname).toLowerCase() !== '.pdf' || seen.has(u.href)) continue;
+        seen.add(u.href);
+        found.push({ title: page.title, url: u.href, isPdf: true });
+      }
+    } catch {
+      /* skip unreachable sub-page */
+    }
+  }
+  return found;
+}
+
 async function fetchIndex(society: Society): Promise<FetchResult> {
   try {
-    let html: string;
-    let status: number;
-    if (flags.browser) {
-      const r = await fetchHtmlViaBrowser(society.guidelinesIndexUrl);
-      html = r.html;
-      status = r.status;
-      if (status >= 400) {
-        return { reachable: false, status, note: `HTTP ${status}`, docs: [], downloaded: 0 };
-      }
-    } else {
-      const res = await fetch(society.guidelinesIndexUrl, {
-        headers: BROWSER_HEADERS,
-        signal: AbortSignal.timeout(15000),
-      });
-      if (!res.ok) {
-        return { reachable: false, status: res.status, note: `HTTP ${res.status}`, docs: [], downloaded: 0 };
-      }
-      html = await res.text();
-      status = res.status;
+    const { html, status } = await getPage(society.guidelinesIndexUrl);
+    if (status >= 400 || !html) {
+      return { reachable: false, status, note: `HTTP ${status}`, docs: [], downloaded: 0 };
     }
     const docs = discoverDocuments(html, society.guidelinesIndexUrl);
+    if (flags.deep) docs.push(...(await followForPdfs(docs)));
     let downloaded = 0;
     if (flags.download) downloaded = await downloadPdfs(society, docs);
     return { reachable: true, status, note: `HTTP ${status}`, docs, downloaded };
@@ -248,8 +280,18 @@ async function fetchIndex(society: Society): Promise<FetchResult> {
   }
 }
 
+// Filenames/titles that are almost never a guideline (skip on download unless --all).
+const NOISE_FILE =
+  /(donation|donate|\bform\b|flyer|flier|brochure|\bcard\b|poster|agenda|newsletter|registration|invoice|receipt|sponsor|membership|save[-_]the[-_]date|infographic|fact[-_ ]sheet)/i;
+
 async function downloadPdfs(society: Society, docs: DiscoveredDoc[]): Promise<number> {
-  const pdfs = docs.filter((d) => d.isPdf);
+  let pdfs = docs.filter((d) => d.isPdf);
+  if (!flags.all) {
+    pdfs = pdfs.filter((d) => {
+      const name = d.url.split('/').pop() || '';
+      return !NOISE_FILE.test(name) && !NOISE_FILE.test(d.title);
+    });
+  }
   if (pdfs.length === 0) return 0;
   const dir = join(root, 'downloads', society.id);
   mkdirSync(dir, { recursive: true });

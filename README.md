@@ -50,6 +50,7 @@ npm run build            # production build (fully static; runs offline)
 npm run start            # serve the production build
 npm run validate         # Zod data validation + flagship search assertions
 npm run sources          # build the guideline-source download worklist
+npm run triage           # rank downloaded PDFs: real guideline vs. noise
 npm run check-updates    # demo update-checker (live fetch, fixture fallback)
 npm run gen:known-urls   # regenerate data/known-urls.json from the seed data
 npm run lint
@@ -67,10 +68,21 @@ npm run sources -- --specialty=cardiology
 npm run sources -- --region=PL --json
 npm run sources -- --fetch               # reach each index (needs network)
 npm run sources -- --fetch --browser     # render JS sites / bypass bot blocks
+npm run sources -- --download --deep     # follow HTML guideline pages to their PDF
 npm run sources -- --download --society=acg
 ```
 
-Many society sites render their guideline lists with JavaScript or block plain requests (403 / connection reset). `--browser` drives a headless Chromium (Playwright) so the page renders before links are extracted. Playwright is an optional dependency — install it once with `npm install -D playwright && npx playwright install chromium`; the default path needs nothing.
+Many society sites render their guideline lists with JavaScript or block plain requests (403 / connection reset). `--browser` drives a headless Chromium (Playwright) so the page renders before links are extracted. Playwright is an optional dependency — install it once with `npm install -D playwright && npx playwright install chromium`; the default path needs nothing. `--deep` follows each discovered guideline page one hop to pull the PDF it links to (for guidelines published as a web page, e.g. KDIGO). By default the downloader skips files whose name looks like noise (forms, flyers, brochures); pass `--all` to keep everything.
+
+## Triaging downloaded PDFs
+
+Society folders fill up with non-guideline PDFs (donation forms, patient flyers, brochures). `npm run triage` reads every PDF under `downloads/`, scores each as **guideline / maybe / noise** from its text and filename, writes a ranked `downloads/triage-report.md`, and dumps the extracted text of the strong candidates to `downloads/_text/` — ready to hand to ingestion. Uses `pdf-parse` (optional): `npm install -D pdf-parse`.
+
+```bash
+npm run triage                       # scan downloads/
+npm run triage -- --dir=downloads/nkf --min=20
+npm run triage -- --json
+```
 
 ## The bilingual update-checker
 
@@ -110,7 +122,8 @@ src/app/                   Routes: /, /search, /guideline/[id], /condition/[id],
                            /societies, /societies/[id], /about
 scripts/
   validate.ts             npm run validate
-  fetch-guidelines.ts     npm run sources
+  fetch-guidelines.ts     npm run sources  (--download / --browser / --deep)
+  triage.ts               npm run triage   (rank downloaded PDFs)
   gen-known-urls.ts       npm run gen:known-urls
   check-updates.mjs        npm run check-updates
   fixtures/               Mock HTML for offline scraper demo
