@@ -1,0 +1,281 @@
+{
+  "note": "Auto-generated from data/guidelines by `npm run gen:known-urls`. The update-checker (scripts/check-updates.mjs) diffs guideline links discovered on society index pages against this list. Do not edit by hand.",
+  "sources": [
+    {
+      "societyId": "acg",
+      "abbreviation": "ACG",
+      "indexUrl": "https://gi.org/guidelines/"
+    },
+    {
+      "societyId": "aga",
+      "abbreviation": "AGA",
+      "indexUrl": "https://gastro.org/clinical-guidance/"
+    },
+    {
+      "societyId": "ptg-e",
+      "abbreviation": "PTG-E",
+      "indexUrl": "https://ptg-e.org.pl/wytyczne/"
+    },
+    {
+      "societyId": "npoa",
+      "abbreviation": "NPOA",
+      "indexUrl": "https://antybiotyki.edu.pl/rekomendacje/"
+    },
+    {
+      "societyId": "ptd",
+      "abbreviation": "PTD",
+      "indexUrl": "https://ptdiab.pl/zalecenia-ptd"
+    },
+    {
+      "societyId": "ptnt",
+      "abbreviation": "PTNT",
+      "indexUrl": "https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt"
+    },
+    {
+      "societyId": "ada",
+      "abbreviation": "ADA",
+      "indexUrl": "https://professional.diabetes.org/standards-of-care"
+    },
+    {
+      "societyId": "aha-acc",
+      "abbreviation": "AHA/ACC",
+      "indexUrl": "https://professional.heart.org/en/guidelines-and-statements"
+    }
+  ],
+  "known": [
+    {
+      "id": "acg-ulcerative-colitis-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline Update: Ulcerative Colitis in Adults",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-crohns-disease-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Management of Crohn's Disease in Adults",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-c-difficile-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guidelines: Prevention, Diagnosis, and Treatment of Clostridioides difficile Infections",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-h-pylori-2024",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Treatment of Helicobacter pylori Infection",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-gerd-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-eoe-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Eosinophilic Esophagitis",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-celiac-2023",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guidelines: Diagnosis and Management of Celiac Disease",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-acute-pancreatitis-2024",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Management of Acute Pancreatitis",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-ibs-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Management of Irritable Bowel Syndrome",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-crc-screening-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guidelines: Colorectal Cancer Screening 2021",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-barretts-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Barrett's Esophagus",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-dyspepsia-2017",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG and CAG Clinical Guideline: Management of Dyspepsia",
+      "titleLocal": null,
+      "url": "https://gi.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "aga-ulcerative-colitis-2024",
+      "societyId": "aga",
+      "country": "US",
+      "title": "AGA Living Clinical Practice Guideline on Pharmacological Management of Moderate-to-Severe Ulcerative Colitis",
+      "titleLocal": null,
+      "url": "https://gastro.org/clinical-guidance/",
+      "pdfUrl": null
+    },
+    {
+      "id": "aga-crohns-disease-2025",
+      "societyId": "aga",
+      "country": "US",
+      "title": "AGA Living Clinical Practice Guideline on Pharmacological Management of Moderate-to-Severe Crohn’s Disease",
+      "titleLocal": null,
+      "url": "https://gastro.org/clinical-guidance/",
+      "pdfUrl": null
+    },
+    {
+      "id": "aga-microscopic-colitis-2016",
+      "societyId": "aga",
+      "country": "US",
+      "title": "AGA Institute Guideline on the Medical Management of Microscopic Colitis",
+      "titleLocal": null,
+      "url": "https://gastro.org/clinical-guidance/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-wzjg-2023",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on the Management of Ulcerative Colitis",
+      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii postępowania w wrzodziejącym zapaleniu jelita grubego",
+      "url": "https://ptg-e.org.pl/wytyczne/ibd/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf"
+    },
+    {
+      "id": "ptge-crohn-2021",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on the Management of Crohn's Disease",
+      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii postępowania w chorobie Leśniowskiego-Crohna",
+      "url": "https://ptg-e.org.pl/wytyczne/ibd/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf"
+    },
+    {
+      "id": "ptge-h-pylori-2023",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Diagnosis and Treatment of Helicobacter pylori Infection — Recommendations of the PTG-E Working Group",
+      "titleLocal": "Rozpoznawanie i leczenie zakażenia Helicobacter pylori — rekomendacje Grupy Roboczej PTG-E",
+      "url": "https://ptg-e.org.pl/wytyczne/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-gerd-2022",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Diagnostic and Therapeutic Management of Gastroesophageal Reflux Disease — Consensus of the PTG-E",
+      "titleLocal": "Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku — konsensus PTG-E",
+      "url": "https://ptg-e.org.pl/en/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-ibs-2018",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Diagnostic and Therapeutic Recommendations for Irritable Bowel Syndrome",
+      "titleLocal": "Rekomendacje diagnostyczno-terapeutyczne w zespole jelita nadwrażliwego",
+      "url": "https://ptg-e.org.pl/wytyczne/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-chronic-pancreatitis-2021",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Recommendations for the Diagnosis and Treatment of Chronic Pancreatitis (PTG-E and Pancreatic Club)",
+      "titleLocal": "Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki",
+      "url": "https://ptg-e.org.pl/wytyczne/",
+      "pdfUrl": null
+    },
+    {
+      "id": "npoa-c-difficile-2018",
+      "societyId": "npoa",
+      "country": "PL",
+      "title": "Clostridioides difficile Infection — Epidemiology, Diagnosis, Therapy and Prevention (Polish National Recommendations)",
+      "titleLocal": "Zakażenia Clostridioides difficile — epidemiologia, diagnostyka, terapia i profilaktyka",
+      "url": "https://antybiotyki.edu.pl/rekomendacje/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptd-diabetes-2026",
+      "societyId": "ptd",
+      "country": "PL",
+      "title": "Clinical Recommendations for the Management of Diabetes 2026 — Diabetes Poland",
+      "titleLocal": "Zalecenia kliniczne dotyczące postępowania u osób z cukrzycą 2026",
+      "url": "https://ptdiab.pl/zalecenia-ptd",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptnt-hypertension-2024",
+      "societyId": "ptnt",
+      "country": "PL",
+      "title": "Guidelines for the Management of Arterial Hypertension 2024 — Polish Society of Hypertension",
+      "titleLocal": "Wytyczne postępowania w nadciśnieniu tętniczym 2024",
+      "url": "https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt",
+      "pdfUrl": null
+    },
+    {
+      "id": "ada-standards-2026",
+      "societyId": "ada",
+      "country": "US",
+      "title": "Standards of Care in Diabetes — 2026",
+      "titleLocal": null,
+      "url": "https://professional.diabetes.org/standards-of-care",
+      "pdfUrl": null
+    },
+    {
+      "id": "aha-acc-hypertension-2025",
+      "societyId": "aha-acc",
+      "country": "US",
+      "title": "2025 Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults",
+      "titleLocal": null,
+      "url": "https://professional.heart.org/en/guidelines-and-statements",
+      "pdfUrl": null
+    }
+  ]
+}
