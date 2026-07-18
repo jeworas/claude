@@ -95,4 +95,7 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
   'acr-aao-hcq-retinopathy-2020': [
     { drug: 'Hydroxychloroquine', indication: 'Ceiling to limit retinal toxicity', regimen: '≤5 mg/kg/day of actual body weight' },
   ],
+  'era-ckd-associated-pruritus': [
+    { drug: 'Difelikefalin', indication: 'Moderate-to-severe CKD-aP in haemodialysis', regimen: '0.5 mcg/kg IV three times weekly, into the dialysis circuit at end of session' },
+  ],
 };

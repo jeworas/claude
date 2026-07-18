@@ -1359,5 +1359,26 @@ export const conditions: Condition[] = [
       "C61"
     ],
     "specialty": "urology"
+  },
+  {
+    "id": "ckd-associated-pruritus",
+    "nameEn": "Chronic kidney disease-associated pruritus",
+    "namePl": "Świąd związany z przewlekłą chorobą nerek",
+    "synonymsEn": [
+      "uraemic pruritus",
+      "uremic pruritus",
+      "dialysis itch",
+      "renal pruritus"
+    ],
+    "synonymsPl": [
+      "świąd mocznicowy"
+    ],
+    "abbreviations": [
+      "CKD-aP"
+    ],
+    "icd10": [
+      "L29.8"
+    ],
+    "specialty": "nephrology"
   }
 ];

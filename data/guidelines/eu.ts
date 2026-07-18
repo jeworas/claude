@@ -884,5 +884,51 @@ export const euGuidelines: Guideline[] = [
     ],
     "lastVerified": "2026-07-18",
     "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "era-ckd-associated-pruritus",
+    "societyId": "era",
+    "conditionIds": ["ckd-associated-pruritus"],
+    "title": "ERA Educational Review: Chronic Kidney Disease-Associated Pruritus (CKD-aP)",
+    "language": "en",
+    "specialty": "nephrology",
+    "year": 2025,
+    "status": "current",
+    "sourceUrl": "https://www.era-online.org/guidelines/",
+    "citation": "European Renal Association (ERA) educational review: Chronic kidney disease-associated pruritus (CKD-aP). era-online.org.",
+    "summary": "An ERA educational review of chronic kidney disease-associated pruritus (CKD-aP, formerly uraemic pruritus) — a common, under-recognised and undertreated symptom in advanced CKD and haemodialysis that impairs quality of life. It sets out a multimodal, severity-guided approach: routine symptom screening, skin-directed therapy first, gabapentin or pregabalin as the systemic treatment of choice, and selective κ-opioid receptor agonists (difelikefalin, anrikefon) for moderate-to-severe disease.",
+    "keyRecommendations": [
+      {
+        "topic": "Recognition and screening",
+        "text": "CKD-aP is highly prevalent in advanced CKD and haemodialysis (moderate-to-severe in roughly a third of HD patients) yet frequently unreported and untreated; screen routinely with a validated itch scale such as the Worst Itching Intensity Numerical Rating Scale.",
+        "lineOfTherapy": "screening"
+      },
+      {
+        "topic": "First-line skin-directed therapy",
+        "text": "Begin with skin-directed treatment, especially where xerosis coexists: regular emollients to restore the skin barrier, with topical pramoxine or capsaicin for additional relief.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["emollient", "capsaicin", "pramoxine"]
+      },
+      {
+        "topic": "Systemic pharmacotherapy",
+        "text": "Gabapentin or pregabalin are the systemic pharmacological treatments of choice, with dose reduction for renal function and monitoring for neurological effects; conventional antihistamines are not routinely recommended.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["gabapentin", "pregabalin"]
+      },
+      {
+        "topic": "κ-opioid receptor agonists",
+        "text": "For moderate-to-severe CKD-aP, selective κ-opioid receptor agonists — difelikefalin (given intravenously three times weekly with dialysis) and the newer anrikefon — significantly reduce itch intensity and improve itch-related quality of life.",
+        "evidenceGrade": "Phase III RCT evidence (KALM-1/KALM-2)",
+        "lineOfTherapy": "escalation",
+        "drugs": ["difelikefalin", "anrikefon"]
+      },
+      {
+        "topic": "Dialysis and mineral metabolism",
+        "text": "Optimise dialysis adequacy and correct calcium-phosphate and mineral disturbances, which may further reduce symptom burden.",
+        "lineOfTherapy": "supportive"
+      }
+    ],
+    "lastVerified": "2026-07-18",
+    "dataProvenance": "hand-curated-demo"
   }
 ];

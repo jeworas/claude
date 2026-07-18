@@ -52,6 +52,11 @@
       "indexUrl": "https://www.kidney.org/professionals/guidelines"
     },
     {
+      "societyId": "era",
+      "abbreviation": "ERA",
+      "indexUrl": "https://www.era-online.org/guidelines/"
+    },
+    {
       "societyId": "ptnt",
       "abbreviation": "PTNT",
       "indexUrl": "https://www.nadcisnienietetnicze.pl/"
@@ -877,6 +882,15 @@
       "title": "European Guideline on Chronic Nausea and Vomiting - A UEG and ESNM Consensus for Clinical Management",
       "titleLocal": null,
       "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/ueg2.12711",
+      "pdfUrl": null
+    },
+    {
+      "id": "era-ckd-associated-pruritus",
+      "societyId": "era",
+      "country": "EU",
+      "title": "ERA Educational Review: Chronic Kidney Disease-Associated Pruritus (CKD-aP)",
+      "titleLocal": null,
+      "url": "https://www.era-online.org/guidelines/",
       "pdfUrl": null
     },
     {

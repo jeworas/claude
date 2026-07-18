@@ -251,6 +251,12 @@ check('“dabrafenib” is cross-referenced to ATC', (drugsForQuery('dabrafenib'
 check('urology condition exists (prostate cancer)', getCondition('prostate-cancer')?.specialty === 'urology');
 check('“prostate cancer” finds the AUA guideline', search('prostate cancer').some((r) => r.guideline.id === 'aua-suo-prostate-early-detection-2023'));
 check('pembrolizumab cross-references ATC (enriched systemic therapy)', (drugsForQuery('pembrolizumab')[0]?.conditions ?? []).some((c) => c.condition.id === 'anaplastic-thyroid-cancer'));
+check('CKD-associated pruritus condition exists (nephrology)', getCondition('ckd-associated-pruritus')?.specialty === 'nephrology');
+check('Polish “świąd mocznicowy” finds CKD-aP', search('świąd mocznicowy').some((r) => r.guideline.id === 'era-ckd-associated-pruritus'));
+check('“difelikefalin” indexed with dosing', (() => {
+  const d = drugsForQuery('difelikefalin')[0];
+  return !!d && d.conditions.some((c) => c.guidelines.some((u) => u.doses.length > 0));
+})());
 
 console.log('');
 if (failures > 0) {
