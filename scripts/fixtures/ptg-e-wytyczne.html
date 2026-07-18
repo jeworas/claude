@@ -1,59 +1,63 @@
 <!--
   REPRESENTATIVE MOCK FIXTURE — not a live capture.
-  Hand-authored to mirror the structure of https://ptg-e.org.pl/wytyczne/ (a
-  WordPress site) so the update-checker can be demonstrated offline. Individual
-  guideline pages live at ptg-e.org.pl/wytyczne/<slug>/; category pages
-  (/wytyczne/ibd/, /wytyczne/endoskopia/, ...) and PDF uploads also appear.
-  Includes guidelines already in the seed dataset (KNOWN) and an invented new
-  one (NEW) to demonstrate the diff. Link text is in Polish, as on the real site.
+  Hand-generated to mirror https://ptg-e.org.pl/wytyczne/ (WordPress). Guideline pages
+  live at ptg-e.org.pl/wytyczne/<slug>/; category pages (/wytyczne/ibd/ etc.) and PDF
+  uploads also appear. Lists dataset guidelines (KNOWN) plus two invented NEW ones.
+  Link text is Polish, as on the real site.
 -->
 <!DOCTYPE html>
 <html lang="pl">
 <head><meta charset="utf-8"><title>Wytyczne - Polskie Towarzystwo Gastroenterologii</title></head>
 <body>
-  <header>
-    <nav>
-      <a href="https://ptg-e.org.pl/">Strona główna</a>
-      <a href="https://ptg-e.org.pl/wytyczne/">Wytyczne</a>
-      <!-- Category pages — should be filtered out, not treated as guidelines -->
-      <a href="https://ptg-e.org.pl/wytyczne/ibd/">Nieswoiste choroby zapalne jelit</a>
-      <a href="https://ptg-e.org.pl/wytyczne/endoskopia/">Endoskopia</a>
-      <a href="https://ptg-e.org.pl/wytyczne/pankreatologia/">Pankreatologia</a>
-    </nav>
-  </header>
-
+  <header><nav>
+    <a href="https://ptg-e.org.pl/">Strona główna</a>
+    <a href="https://ptg-e.org.pl/wytyczne/">Wytyczne</a>
+    <a href="https://ptg-e.org.pl/wytyczne/ibd/">Nieswoiste choroby zapalne jelit</a>
+    <a href="https://ptg-e.org.pl/wytyczne/endoskopia/">Endoskopia</a>
+    <a href="https://ptg-e.org.pl/wytyczne/pankreatologia/">Pankreatologia</a>
+  </nav></header>
   <main class="wytyczne">
     <h1>Wytyczne i rekomendacje PTG-E</h1>
     <ul>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-w-wrzodziejacym-zapaleniu-jelita-grubego/">Wytyczne postępowania w wrzodziejącym zapaleniu jelita grubego</a>
-        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf">PDF</a>
-      </li>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-w-chorobie-lesniowskiego-crohna/">Wytyczne postępowania w chorobie Leśniowskiego-Crohna</a>
-        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf">PDF</a>
-      </li>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/rozpoznawanie-i-leczenie-zakazenia-helicobacter-pylori/">Rozpoznawanie i leczenie zakażenia Helicobacter pylori — rekomendacje Grupy Roboczej PTG-E</a>
-      </li>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/rekomendacje-diagnostyczno-terapeutyczne-w-zespole-jelita-nadwrazliwego/">Rekomendacje diagnostyczno-terapeutyczne w zespole jelita nadwrażliwego</a>
-      </li>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-diagnostyczno-terapeutyczne-w-chorobie-refluksowej-przelyku/">Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku</a>
-      </li>
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/zalecenia-w-przewleklym-zapaleniu-trzustki/">Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki</a>
-      </li>
-
-      <!-- Guideline NOT in the seed dataset — should be reported as NEW -->
-      <li>
-        <a href="https://ptg-e.org.pl/wytyczne/wytyczne-dotyczace-rozpoznawania-i-leczenia-celiakii/">Wytyczne PTG-E dotyczące rozpoznawania i leczenia celiakii</a>
-        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2024/05/celiakia-2024.pdf">PDF</a>
-      </li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/wzjg-2023/">Wytyczne Polskiego Towarzystwa Gastroenterologii i Konsultanta Krajowego w dziedzinie Gastroenterologii dotyczące postępowania z pacjentem z wrzodziejącym zapaleniem jelita grubego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/crohn-2021/">Wytyczne Polskiego Towarzystwa Gastroenterologii i Konsultanta Krajowego w dziedzinie Gastroenterologii dotyczące postępowania z pacjentem z chorobą Leśniowskiego-Crohna</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/h-pylori-2023/">Diagnostyka i leczenie zakażenia Helicobacter pylori – rekomendacje Grupy Roboczej Polskiego Towarzystwa Gastroenterologii</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/ibs-2018/">Rekomendacje diagnostyczno-terapeutyczne w zespole jelita nadwrażliwego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/Wytyczne-IBS-pol-2018.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/gerd-2022/">Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku – konsensus Polskiego Towarzystwa Gastroenterologii</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/07/wytyczne_ptge2022_choroba_refluksowa_przelyku.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/chronic-pancreatitis-2021/">Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki. Rekomendacje Grupy Roboczej Konsultanta Krajowego w dziedzinie Gastroenterologii i Polskiego Klubu Trzustkowego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/RPG_1_2018.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/nafld-2019/">Postępowanie z chorymi na niealkoholową stłuszczeniową chorobę wątroby – Zalecenia Polskiej Grupy Ekspertów NAFLD</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/cholestatic-2018/">Choroby cholestatyczne u dorosłych – wytyczne postępowania Sekcji Hepatologicznej Polskiego Towarzystwa Gastroenterologii</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/Cholestaza.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/liver-biliary-poz-2017/">Rekomendacje postępowania u chorych z zaburzeniami czynności wątroby i kamicą dróg żółciowych dla lekarzy POZ</a>
+        <a class="pdf" href="http://ptg-e.org.pl/wp-content/uploads/2022/03/LPOZ_Art_30711-10-1.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/pancreatic-cancer-2019/">Zalecenia diagnostyczne i terapeutyczne w gruczolakoraku przewodowym trzustki – rekomendacje Grupy Roboczej Polskiego Klubu Trzustkowego</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/acute-pancreatitis-2016/">Postępowanie w ostrym zapaleniu trzustki – rekomendacje Polskiego Klubu Trzustkowego</a>
+        <a class="pdf" href="https://www.termedia.pl/Management-of-acute-pancreatitis-AP-Polish-Pancreatic-Club-recommendations,41,27681,1,1.html">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/pancreatic-cystic-tumors-2025/">Zalecenia diagnostyczno-terapeutyczne w torbielowatych guzach trzustki – rekomendacje ekspertów Polskiego Klubu Trzustkowego</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/pancreatic-fluid-collections-2025/">Wytyczne leczenia endoskopowego pozapalnych zbiorników płynowych trzustki i okolicy trzustki</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2026/03/Jagielski_guidelines.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/clinical-nutrition-2025/">Żywienie kliniczne w chorobach przewodu pokarmowego – aktualne wytyczne praktyki klinicznej. Zalecenia Sekcji Żywienia Klinicznego i Metabolizmu Polskiego Towarzystwa Gastroenterologii</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2025/06/Zalecenia_Sekcji_Zywienia_Klinicznego_i_Metabolizmu.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/microscopic-colitis-2025/">Diagnostyka i leczenie mikroskopowego zapalenia jelita grubego – stanowisko ekspertów Polskiego Towarzystwa Gastroenterologii</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/gerd-primary-care-2019/">Postępowanie u pacjentów z objawami choroby refluksowej przełyku – rekomendacje dla lekarzy rodzinnych</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/rekomendacje_GERD_2019_LPOZ.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/ibd-primary-care-2017/">Wytyczne postępowania z chorymi na nieswoiste choroby zapalne jelit w praktyce lekarza rodzinnego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/LPOZ_Art_29565-10.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/diverticular-2015/">Polski konsensus interdyscyplinarny dotyczący diagnostyki i leczenia choroby uchyłkowej okrężnicy</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/colonoscopy-surveillance-2011/">Wytyczne Polskiego Towarzystwa Gastroenterologii dotyczące nadzoru kolonoskopowego po polipektomii – adaptacja wytycznych europejskich</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/ugib-2008/">Wytyczne postępowania w krwawieniu z górnego odcinka przewodu pokarmowego pochodzenia nieżylakowego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/03/PG_Art_9988-1.pdf">PDF</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/antithrombotic-endoscopy-2012/">Endoskopia przewodu pokarmowego u chorych przyjmujących leki przeciwpłytkowe i przeciwzakrzepowe – wytyczne PTG-E i Konsultanta Krajowego</a></li>
+      <!-- Guidelines NOT in the dataset — should be reported as NEW -->
+      <li><a href="https://ptg-e.org.pl/wytyczne/celiakia-doroslych/">Wytyczne PTG-E dotyczące rozpoznawania i leczenia celiakii u dorosłych</a></li>
+      <li><a href="https://ptg-e.org.pl/wytyczne/choroba-wilsona/">Stanowisko PTG-E dotyczące choroby Wilsona</a></li>
     </ul>
   </main>
-
   <footer><a href="https://ptg-e.org.pl/kontakt/">Kontakt</a></footer>
 </body>
 </html>

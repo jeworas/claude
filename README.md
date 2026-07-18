@@ -10,8 +10,8 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 
 ## What it does
 
-- **Maps societies** in the US and Poland (ACG, AGA, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC).
-- **Indexes ~26 real guidelines** with structured treatment summaries (deep gastroenterology + diabetes/hypertension for breadth).
+- **Maps societies** in the US and Poland (ACG, AGA, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC) — with ACG and PTG-E covered in full.
+- **Indexes 65 real guidelines** with structured treatment summaries — the full current ACG and PTG-E gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
 - **Bilingual search** — `colitis`, `UC`, `WZJG` and `wrzodziejące zapalenie jelita grubego` all resolve to ulcerative colitis; the UI shows *which* term matched.
 - **Freshness tracking** — every guideline shows its year and a currency badge (current / aging / superseded).
 - **Condition comparison** — see US vs Polish guidance side by side.

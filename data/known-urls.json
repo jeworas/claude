@@ -47,9 +47,9 @@
       "id": "acg-ulcerative-colitis-2025",
       "societyId": "acg",
       "country": "US",
-      "title": "ACG Clinical Guideline Update: Ulcerative Colitis in Adults",
+      "title": "ACG Clinical Guideline: Ulcerative Colitis in Adults",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2025/06000/acg_clinical_guideline_update__ulcerative_colitis.13.aspx",
       "pdfUrl": null
     },
     {
@@ -58,7 +58,7 @@
       "country": "US",
       "title": "ACG Clinical Guideline: Management of Crohn's Disease in Adults",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2025/06000/acg_clinical_guideline__management_of_crohn_s.14.aspx",
       "pdfUrl": null
     },
     {
@@ -67,7 +67,7 @@
       "country": "US",
       "title": "ACG Clinical Guidelines: Prevention, Diagnosis, and Treatment of Clostridioides difficile Infections",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2021/06000/acg_clinical_guidelines__prevention,_diagnosis,.12.aspx",
       "pdfUrl": null
     },
     {
@@ -76,7 +76,7 @@
       "country": "US",
       "title": "ACG Clinical Guideline: Treatment of Helicobacter pylori Infection",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2024/09000/acg_clinical_guideline__treatment_of_helicobacter.13.aspx",
       "pdfUrl": null
     },
     {
@@ -85,7 +85,7 @@
       "country": "US",
       "title": "ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2022/01000/acg_clinical_guideline_for_the_diagnosis_and.14.aspx",
       "pdfUrl": null
     },
     {
@@ -94,25 +94,25 @@
       "country": "US",
       "title": "ACG Clinical Guideline: Diagnosis and Management of Eosinophilic Esophagitis",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2025/01000/acg_clinical_guideline__diagnosis_and_management.16.aspx",
       "pdfUrl": null
     },
     {
       "id": "acg-celiac-2023",
       "societyId": "acg",
       "country": "US",
-      "title": "ACG Clinical Guidelines: Diagnosis and Management of Celiac Disease",
+      "title": "American College of Gastroenterology Guidelines Update: Diagnosis and Management of Celiac Disease",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2023/01000/american_college_of_gastroenterology_guidelines.17.aspx",
       "pdfUrl": null
     },
     {
       "id": "acg-acute-pancreatitis-2024",
       "societyId": "acg",
       "country": "US",
-      "title": "ACG Clinical Guideline: Management of Acute Pancreatitis",
+      "title": "American College of Gastroenterology Guidelines: Management of Acute Pancreatitis",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2024/03000/american_college_of_gastroenterology_guidelines_.10.aspx",
       "pdfUrl": null
     },
     {
@@ -121,7 +121,7 @@
       "country": "US",
       "title": "ACG Clinical Guideline: Management of Irritable Bowel Syndrome",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2021/01000/acg_clinical_guideline__management_of_irritable.11.aspx",
       "pdfUrl": null
     },
     {
@@ -130,16 +130,7 @@
       "country": "US",
       "title": "ACG Clinical Guidelines: Colorectal Cancer Screening 2021",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
-      "pdfUrl": null
-    },
-    {
-      "id": "acg-barretts-2022",
-      "societyId": "acg",
-      "country": "US",
-      "title": "ACG Clinical Guideline: Diagnosis and Management of Barrett's Esophagus",
-      "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2021/03000/acg_clinical_guidelines__colorectal_cancer.14.aspx",
       "pdfUrl": null
     },
     {
@@ -148,7 +139,232 @@
       "country": "US",
       "title": "ACG and CAG Clinical Guideline: Management of Dyspepsia",
       "titleLocal": null,
-      "url": "https://gi.org/guidelines/",
+      "url": "https://journals.lww.com/ajg/fulltext/2017/07000/acg_and_cag_clinical_guideline__management_of.18.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-barretts-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "Diagnosis and Management of Barrett's Esophagus: An Updated ACG Guideline",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2022/04000/diagnosis_and_management_of_barrett_s_esophagus_.17.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-chronic-pancreatitis-2020",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Chronic Pancreatitis",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2020/03000/acg_clinical_guideline__chronic_pancreatitis.9.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-gastroparesis-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Gastroparesis",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2022/08000/acg_clinical_guideline__gastroparesis.15.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-upper-gi-bleeding-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Upper Gastrointestinal and Ulcer Bleeding",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2021/05000/acg_clinical_guideline__upper_gastrointestinal_and.14.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-lower-gi-bleeding-2016",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Management of Patients With Acute Lower Gastrointestinal Bleeding",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2016/04000/acg_clinical_guideline__management_of_patients.14.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-small-bowel-bleeding-2015",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Small Bowel Bleeding",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2015/09000/acg_clinical_guideline__diagnosis_and_management.10.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-abnormal-liver-chemistries-2017",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Evaluation of Abnormal Liver Chemistries",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2017/01000/acg_clinical_guideline__evaluation_of_abnormal.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-dili-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Idiosyncratic Drug-Induced Liver Injury",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2021/05000/acg_clinical_guideline__diagnosis_and_management.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-alcohol-associated-liver-disease-2024",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Alcohol-Associated Liver Disease",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2024/01000/acg_clinical_guideline__alcohol_associated_liver.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-primary-sclerosing-cholangitis-2015",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Primary Sclerosing Cholangitis",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2015/05000/acg_clinical_guideline__primary_sclerosing.10.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-focal-liver-lesions-2024",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Focal Liver Lesions",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2024/07000/acg_clinical_guideline__focal_liver_lesions.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-acute-liver-failure-2023",
+      "societyId": "acg",
+      "country": "US",
+      "title": "Acute Liver Failure Guidelines",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2023/07000/acute_liver_failure_guidelines.14.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-preventive-care-ibd-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Preventive Care in Inflammatory Bowel Disease",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2025/07000/acg_clinical_guideline_update__preventive_care_in.15.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-hereditary-gi-cancer-2015",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Genetic Testing and Management of Hereditary Gastrointestinal Cancer Syndromes",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2015/02000/acg_clinical_guideline__genetic_testing_and.8.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-colon-ischemia-2015",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Epidemiology, Risk Factors, Patterns of Presentation, Diagnosis, and Management of Colon Ischemia (CI)",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2015/01000/acg_clinical_guideline__epidemiology,_risk_factors.8.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-achalasia-2020",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guidelines: Diagnosis and Management of Achalasia",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2020/09000/acg_clinical_guidelines__diagnosis_and_management.18.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-pancreatic-cysts-2018",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Pancreatic Cysts",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2018/04000/acg_clinical_guideline__diagnosis_and_management.18.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-antithrombotic-gi-bleeding-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "American College of Gastroenterology-Canadian Association of Gastroenterology Clinical Practice Guideline: Management of Anticoagulants and Antiplatelets During Acute Gastrointestinal Bleeding and the Periendoscopic Period",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2022/04000/american_college_of_gastroenterology_canadian.16.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-sibo-2020",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Small Intestinal Bacterial Overgrowth",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2020/02000/acg_clinical_guideline__small_intestinal_bacterial.9.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-chronic-idiopathic-constipation-2023",
+      "societyId": "acg",
+      "country": "US",
+      "title": "American Gastroenterological Association-American College of Gastroenterology Clinical Practice Guideline: Pharmacological Management of Chronic Idiopathic Constipation",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2023/06000/american_gastroenterological_association_american.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-benign-anorectal-disorders-2021",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guidelines: Management of Benign Anorectal Disorders",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2021/10000/acg_clinical_guidelines__management_of_benign.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-gastric-premalignant-conditions-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Gastric Premalignant Conditions",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2025/04000/acg_clinical_guideline__diagnosis_and_management.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-colonic-diverticulitis-2026",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Colonic Diverticulitis",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2026/07000/acg_clinical_guideline__colonic_diverticulitis.13.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-hepatic-encephalopathy-2026",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Hepatic Encephalopathy",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2026/03000/acg_clinical_guideline__hepatic_encephalopathy.12.aspx",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-liver-disease-pregnancy-2016",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Liver Disease and Pregnancy",
+      "titleLocal": null,
+      "url": "https://journals.lww.com/ajg/fulltext/2016/02000/acg_clinical_guideline__liver_disease_and.15.aspx",
       "pdfUrl": null
     },
     {
@@ -183,8 +399,8 @@
       "societyId": "ptg-e",
       "country": "PL",
       "title": "PTG-E Guidelines on the Management of Ulcerative Colitis",
-      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii postępowania w wrzodziejącym zapaleniu jelita grubego",
-      "url": "https://ptg-e.org.pl/wytyczne/ibd/",
+      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii i Konsultanta Krajowego w dziedzinie Gastroenterologii dotyczące postępowania z pacjentem z wrzodziejącym zapaleniem jelita grubego",
+      "url": "https://ptg-e.org.pl/wytyczne/wytyczne-polskiego-towarzystwa-gastroenterologii-i-konsultanta-krajowego-w-dziedzinie-gastroenterologii-dotyczace-postepowania-z-pacjentem-z-wrzodziejacym-zapaleniem-jelita-grubego/",
       "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf"
     },
     {
@@ -192,44 +408,179 @@
       "societyId": "ptg-e",
       "country": "PL",
       "title": "PTG-E Guidelines on the Management of Crohn's Disease",
-      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii postępowania w chorobie Leśniowskiego-Crohna",
-      "url": "https://ptg-e.org.pl/wytyczne/ibd/",
+      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii i Konsultanta Krajowego w dziedzinie Gastroenterologii dotyczące postępowania z pacjentem z chorobą Leśniowskiego-Crohna",
+      "url": "https://ptg-e.org.pl/wytyczne/wytyczne-ptge-konsultanta-krajowego-w-dziedzinie-gastroenterologii-dotyczace-postepowania-z-pacjentem-z-choroba-lesniowskiego-crohna/",
       "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf"
     },
     {
       "id": "ptge-h-pylori-2023",
       "societyId": "ptg-e",
       "country": "PL",
-      "title": "Diagnosis and Treatment of Helicobacter pylori Infection — Recommendations of the PTG-E Working Group",
-      "titleLocal": "Rozpoznawanie i leczenie zakażenia Helicobacter pylori — rekomendacje Grupy Roboczej PTG-E",
+      "title": "PTG-E Guidelines on the Diagnosis and Treatment of Helicobacter pylori Infection",
+      "titleLocal": "Diagnostyka i leczenie zakażenia Helicobacter pylori – rekomendacje Grupy Roboczej Polskiego Towarzystwa Gastroenterologii",
       "url": "https://ptg-e.org.pl/wytyczne/",
-      "pdfUrl": null
-    },
-    {
-      "id": "ptge-gerd-2022",
-      "societyId": "ptg-e",
-      "country": "PL",
-      "title": "Diagnostic and Therapeutic Management of Gastroesophageal Reflux Disease — Consensus of the PTG-E",
-      "titleLocal": "Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku — konsensus PTG-E",
-      "url": "https://ptg-e.org.pl/en/guidelines/",
       "pdfUrl": null
     },
     {
       "id": "ptge-ibs-2018",
       "societyId": "ptg-e",
       "country": "PL",
-      "title": "Diagnostic and Therapeutic Recommendations for Irritable Bowel Syndrome",
+      "title": "PTG-E Diagnostic and Therapeutic Recommendations for Irritable Bowel Syndrome",
       "titleLocal": "Rekomendacje diagnostyczno-terapeutyczne w zespole jelita nadwrażliwego",
-      "url": "https://ptg-e.org.pl/wytyczne/",
-      "pdfUrl": null
+      "url": "https://ptg-e.org.pl/wytyczne/rekomendacje-diagnostyczno-terapeutyczne-w-zespole-jelita-nadwrazliwego/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/Wytyczne-IBS-pol-2018.pdf"
+    },
+    {
+      "id": "ptge-gerd-2022",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Consensus on Diagnostic and Therapeutic Management of GERD",
+      "titleLocal": "Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku – konsensus Polskiego Towarzystwa Gastroenterologii",
+      "url": "https://ptg-e.org.pl/en/guidelines/diagnostic-and-therapeutic-management-in-gastroesophageal-reflux-disease-consensus-of-the-polish-society-of-gastroenterology-2022/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/07/wytyczne_ptge2022_choroba_refluksowa_przelyku.pdf"
     },
     {
       "id": "ptge-chronic-pancreatitis-2021",
       "societyId": "ptg-e",
       "country": "PL",
-      "title": "Recommendations for the Diagnosis and Treatment of Chronic Pancreatitis (PTG-E and Pancreatic Club)",
-      "titleLocal": "Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki",
+      "title": "PTG-E / Polish Pancreatic Club Recommendations for Chronic Pancreatitis",
+      "titleLocal": "Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki. Rekomendacje Grupy Roboczej Konsultanta Krajowego w dziedzinie Gastroenterologii i Polskiego Klubu Trzustkowego",
+      "url": "https://ptg-e.org.pl/wytyczne/zalecenia-diagnostyczne-i-terapeutyczne-w-przewleklym-zapaleniu-trzustki-rekomendacje-grupy-roboczej-ptg-e-oraz-pkt/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/RPG_1_2018.pdf"
+    },
+    {
+      "id": "ptge-nafld-2019",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Polish Expert Group Recommendations on Non-Alcoholic Fatty Liver Disease",
+      "titleLocal": "Postępowanie z chorymi na niealkoholową stłuszczeniową chorobę wątroby – Zalecenia Polskiej Grupy Ekspertów NAFLD",
+      "url": "https://ptg-e.org.pl/wytyczne/postepowanie-z-chorymi-na-niealkoholowa-stluszczeniowa-chorobe-watroby-zalecenia-polskiej-grupy-ekspertow-nafld-2019/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-cholestatic-2018",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Hepatology Section Guidelines on Cholestatic Liver Diseases in Adults",
+      "titleLocal": "Choroby cholestatyczne u dorosłych – wytyczne postępowania Sekcji Hepatologicznej Polskiego Towarzystwa Gastroenterologii",
+      "url": "https://ptg-e.org.pl/wytyczne/hepatologia/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/Cholestaza.pdf"
+    },
+    {
+      "id": "ptge-liver-biliary-poz-2017",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Recommendations on Liver Function Disorders and Gallstone Disease for Primary Care",
+      "titleLocal": "Rekomendacje postępowania u chorych z zaburzeniami czynności wątroby i kamicą dróg żółciowych dla lekarzy POZ",
+      "url": "https://ptg-e.org.pl/wytyczne/hepatologia/",
+      "pdfUrl": "http://ptg-e.org.pl/wp-content/uploads/2022/03/LPOZ_Art_30711-10-1.pdf"
+    },
+    {
+      "id": "ptge-pancreatic-cancer-2019",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Polish Pancreatic Club Recommendations for Pancreatic Ductal Adenocarcinoma",
+      "titleLocal": "Zalecenia diagnostyczne i terapeutyczne w gruczolakoraku przewodowym trzustki – rekomendacje Grupy Roboczej Polskiego Klubu Trzustkowego",
+      "url": "https://ptg-e.org.pl/wytyczne/diagnostic-and-therapeutic-recommendations-in-pancreatic-ductal-adenocarcinoma-recommendations-of-the-working-group-of-the-polish-pancreatic-club/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-acute-pancreatitis-2016",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Polish Pancreatic Club Recommendations on the Management of Acute Pancreatitis",
+      "titleLocal": "Postępowanie w ostrym zapaleniu trzustki – rekomendacje Polskiego Klubu Trzustkowego",
+      "url": "https://ptg-e.org.pl/wytyczne/pankreatologia/",
+      "pdfUrl": "https://www.termedia.pl/Management-of-acute-pancreatitis-AP-Polish-Pancreatic-Club-recommendations,41,27681,1,1.html"
+    },
+    {
+      "id": "ptge-pancreatic-cystic-tumors-2025",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Polish Pancreatic Club Guidelines on Pancreatic Cystic Tumors",
+      "titleLocal": "Zalecenia diagnostyczno-terapeutyczne w torbielowatych guzach trzustki – rekomendacje ekspertów Polskiego Klubu Trzustkowego",
+      "url": "https://www.termedia.pl/Diagnostic-and-therapeutic-guidelines-for-pancreatic-cystic-tumors-recommendations-of-Polish-Pancreatic-Club-experts,41,56822,1,1.html",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-pancreatic-fluid-collections-2025",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Guidelines on Endoscopic Treatment of Postinflammatory Pancreatic and Peripancreatic Fluid Collections",
+      "titleLocal": "Wytyczne leczenia endoskopowego pozapalnych zbiorników płynowych trzustki i okolicy trzustki",
+      "url": "https://ptg-e.org.pl/wp-content/uploads/2026/03/Jagielski_guidelines.pdf",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2026/03/Jagielski_guidelines.pdf"
+    },
+    {
+      "id": "ptge-clinical-nutrition-2025",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on Clinical Nutrition in Gastrointestinal Diseases",
+      "titleLocal": "Żywienie kliniczne w chorobach przewodu pokarmowego – aktualne wytyczne praktyki klinicznej. Zalecenia Sekcji Żywienia Klinicznego i Metabolizmu Polskiego Towarzystwa Gastroenterologii",
       "url": "https://ptg-e.org.pl/wytyczne/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2025/06/Zalecenia_Sekcji_Zywienia_Klinicznego_i_Metabolizmu.pdf"
+    },
+    {
+      "id": "ptge-microscopic-colitis-2025",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Expert Position on Diagnosis and Treatment of Microscopic Colitis",
+      "titleLocal": "Diagnostyka i leczenie mikroskopowego zapalenia jelita grubego – stanowisko ekspertów Polskiego Towarzystwa Gastroenterologii",
+      "url": "https://www.termedia.pl/Diagnostyka-i-leczenie-mikroskopowego-zapalenia-jelita-grubego-stanowisko-ekspertow-Polskiego-Towarzystwa-Gastroenterologii,98,57408,0,0.html",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-gerd-primary-care-2019",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Recommendations on GERD Symptoms for Family Physicians",
+      "titleLocal": "Postępowanie u pacjentów z objawami choroby refluksowej przełyku – rekomendacje dla lekarzy rodzinnych",
+      "url": "https://ptg-e.org.pl/wytyczne/postepowanie-u-pacjentow-z-objawami-choroby-refluksowej-przelyku-rekomendacje-dla-lekarzy-rodzinnych/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/rekomendacje_GERD_2019_LPOZ.pdf"
+    },
+    {
+      "id": "ptge-ibd-primary-care-2017",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on IBD Management in Family Medicine Practice",
+      "titleLocal": "Wytyczne postępowania z chorymi na nieswoiste choroby zapalne jelit w praktyce lekarza rodzinnego",
+      "url": "https://ptg-e.org.pl/wytyczne/wytyczne-postepowania-z-chorymi-na-nieswoiste-choroby-zapalne-jelit-w-praktyce-lekarza-rodzinnego-2017/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/LPOZ_Art_29565-10.pdf"
+    },
+    {
+      "id": "ptge-diverticular-2015",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "Polish Interdisciplinary Consensus on Diverticular Disease of the Colon",
+      "titleLocal": "Polski konsensus interdyscyplinarny dotyczący diagnostyki i leczenia choroby uchyłkowej okrężnicy",
+      "url": "https://ptg-e.org.pl/wytyczne/diagnostyka-i-leczenie-choroby-uchylkowej-okreznicy-2015/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-colonoscopy-surveillance-2011",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on Colonoscopic Surveillance After Polypectomy",
+      "titleLocal": "Wytyczne Polskiego Towarzystwa Gastroenterologii dotyczące nadzoru kolonoskopowego po polipektomii – adaptacja wytycznych europejskich",
+      "url": "https://ptg-e.org.pl/wytyczne/endoskopia/",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptge-ugib-2008",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on Non-Variceal Upper Gastrointestinal Bleeding",
+      "titleLocal": "Wytyczne postępowania w krwawieniu z górnego odcinka przewodu pokarmowego pochodzenia nieżylakowego",
+      "url": "https://ptg-e.org.pl/wytyczne/choroby-gopp/",
+      "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/PG_Art_9988-1.pdf"
+    },
+    {
+      "id": "ptge-antithrombotic-endoscopy-2012",
+      "societyId": "ptg-e",
+      "country": "PL",
+      "title": "PTG-E Guidelines on GI Endoscopy in Patients on Antiplatelet and Anticoagulant Therapy",
+      "titleLocal": "Endoskopia przewodu pokarmowego u chorych przyjmujących leki przeciwpłytkowe i przeciwzakrzepowe – wytyczne PTG-E i Konsultanta Krajowego",
+      "url": "https://ptg-e.org.pl/wytyczne/endoskopia/",
       "pdfUrl": null
     },
     {

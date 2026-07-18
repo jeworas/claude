@@ -141,7 +141,7 @@ The PoC runs **fully offline after `npm install`**; only the update-checker touc
 ## 10. Roadmap
 
 **PoC (this repo) — done**
-Bilingual search over ~26 curated GI-deep + breadth guidelines (US + PL, 8 societies); structured summaries; freshness/supersession UI; condition comparison; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
+Bilingual search over 65 curated guidelines from 8 societies (US + PL) — the **complete current ACG and PTG-E gastroenterology/hepatology catalogs** plus AGA and diabetes/hypertension for breadth, spanning 46 conditions; structured summaries; freshness/supersession UI; condition comparison; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
 
 **MVP (next)**
 Move data to a database with an editor CMS and verification workflow; expand GI coverage to near-complete for ACG/AGA/PTG-E; add 2–3 more Polish societies and specialties; scheduled update-monitoring feeding an editor queue; basic analytics; production hosting; per-source copyright sign-off.
