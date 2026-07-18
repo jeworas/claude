@@ -49,7 +49,7 @@ async function pdfText(path: string): Promise<{ text: string; pages: number }> {
 const POS: [RegExp, number][] = [
   [/\bwe (recommend|suggest)\b/gi, 4],
   [/\brecommend(ation|s|ed|ing)?\b/gi, 2],
-  [/\b(clinical practice guideline|practice guideline|consensus statement|guidance)\b/gi, 3],
+  [/\b(clinical practice guideline|practice guideline|consensus statement|joint statement|position statement|guidance)\b/gi, 3],
   [/\b(diagnosis|management|treatment) of\b/gi, 1.5],
   [/\b(evidence|GRADE|certainty|quality of evidence|level of evidence|strength of recommendation)\b/gi, 1.5],
   [/\b(first-line|second-line|maintenance therapy|induction|dosing|mg\/kg|mcg)\b/gi, 1],

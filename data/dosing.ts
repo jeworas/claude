@@ -92,4 +92,7 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Fidaxomicin (fidaksomycyna)', indication: 'First-line (lower recurrence)', regimen: '200 mg orally twice daily for 10 days' },
     { drug: 'Metronidazole (metronidazol)', indication: 'Mild disease if preferred agents unavailable', regimen: '500 mg orally three times daily for 10 days' },
   ],
+  'acr-aao-hcq-retinopathy-2020': [
+    { drug: 'Hydroxychloroquine', indication: 'Ceiling to limit retinal toxicity', regimen: '≤5 mg/kg/day of actual body weight' },
+  ],
 };

@@ -60,6 +60,11 @@
       "societyId": "npoa",
       "abbreviation": "NPOA",
       "indexUrl": "https://antybiotyki.edu.pl/rekomendacje/"
+    },
+    {
+      "societyId": "acr",
+      "abbreviation": "ACR",
+      "indexUrl": "https://rheumatology.org/clinical-practice-guidelines"
     }
   ],
   "known": [
@@ -655,6 +660,15 @@
       "title": "CKD Change Package: Population Health Strategies for Cardiovascular and Kidney Disease Risk Reduction (2023)",
       "titleLocal": null,
       "url": "https://www.kidney.org/professionals/guidelines",
+      "pdfUrl": null
+    },
+    {
+      "id": "acr-aao-hcq-retinopathy-2020",
+      "societyId": "acr",
+      "country": "US",
+      "title": "ACR/AAD/RDS/AAO Joint Statement on Hydroxychloroquine Use With Respect to Retinal Toxicity (2020)",
+      "titleLocal": null,
+      "url": "https://rheumatology.org/clinical-practice-guidelines",
       "pdfUrl": null
     },
     {

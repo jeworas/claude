@@ -239,6 +239,12 @@ check(
     return specs.has('nephrology') && (specs.has('diabetology') || specs.has('diabetes'));
   })(),
 );
+check('ophthalmology condition exists (HCQ retinopathy)', getCondition('hydroxychloroquine-retinopathy')?.specialty === 'ophthalmology');
+check('“hydroxychloroquine” is indexed as a medicine with dosing', (() => {
+  const d = drugsForQuery('hydroxychloroquine')[0];
+  return !!d && d.conditions.some((c) => c.condition.id === 'hydroxychloroquine-retinopathy') &&
+    d.conditions.some((c) => c.guidelines.some((u) => u.doses.length > 0));
+})());
 
 console.log('');
 if (failures > 0) {

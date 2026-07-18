@@ -1295,5 +1295,27 @@ export const conditions: Condition[] = [
       "N18"
     ],
     "specialty": "nephrology"
+  },
+  {
+    "id": "hydroxychloroquine-retinopathy",
+    "nameEn": "Hydroxychloroquine retinopathy",
+    "namePl": "Retinopatia po hydroksychlorochinie",
+    "synonymsEn": [
+      "hydroxychloroquine retinal toxicity",
+      "antimalarial retinopathy",
+      "chloroquine retinopathy",
+      "toxic maculopathy"
+    ],
+    "synonymsPl": [
+      "toksyczność siatkówkowa hydroksychlorochiny",
+      "makulopatia toksyczna"
+    ],
+    "abbreviations": [
+      "HCQ"
+    ],
+    "icd10": [
+      "H35.389"
+    ],
+    "specialty": "ophthalmology"
   }
 ];

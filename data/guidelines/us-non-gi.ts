@@ -132,4 +132,51 @@ export const usNonGiGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'acr-aao-hcq-retinopathy-2020',
+    societyId: 'acr',
+    conditionIds: ['hydroxychloroquine-retinopathy'],
+    title: 'ACR/AAD/RDS/AAO Joint Statement on Hydroxychloroquine Use With Respect to Retinal Toxicity (2020)',
+    language: 'en',
+    specialty: 'ophthalmology',
+    year: 2020,
+    status: 'current',
+    sourceUrl: 'https://rheumatology.org/clinical-practice-guidelines',
+    citation:
+      'Rosenbaum JT, Costenbader KH, Desmarais J, et al. ACR/AAD/RDS/AAO 2020 Joint Statement on Hydroxychloroquine Use with Respect to Retinal Toxicity. Arthritis & Rheumatology, 2021.',
+    summary:
+      'A joint statement from the American College of Rheumatology, American Academy of Dermatology, Rheumatologic Dermatology Society and American Academy of Ophthalmology on minimizing retinal toxicity from long-term hydroxychloroquine (HCQ). It sets a dosing ceiling of ≤5 mg/kg/day of actual body weight (retinal-toxicity risk under 2% at 10 years) and calls for a baseline retinal exam followed by annual screening — beginning no later than 5 years — with optical coherence tomography and automated visual fields. Renal impairment and concurrent tamoxifen raise risk; HCQ should not be stopped for uncertain findings.',
+    keyRecommendations: [
+      {
+        topic: 'Dosing ceiling',
+        text: 'Keep hydroxychloroquine at ≤5 mg/kg/day of actual body weight; at this dose the risk of retinal toxicity is under 2% for up to 10 years and rises with higher daily dose and greater cumulative exposure.',
+        evidenceGrade: 'Joint society consensus',
+        lineOfTherapy: 'prevention',
+        drugs: ['hydroxychloroquine'],
+      },
+      {
+        topic: 'Baseline screening',
+        text: 'Perform a baseline retinal examination within the first months of starting HCQ to exclude pre-existing retinal disease that could confound later monitoring.',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Ongoing screening',
+        text: 'Without major risk factors, defer annual screening until 5 years of use, then screen yearly with optical coherence tomography and automated visual fields (central 10-2 fields; broader OCT/fields for East Asian patients, who may show pericentral involvement).',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Risk factors',
+        text: 'Higher daily dose per body weight, larger cumulative dose, renal insufficiency (reduced clearance) and concurrent tamoxifen all increase risk; patients with renal impairment may need lower doses and closer monitoring.',
+        lineOfTherapy: 'supportive',
+        drugs: ['hydroxychloroquine', 'tamoxifen'],
+      },
+      {
+        topic: 'Managing borderline findings',
+        text: 'Do not stop HCQ for uncertain or borderline findings — retinopathy progresses slowly, so recheck; discontinuation should be a shared decision among patient, prescriber and eye-care provider, weighing rheumatic-disease control against the risk of visual loss.',
+        lineOfTherapy: 'supportive',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];
