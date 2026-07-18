@@ -58,10 +58,16 @@ const POS: [RegExp, number][] = [
 const NEG: [RegExp, number][] = [
   [/\b(donat(e|ion)|tax id|credit card|501\(c\)|enclosed is my check|payment information|\bcvc\b)\b/gi, 8],
   [/\b(membership|sponsor|exhibitor|registration form|save the date|webinar|newsletter|meeting minutes)\b/gi, 4],
+  // Policy / governance / admin documents that mention "guideline" but aren't one.
+  // Low per-hit weight so a single incidental mention in a real guideline (e.g. a
+  // one-line COI statement) doesn't sink it; genuine policy docs repeat these.
+  [/\b(privacy policy|code of conduct|by-?laws|prospectus|strategic priorit|development polic|endorsement polic|commercial support|disclosure statement|year in review|regulamin|polityka prywatno|statut\b)\b/gi, 2],
+  [/\b(proposal|support request|specifications|requirement for website)\b/gi, 2],
   [/\b(flyer|brochure|poster|infographic|fact sheet)\b/gi, 3],
   [/\b(talk to your doctor|ask your doctor|educate your|patients about)\b/gi, 2],
 ];
-const FILENAME_NOISE = /(form|flyer|card|brochure|donation|bulletin|poster|agenda|newsletter|invite|registration|flier)/i;
+const FILENAME_NOISE =
+  /(form|flyer|card|brochure|donation|bulletin|poster|agenda|newsletter|invite|registration|flier|prospectus|by-?laws|proposal|policy|policies|endorsement|regulamin|polityka|prywatno|statut|disclosure|strategic|symposia|postcard)/i;
 
 function count(re: RegExp, s: string): number {
   const m = s.match(re);
