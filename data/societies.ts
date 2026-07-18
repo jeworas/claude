@@ -69,7 +69,7 @@ export const societies: Society[] = [
     specialties: ['gastroenterology'],
     homepage: 'https://ecco-ibd.eu',
     guidelinesIndexUrl:
-      'https://ecco-ibd.eu/publications/ecco-guidelines-science/published-ecco-guidelines.html',
+      'https://ecco-ibd.eu/publications/guidelines',
     description:
       "Pan-European organisation focused on inflammatory bowel disease; publishes topical, regularly updated ECCO guidelines in the Journal of Crohn's and Colitis.",
   },
@@ -80,7 +80,7 @@ export const societies: Society[] = [
     country: 'EU',
     specialties: ['gastroenterology', 'hepatology'],
     homepage: 'https://ueg.eu',
-    guidelinesIndexUrl: 'https://ueg.eu/guideline',
+    guidelinesIndexUrl: 'https://ueg.eu/quality-of-care',
     description:
       'Umbrella organisation of European GI societies; develops and endorses pan-European evidence-based guidelines and standards.',
   },
@@ -163,7 +163,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['lipidology'],
     homepage: 'https://ptlipid.pl',
-    guidelinesIndexUrl: 'https://ptlipid.pl/wytyczne/',
+    guidelinesIndexUrl: 'https://ptlipid.pl/wytyczne-w-codziennej-praktyce-lekarskiej/',
     description:
       'Issues the multi-society Polish guidelines on the diagnosis and treatment of lipid disorders (PTL/KLRwP/PTK/PTDL/PTD/PTNT).',
   },
@@ -255,7 +255,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['endocrinology'],
     homepage: 'https://ptendo.org.pl',
-    guidelinesIndexUrl: 'https://ptendo.org.pl/rekomendacje-i-stanowiska',
+    guidelinesIndexUrl: 'https://ptendo.org.pl/',
     description:
       'National Polish endocrinology society; issues recommendations and position statements on endocrine disease management.',
   },
@@ -302,7 +302,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['nephrology'],
     homepage: 'https://ptnefro.pl',
-    guidelinesIndexUrl: 'https://ptnefro.pl/rekomendacje',
+    guidelinesIndexUrl: 'https://ptnefro.com.pl/zalecenia-i-stanowiska-ptn',
     description:
       'National Polish nephrology society; issues recommendations on renal replacement therapy and CKD management.',
   },
@@ -314,7 +314,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['hypertensiology', 'cardiology'],
     homepage: 'https://nadcisnienietetnicze.pl',
-    guidelinesIndexUrl: 'https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt',
+    guidelinesIndexUrl: 'https://www.nadcisnienietetnicze.pl/',
     description: 'Issues the national Polish guidelines on the management of arterial hypertension.',
   },
 
@@ -359,7 +359,7 @@ export const societies: Society[] = [
     country: 'EU',
     specialties: ['pulmonology'],
     homepage: 'https://www.ersnet.org',
-    guidelinesIndexUrl: 'https://www.ersnet.org/science-and-research/clinical-practice-guidelines/',
+    guidelinesIndexUrl: 'https://www.ersnet.org/science-and-research/development-programme/ers-clinical-practice-guidelines-statements-and-technical-standards/',
     description:
       'Pan-European respiratory society; publishes ERS and joint ERS/ATS clinical practice guidelines.',
   },
@@ -371,7 +371,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['pulmonology'],
     homepage: 'https://ptchp.org',
-    guidelinesIndexUrl: 'https://ptchp.org/zalecenia-i-rekomendacje',
+    guidelinesIndexUrl: 'https://ptchp.org/zalecenia-ptchp/',
     description:
       'National Polish respiratory society; issues recommendations on asthma, COPD and other lung diseases.',
   },
@@ -395,7 +395,7 @@ export const societies: Society[] = [
     country: 'EU',
     specialties: ['infectious-disease'],
     homepage: 'https://www.escmid.org',
-    guidelinesIndexUrl: 'https://www.escmid.org/guidelines-publications/',
+    guidelinesIndexUrl: 'https://www.escmid.org/guidelines-journals/guidelines/published-guidelines/',
     description:
       'Pan-European ID/microbiology society; publishes guidelines on resistant infections, antifungal therapy and diagnostics.',
   },
@@ -442,7 +442,7 @@ export const societies: Society[] = [
     country: 'US',
     specialties: ['oncology'],
     homepage: 'https://www.asco.org',
-    guidelinesIndexUrl: 'https://society.asco.org/practice-patients/guidelines',
+    guidelinesIndexUrl: 'https://www.asco.org/guidelines',
     description:
       'Publishes evidence-based clinical practice guidelines on cancer treatment, supportive care and survivorship.',
   },
@@ -465,7 +465,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['oncology'],
     homepage: 'https://ptok.pl',
-    guidelinesIndexUrl: 'https://ptok.pl/zalecenia_postepowania_diagnostyczno_terapeutycznego',
+    guidelinesIndexUrl: 'https://ptok.pl/',
     description:
       'Issues the Polish diagnostic-therapeutic recommendations for malignant tumours ("Zalecenia postępowania").',
   },
@@ -499,7 +499,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['hematology'],
     homepage: 'https://pthit.pl',
-    guidelinesIndexUrl: 'https://pthit.pl/rekomendacje',
+    guidelinesIndexUrl: 'https://pthit.pl/',
     description:
       'National Polish haematology/transfusion society; issues recommendations on blood disorders and transfusion medicine.',
   },
@@ -523,7 +523,7 @@ export const societies: Society[] = [
     country: 'EU',
     specialties: ['rheumatology'],
     homepage: 'https://www.eular.org',
-    guidelinesIndexUrl: 'https://www.eular.org/recommendations-overview',
+    guidelinesIndexUrl: 'https://www.eular.org/recommendations-home',
     description:
       'Publishes EULAR recommendations for the management of rheumatic and musculoskeletal diseases.',
   },
@@ -571,7 +571,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['neurology'],
     homepage: 'https://ptneuro.pl',
-    guidelinesIndexUrl: 'https://ptneuro.pl/rekomendacje',
+    guidelinesIndexUrl: 'https://ptneuro.pl/',
     description:
       'National Polish neurology society; issues recommendations on stroke, epilepsy, multiple sclerosis and more.',
   },
@@ -630,7 +630,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['allergy-immunology'],
     homepage: 'https://pta.med.pl',
-    guidelinesIndexUrl: 'https://pta.med.pl/dla-lekarzy/standardy-i-wytyczne/',
+    guidelinesIndexUrl: 'https://pta.med.pl/',
     description:
       'National Polish allergology society; issues standards and recommendations on allergic disease management.',
   },
@@ -666,7 +666,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['dermatology'],
     homepage: 'https://ptderm.pl',
-    guidelinesIndexUrl: 'https://ptderm.pl/dla-lekarzy/rekomendacje',
+    guidelinesIndexUrl: 'https://ptderm.pl/',
     description:
       'National Polish dermatology society; issues diagnostic-therapeutic recommendations for skin disease.',
   },
@@ -702,7 +702,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['urology'],
     homepage: 'https://pturol.org.pl',
-    guidelinesIndexUrl: 'https://pturol.org.pl/wytyczne',
+    guidelinesIndexUrl: 'https://pturol.org.pl/',
     description:
       'National Polish urology society; issues recommendations and Polish adaptations of EAU guidelines.',
   },
@@ -773,7 +773,7 @@ export const societies: Society[] = [
     country: 'EU',
     specialties: ['pediatrics', 'gastroenterology'],
     homepage: 'https://www.espghan.org',
-    guidelinesIndexUrl: 'https://www.espghan.org/knowledge-center/publications/Guidelines_Position_Papers',
+    guidelinesIndexUrl: 'https://espghan.info/published-guidelines/',
     description:
       'Publishes paediatric GI/hepatology/nutrition guidelines (coeliac disease, paediatric IBD, infant feeding).',
   },
@@ -798,7 +798,7 @@ export const societies: Society[] = [
     country: 'US',
     specialties: ['surgery'],
     homepage: 'https://www.facs.org',
-    guidelinesIndexUrl: 'https://www.facs.org/for-medical-professionals/education/clinical-guidelines/',
+    guidelinesIndexUrl: 'https://www.facs.org/for-medical-professionals/clinical-practice/',
     description:
       'Publishes surgical clinical guidance and best-practice guidelines (trauma, cancer, bariatric, quality programmes).',
   },
@@ -971,7 +971,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['primary-care'],
     homepage: 'https://klrwp.pl',
-    guidelinesIndexUrl: 'https://klrwp.pl/pl/wytyczne',
+    guidelinesIndexUrl: 'https://klrwp.pl/',
     description:
       'National Polish college of family physicians; co-authors multi-society primary-care recommendations.',
   },

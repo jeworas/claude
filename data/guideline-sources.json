@@ -56,7 +56,7 @@
       "specialties": [
         "gastroenterology"
       ],
-      "guidelinesIndexUrl": "https://ecco-ibd.eu/publications/ecco-guidelines-science/published-ecco-guidelines.html",
+      "guidelinesIndexUrl": "https://ecco-ibd.eu/publications/guidelines",
       "ingested": 13
     },
     {
@@ -68,7 +68,7 @@
         "gastroenterology",
         "hepatology"
       ],
-      "guidelinesIndexUrl": "https://ueg.eu/guideline",
+      "guidelinesIndexUrl": "https://ueg.eu/quality-of-care",
       "ingested": 7
     },
     {
@@ -147,7 +147,7 @@
       "specialties": [
         "lipidology"
       ],
-      "guidelinesIndexUrl": "https://ptlipid.pl/wytyczne/",
+      "guidelinesIndexUrl": "https://ptlipid.pl/wytyczne-w-codziennej-praktyce-lekarskiej/",
       "ingested": 0
     },
     {
@@ -236,7 +236,7 @@
       "specialties": [
         "endocrinology"
       ],
-      "guidelinesIndexUrl": "https://ptendo.org.pl/rekomendacje-i-stanowiska",
+      "guidelinesIndexUrl": "https://ptendo.org.pl/",
       "ingested": 0
     },
     {
@@ -280,7 +280,7 @@
       "specialties": [
         "nephrology"
       ],
-      "guidelinesIndexUrl": "https://ptnefro.pl/rekomendacje",
+      "guidelinesIndexUrl": "https://ptnefro.com.pl/zalecenia-i-stanowiska-ptn",
       "ingested": 0
     },
     {
@@ -292,7 +292,7 @@
         "hypertensiology",
         "cardiology"
       ],
-      "guidelinesIndexUrl": "https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt",
+      "guidelinesIndexUrl": "https://www.nadcisnienietetnicze.pl/",
       "ingested": 1
     },
     {
@@ -337,7 +337,7 @@
       "specialties": [
         "pulmonology"
       ],
-      "guidelinesIndexUrl": "https://www.ersnet.org/science-and-research/clinical-practice-guidelines/",
+      "guidelinesIndexUrl": "https://www.ersnet.org/science-and-research/development-programme/ers-clinical-practice-guidelines-statements-and-technical-standards/",
       "ingested": 0
     },
     {
@@ -348,7 +348,7 @@
       "specialties": [
         "pulmonology"
       ],
-      "guidelinesIndexUrl": "https://ptchp.org/zalecenia-i-rekomendacje",
+      "guidelinesIndexUrl": "https://ptchp.org/zalecenia-ptchp/",
       "ingested": 0
     },
     {
@@ -370,7 +370,7 @@
       "specialties": [
         "infectious-disease"
       ],
-      "guidelinesIndexUrl": "https://www.escmid.org/guidelines-publications/",
+      "guidelinesIndexUrl": "https://www.escmid.org/guidelines-journals/guidelines/published-guidelines/",
       "ingested": 0
     },
     {
@@ -415,7 +415,7 @@
       "specialties": [
         "oncology"
       ],
-      "guidelinesIndexUrl": "https://society.asco.org/practice-patients/guidelines",
+      "guidelinesIndexUrl": "https://www.asco.org/guidelines",
       "ingested": 0
     },
     {
@@ -437,7 +437,7 @@
       "specialties": [
         "oncology"
       ],
-      "guidelinesIndexUrl": "https://ptok.pl/zalecenia_postepowania_diagnostyczno_terapeutycznego",
+      "guidelinesIndexUrl": "https://ptok.pl/",
       "ingested": 0
     },
     {
@@ -470,7 +470,7 @@
       "specialties": [
         "hematology"
       ],
-      "guidelinesIndexUrl": "https://pthit.pl/rekomendacje",
+      "guidelinesIndexUrl": "https://pthit.pl/",
       "ingested": 0
     },
     {
@@ -492,7 +492,7 @@
       "specialties": [
         "rheumatology"
       ],
-      "guidelinesIndexUrl": "https://www.eular.org/recommendations-overview",
+      "guidelinesIndexUrl": "https://www.eular.org/recommendations-home",
       "ingested": 0
     },
     {
@@ -536,7 +536,7 @@
       "specialties": [
         "neurology"
       ],
-      "guidelinesIndexUrl": "https://ptneuro.pl/rekomendacje",
+      "guidelinesIndexUrl": "https://ptneuro.pl/",
       "ingested": 0
     },
     {
@@ -591,7 +591,7 @@
       "specialties": [
         "allergy-immunology"
       ],
-      "guidelinesIndexUrl": "https://pta.med.pl/dla-lekarzy/standardy-i-wytyczne/",
+      "guidelinesIndexUrl": "https://pta.med.pl/",
       "ingested": 0
     },
     {
@@ -624,7 +624,7 @@
       "specialties": [
         "dermatology"
       ],
-      "guidelinesIndexUrl": "https://ptderm.pl/dla-lekarzy/rekomendacje",
+      "guidelinesIndexUrl": "https://ptderm.pl/",
       "ingested": 0
     },
     {
@@ -657,7 +657,7 @@
       "specialties": [
         "urology"
       ],
-      "guidelinesIndexUrl": "https://pturol.org.pl/wytyczne",
+      "guidelinesIndexUrl": "https://pturol.org.pl/",
       "ingested": 0
     },
     {
@@ -724,7 +724,7 @@
         "pediatrics",
         "gastroenterology"
       ],
-      "guidelinesIndexUrl": "https://www.espghan.org/knowledge-center/publications/Guidelines_Position_Papers",
+      "guidelinesIndexUrl": "https://espghan.info/published-guidelines/",
       "ingested": 0
     },
     {
@@ -746,7 +746,7 @@
       "specialties": [
         "surgery"
       ],
-      "guidelinesIndexUrl": "https://www.facs.org/for-medical-professionals/education/clinical-guidelines/",
+      "guidelinesIndexUrl": "https://www.facs.org/for-medical-professionals/clinical-practice/",
       "ingested": 0
     },
     {
@@ -913,7 +913,7 @@
       "specialties": [
         "primary-care"
       ],
-      "guidelinesIndexUrl": "https://klrwp.pl/pl/wytyczne",
+      "guidelinesIndexUrl": "https://klrwp.pl/",
       "ingested": 0
     }
   ]

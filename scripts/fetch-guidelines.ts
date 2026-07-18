@@ -15,6 +15,10 @@
  *               gracefully when outbound HTTPS is blocked (marks unreachable).
  *   --download  Implies --fetch; save discovered PDFs under downloads/<id>/
  *               (git-ignored). Only runs where the index is reachable.
+ *   --browser   Render each index in a headless Chromium (Playwright) before
+ *               extracting links. Needed for JavaScript-rendered sites and to
+ *               get past many bot blocks (403 / connection reset). Install once:
+ *               npm install -D playwright && npx playwright install chromium
  *
  * Filters: --specialty=<slug> --region=<US|EU|UK|PL|INT> --society=<id>
  *          --limit=<n> --json
@@ -24,6 +28,7 @@
  *   npm run sources -- --specialty=cardiology
  *   npm run sources -- --region=PL --json
  *   npm run sources -- --fetch            # try to reach each index
+ *   npm run sources -- --fetch --browser  # render JS sites / bypass bot blocks
  *   npm run sources -- --download --society=acg
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -43,6 +48,7 @@ const opt = (name: string) =>
 const flags = {
   fetch: flag('fetch') || flag('download'),
   download: flag('download'),
+  browser: flag('browser'),
   json: flag('json'),
   specialty: opt('specialty'),
   region: opt('region'),
@@ -55,7 +61,58 @@ const BROWSER_HEADERS = {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
   'Accept-Language': 'en,pl;q=0.9',
   Accept: 'text/html,application/xhtml+xml,application/pdf',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Upgrade-Insecure-Requests': '1',
 };
+
+// ── Optional headless-browser fetch (--browser) ───────────────────────────────
+// Many society sites render their guideline lists with JavaScript, or block
+// plain requests (403 / connection reset). With --browser we drive a real
+// Chromium via Playwright so the page renders before we extract links. Playwright
+// is an optional dependency, imported lazily so the default path needs nothing.
+interface BrowserPage {
+  goto: (url: string, opts: Record<string, unknown>) => Promise<unknown>;
+  content: () => Promise<string>;
+  close: () => Promise<void>;
+}
+interface HeadlessBrowser {
+  newPage: () => Promise<BrowserPage>;
+  close: () => Promise<void>;
+}
+let browserInstance: HeadlessBrowser | null = null;
+
+async function getBrowser(): Promise<HeadlessBrowser> {
+  if (browserInstance) return browserInstance;
+  let chromium: { launch: (o: object) => Promise<HeadlessBrowser> };
+  try {
+    // Non-literal specifier: resolved at runtime (tsx), not type-checked here,
+    // so the project builds without Playwright installed.
+    const mod = 'playwright';
+    chromium = ((await import(mod)) as { chromium: typeof chromium }).chromium;
+  } catch {
+    throw new Error(
+      '--browser needs Playwright. Install it once:\n' +
+        '      npm install -D playwright && npx playwright install chromium',
+    );
+  }
+  browserInstance = await chromium.launch({ headless: true });
+  return browserInstance;
+}
+
+async function fetchHtmlViaBrowser(url: string): Promise<{ html: string; status: number }> {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  try {
+    const res = (await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 })) as {
+      status: () => number;
+    } | null;
+    const html = await page.content();
+    return { html, status: res?.status() ?? 200 };
+  } finally {
+    await page.close();
+  }
+}
 
 /** Ingested-guideline count per society (current editions only). */
 const ingestedCount = new Map<string, number>();
@@ -140,18 +197,30 @@ interface FetchResult {
 
 async function fetchIndex(society: Society): Promise<FetchResult> {
   try {
-    const res = await fetch(society.guidelinesIndexUrl, {
-      headers: BROWSER_HEADERS,
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) {
-      return { reachable: false, status: res.status, note: `HTTP ${res.status}`, docs: [], downloaded: 0 };
+    let html: string;
+    let status: number;
+    if (flags.browser) {
+      const r = await fetchHtmlViaBrowser(society.guidelinesIndexUrl);
+      html = r.html;
+      status = r.status;
+      if (status >= 400) {
+        return { reachable: false, status, note: `HTTP ${status}`, docs: [], downloaded: 0 };
+      }
+    } else {
+      const res = await fetch(society.guidelinesIndexUrl, {
+        headers: BROWSER_HEADERS,
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) {
+        return { reachable: false, status: res.status, note: `HTTP ${res.status}`, docs: [], downloaded: 0 };
+      }
+      html = await res.text();
+      status = res.status;
     }
-    const html = await res.text();
     const docs = discoverDocuments(html, society.guidelinesIndexUrl);
     let downloaded = 0;
     if (flags.download) downloaded = await downloadPdfs(society, docs);
-    return { reachable: true, status: res.status, note: `HTTP ${res.status}`, docs, downloaded };
+    return { reachable: true, status, note: `HTTP ${status}`, docs, downloaded };
   } catch (err) {
     const e = err as { name?: string; message?: string };
     return {
@@ -219,6 +288,7 @@ async function run() {
       entries.push(base);
     }
   }
+  if (browserInstance) await browserInstance.close();
 
   // The worklist is always written (source of truth for the ingestion pipeline).
   const manifest = {
@@ -292,11 +362,20 @@ function printReport(entries: Array<Record<string, unknown>>) {
     console.log('  or --download to save discovered PDFs under downloads/.\n');
   } else {
     const unreachable = entries.filter((e) => !e.reachable).length;
+    const emptyButOk = entries.filter((e) => e.reachable && e.documentsDiscovered === 0).length;
     if (unreachable === entries.length) {
       console.log('  All indexes unreachable — outbound HTTPS is blocked in this');
       console.log('  environment. Run --fetch where the network is open.\n');
     } else {
-      console.log(`  ${entries.length - unreachable}/${entries.length} indexes reached.\n`);
+      console.log(`  ${entries.length - unreachable}/${entries.length} indexes reached.`);
+      if (!flags.browser && (unreachable > 0 || emptyButOk > 0)) {
+        console.log(
+          `  ${unreachable} unreachable, ${emptyButOk} reached but empty (likely JS-rendered or`,
+        );
+        console.log('  bot-blocked). Re-run with --browser to render those pages.\n');
+      } else {
+        console.log('');
+      }
     }
   }
 }

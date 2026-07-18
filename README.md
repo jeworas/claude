@@ -66,8 +66,11 @@ npm run sources                          # write + print the worklist (no networ
 npm run sources -- --specialty=cardiology
 npm run sources -- --region=PL --json
 npm run sources -- --fetch               # reach each index (needs network)
+npm run sources -- --fetch --browser     # render JS sites / bypass bot blocks
 npm run sources -- --download --society=acg
 ```
+
+Many society sites render their guideline lists with JavaScript or block plain requests (403 / connection reset). `--browser` drives a headless Chromium (Playwright) so the page renders before links are extracted. Playwright is an optional dependency — install it once with `npm install -D playwright && npx playwright install chromium`; the default path needs nothing.
 
 ## The bilingual update-checker
 
