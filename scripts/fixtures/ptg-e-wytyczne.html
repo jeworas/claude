@@ -1,0 +1,59 @@
+<!--
+  REPRESENTATIVE MOCK FIXTURE — not a live capture.
+  Hand-authored to mirror the structure of https://ptg-e.org.pl/wytyczne/ (a
+  WordPress site) so the update-checker can be demonstrated offline. Individual
+  guideline pages live at ptg-e.org.pl/wytyczne/<slug>/; category pages
+  (/wytyczne/ibd/, /wytyczne/endoskopia/, ...) and PDF uploads also appear.
+  Includes guidelines already in the seed dataset (KNOWN) and an invented new
+  one (NEW) to demonstrate the diff. Link text is in Polish, as on the real site.
+-->
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="utf-8"><title>Wytyczne - Polskie Towarzystwo Gastroenterologii</title></head>
+<body>
+  <header>
+    <nav>
+      <a href="https://ptg-e.org.pl/">Strona główna</a>
+      <a href="https://ptg-e.org.pl/wytyczne/">Wytyczne</a>
+      <!-- Category pages — should be filtered out, not treated as guidelines -->
+      <a href="https://ptg-e.org.pl/wytyczne/ibd/">Nieswoiste choroby zapalne jelit</a>
+      <a href="https://ptg-e.org.pl/wytyczne/endoskopia/">Endoskopia</a>
+      <a href="https://ptg-e.org.pl/wytyczne/pankreatologia/">Pankreatologia</a>
+    </nav>
+  </header>
+
+  <main class="wytyczne">
+    <h1>Wytyczne i rekomendacje PTG-E</h1>
+    <ul>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-w-wrzodziejacym-zapaleniu-jelita-grubego/">Wytyczne postępowania w wrzodziejącym zapaleniu jelita grubego</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf">PDF</a>
+      </li>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-w-chorobie-lesniowskiego-crohna/">Wytyczne postępowania w chorobie Leśniowskiego-Crohna</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf">PDF</a>
+      </li>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/rozpoznawanie-i-leczenie-zakazenia-helicobacter-pylori/">Rozpoznawanie i leczenie zakażenia Helicobacter pylori — rekomendacje Grupy Roboczej PTG-E</a>
+      </li>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/rekomendacje-diagnostyczno-terapeutyczne-w-zespole-jelita-nadwrazliwego/">Rekomendacje diagnostyczno-terapeutyczne w zespole jelita nadwrażliwego</a>
+      </li>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/postepowanie-diagnostyczno-terapeutyczne-w-chorobie-refluksowej-przelyku/">Postępowanie diagnostyczno-terapeutyczne w chorobie refluksowej przełyku</a>
+      </li>
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/zalecenia-w-przewleklym-zapaleniu-trzustki/">Zalecenia diagnostyczne i terapeutyczne w przewlekłym zapaleniu trzustki</a>
+      </li>
+
+      <!-- Guideline NOT in the seed dataset — should be reported as NEW -->
+      <li>
+        <a href="https://ptg-e.org.pl/wytyczne/wytyczne-dotyczace-rozpoznawania-i-leczenia-celiakii/">Wytyczne PTG-E dotyczące rozpoznawania i leczenia celiakii</a>
+        <a class="pdf" href="https://ptg-e.org.pl/wp-content/uploads/2024/05/celiakia-2024.pdf">PDF</a>
+      </li>
+    </ul>
+  </main>
+
+  <footer><a href="https://ptg-e.org.pl/kontakt/">Kontakt</a></footer>
+</body>
+</html>
