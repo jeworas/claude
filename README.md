@@ -30,6 +30,18 @@ npm run dev          # http://localhost:3000
 
 Then try searching `colitis`, `WZJG`, `H. pylori`, `refluks`, `budesonide`, or `cukrzyca`.
 
+## Deploy (Vercel)
+
+This is a standard Next.js app — Vercel builds and hosts it with **zero configuration** (no environment variables, no build tweaks). Via Vercel's GitHub integration (~2 minutes, no CLI):
+
+1. Go to **[vercel.com](https://vercel.com)** and sign in with GitHub.
+2. **Add New… → Project**, and import the **`jeworas/claude`** repository.
+3. Under **Production Branch**, select **`claude/medical-guidelines-search-941dx3`** (currently the repo's only branch — confirm it's the one selected).
+4. Vercel auto-detects the **Next.js** preset. Leave the build/install commands at their defaults; no environment variables are needed. Click **Deploy**.
+5. You'll get a `https://<project>.vercel.app` URL. Every push to that branch redeploys automatically; other branches get preview URLs.
+
+The `scripts/` tooling (the update-checker, validators) is not part of the web build and is ignored by Vercel. To deploy from a machine with internet instead: `npm i -g vercel && vercel --prod` (requires a Vercel login).
+
 ### Other commands
 
 ```bash
