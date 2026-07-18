@@ -81,6 +81,26 @@ const DRUG_SYNONYMS: Record<string, string> = {
   klarytromycyna: 'clarithromycin',
   '5-asa': '5-aminosalicylate',
   '5-aminosalicylates': '5-aminosalicylate',
+  // Diabetes / cardiometabolic agents that appear in the ADA/PTD and
+  // hypertension/lipid guidelines, so Polish and English spellings collapse.
+  metformina: 'metformin',
+  empagliflozyna: 'empagliflozin',
+  dapagliflozyna: 'dapagliflozin',
+  kanagliflozyna: 'canagliflozin',
+  semaglutyd: 'semaglutide',
+  dulaglutyd: 'dulaglutide',
+  liraglutyd: 'liraglutide',
+  tyrzepatyd: 'tirzepatide',
+  peryndopryl: 'perindopril',
+  ramipryl: 'ramipril',
+  lizynopryl: 'lisinopril',
+  amlodypina: 'amlodipine',
+  indapamid: 'indapamide',
+  spironolakton: 'spironolactone',
+  chlortalidon: 'chlorthalidone',
+  statyna: 'statin',
+  statyny: 'statin',
+  statins: 'statin',
 };
 
 export function drugKey(name: string): string {

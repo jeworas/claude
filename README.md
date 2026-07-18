@@ -16,6 +16,7 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 - **Bilingual interface** — a full PL/EN language toggle (persisted per browser) translates all navigation, labels and disclaimers; guideline content stays in its source language.
 - **Quick answers** — a specific query like `celiac dosage`, `H. pylori dosing`, or `budesonide dose` surfaces the most relevant recommendation and dosing directly above the results.
 - **Dosing quick-reference** — flagship guidelines carry a standard-regimen table (kept in a separate, auditable module) with a strong verify-against-source framing.
+- **Drug cross-reference** — the inverse view: search a medicine (e.g. `infliximab`) and see **every condition it is recommended for**, with therapy line, evidence grade and standard dosing per guideline, across US/EU/PL. Polish and English drug names (`infliksymab` ≡ `infliximab`) resolve to one medicine. Browsable at `/drugs`; introduces no new clinical facts — it re-groups curated data by drug.
 - **Region comparison** — a US ↔ Europe ↔ Poland matrix aligned by therapy line, highlighting where societies **agree** vs. **diverge** (drug names matched across languages).
 - **Revision timeline** — for conditions where guidance was revised (e.g. ACG UC 2010 → 2019 → 2025), a timeline of successive editions; superseded editions stay viewable but are kept out of search.
 - **Freshness tracking** — every guideline shows its year and a currency badge (current / aging / superseded).
@@ -98,8 +99,11 @@ src/lib/
   thesaurus.ts            Bilingual query → condition resolver
   search.ts               MiniSearch index + combined search
   data.ts                 Typed loaders / cross-reference helpers
+  drugs.ts                Drug → conditions cross-reference index
+  compare.ts              Cross-region comparison + drug-name normalization
 src/components/            SearchBar, SearchExperience, GuidelineCard, badges, …
 src/app/                   Routes: /, /search, /guideline/[id], /condition/[id],
+                           /conditions, /drugs, /drug/[slug],
                            /societies, /societies/[id], /about
 scripts/
   validate.ts             npm run validate

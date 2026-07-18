@@ -17,6 +17,7 @@ import { countryOf, lineagesForCondition, getDosing } from '../src/lib/data';
 import { search } from '../src/lib/search';
 import { buildComparison } from '../src/lib/compare';
 import { answerFor } from '../src/lib/answer';
+import { allDrugs, getDrugBySlug, drugsForQuery } from '../src/lib/drugs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -182,6 +183,42 @@ check('Polish “…dawkowanie” triggers dosing intent', (() => {
   const a = answerFor('wrzodziejące zapalenie jelita grubego dawkowanie');
   return !!a && a.intent === 'dosing';
 })());
+
+console.log('\nDrug cross-reference');
+const drugs = allDrugs();
+check('drug index is populated', drugs.length >= 50, `${drugs.length} drugs`);
+check('drug slugs are unique', new Set(drugs.map((d) => d.slug)).size === drugs.length);
+const infliximab = getDrugBySlug('infliximab');
+check('infliximab is indexed', !!infliximab);
+check(
+  'infliximab cross-references UC and Crohn’s',
+  !!infliximab &&
+    infliximab.conditions.some((c) => c.condition.id === 'ulcerative-colitis') &&
+    infliximab.conditions.some((c) => c.condition.id === 'crohns-disease'),
+);
+check(
+  'infliximab spans multiple guidelines',
+  (infliximab?.guidelineCount ?? 0) >= 5,
+  `${infliximab?.guidelineCount}`,
+);
+check(
+  'infliximab UC use carries dosing',
+  !!infliximab &&
+    (infliximab.conditions.find((c) => c.condition.id === 'ulcerative-colitis')?.guidelines ?? [])
+      .some((u) => u.doses.length > 0),
+);
+check(
+  'Polish “infliksymab” resolves to the same medicine',
+  drugsForQuery('infliksymab')[0]?.slug === 'infliximab',
+);
+const empagliflozin = getDrugBySlug('empagliflozin');
+check(
+  'empagliflozin merges the Polish alias and treats diabetes',
+  !!empagliflozin &&
+    empagliflozin.aliases.some((a) => a.toLowerCase() === 'empagliflozyna') &&
+    empagliflozin.conditions.some((c) => c.condition.specialty === 'diabetology' || c.condition.id.includes('diabet')),
+);
+check('“proton pump inhibitor” is found as a medicine', drugsForQuery('proton pump inhibitor').length > 0);
 
 console.log('');
 if (failures > 0) {

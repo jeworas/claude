@@ -5,7 +5,7 @@ import type { Country } from '@/lib/types';
 import { CountryBadge } from '@/components/badges';
 import { T } from '@/components/i18n';
 
-const EXAMPLE_QUERIES = ['colitis', 'WZJG', 'H. pylori dosing', 'celiac dosage', 'refluks', 'budesonide', 'cukrzyca'];
+const EXAMPLE_QUERIES = ['colitis', 'WZJG', 'H. pylori dosing', 'infliximab', 'celiac dosage', 'refluks', 'cukrzyca'];
 
 const FEATURED_CONDITION_IDS = [
   'ulcerative-colitis',

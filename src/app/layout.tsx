@@ -39,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <nav className="flex items-center gap-4 text-sm text-slate-600">
                 <Link href="/search" className="hover:text-teal-700"><T k="nav.search" /></Link>
                 <Link href="/conditions" className="hover:text-teal-700"><T k="nav.conditions" /></Link>
+                <Link href="/drugs" className="hover:text-teal-700"><T k="nav.drugs" /></Link>
                 <Link href="/societies" className="hover:text-teal-700"><T k="nav.societies" /></Link>
                 <Link href="/about" className="hover:text-teal-700"><T k="nav.about" /></Link>
                 <LangToggle />

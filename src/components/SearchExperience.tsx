@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { search } from '@/lib/search';
 import { answerFor } from '@/lib/answer';
+import { drugsForQuery } from '@/lib/drugs';
 import { getSociety, countryOf } from '@/lib/data';
 import SearchBar from '@/components/SearchBar';
 import GuidelineCard from '@/components/GuidelineCard';
@@ -29,6 +30,7 @@ export default function SearchExperience() {
 
   const results = useMemo(() => search(query), [query]);
   const answer = useMemo(() => answerFor(query), [query]);
+  const drugMatches = useMemo(() => (query ? drugsForQuery(query) : []), [query]);
 
   // Facets derived from the unfiltered result set (so counts reflect this query).
   const facets = useMemo(() => {
@@ -67,6 +69,30 @@ export default function SearchExperience() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <SearchBar initialQuery={query} />
+
+      {drugMatches.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {drugMatches.map((d) => (
+            <Link
+              key={d.slug}
+              href={`/drug/${d.slug}`}
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-teal-200 bg-teal-50/60 px-4 py-3 transition hover:border-teal-300"
+            >
+              <span className="rounded-full bg-teal-600 px-2 py-0.5 text-xs font-semibold text-white">
+                {t('search.medicine')}
+              </span>
+              <span className="font-semibold text-slate-800">{d.name}</span>
+              <span className="text-sm text-slate-600">
+                · {t('search.medicine.used')} {d.conditionCount}{' '}
+                {t(d.conditionCount === 1 ? 'drug.condition.one' : 'drug.condition.many')}
+              </span>
+              <span className="ml-auto text-sm font-medium text-teal-700">
+                {t('search.medicine.cta')} →
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {answer && <AnswerPanel answer={answer} />}
 
