@@ -21,10 +21,13 @@ const en: Dict = {
   'nav.conditions': 'Conditions',
   'nav.drugs': 'Medicines',
   'nav.societies': 'Societies',
+  'nav.coverage': 'Coverage',
   'nav.about': 'About',
   'conditions.title': 'Browse conditions',
   'conditions.subtitle':
     'Every condition in the index, grouped by specialty. Each gathers the matching guidelines from all mapped societies.',
+  'conditions.filter.title': 'Browse by specialty',
+  'conditions.filter.all': 'All specialties',
   'drugs.title': 'Browse medicines',
   'drugs.subtitle':
     'Every medicine in the atlas, cross-referenced to the conditions it is recommended for. Open one to see its indications, therapy line and standard dosing across guidelines.',
@@ -201,6 +204,21 @@ const en: Dict = {
   'societies.filter.all': 'All specialties',
   'societies.filter.count': 'societies',
 
+  'coverage.title': 'Coverage dashboard',
+  'coverage.subtitle':
+    'How the atlas covers each specialty across regions — current guidelines by discipline and region, the conditions indexed for each, and how many current guidelines are aging. Gaps (a discipline with conditions but few guidelines) are where the atlas grows next.',
+  'coverage.stat.guidelines': 'Current guidelines',
+  'coverage.stat.specialties': 'Specialties',
+  'coverage.stat.regions': 'Regions covered',
+  'coverage.stat.conditions': 'Conditions',
+  'coverage.col.specialty': 'Specialty',
+  'coverage.col.total': 'Total',
+  'coverage.col.conditions': 'Conditions',
+  'coverage.col.aging': 'Aging',
+  'coverage.row.total': 'All specialties',
+  'coverage.note':
+    'Counts reflect current (non-superseded) guidelines in this demo dataset. “Aging” counts current guidelines older than 5 years — a prompt to check the source for a newer edition. Select a specialty to browse its conditions.',
+
   'about.title': 'About GuidelineAtlas',
   'about.intro':
     'GuidelineAtlas is a proof-of-concept for a bilingual index of clinical practice guidelines. It gathers treatment recommendations from medical societies in the United States, Europe and Poland into one searchable place, so a clinician can find the current guidance for a condition — in English or Polish — in seconds instead of hunting across dozens of society websites.',
@@ -231,10 +249,13 @@ const pl: Dict = {
   'nav.conditions': 'Choroby',
   'nav.drugs': 'Leki',
   'nav.societies': 'Towarzystwa',
+  'nav.coverage': 'Zasięg',
   'nav.about': 'O aplikacji',
   'conditions.title': 'Przeglądaj choroby',
   'conditions.subtitle':
     'Wszystkie choroby w indeksie, pogrupowane według specjalności. Każda zbiera pasujące wytyczne ze wszystkich uwzględnionych towarzystw.',
+  'conditions.filter.title': 'Przeglądaj według specjalności',
+  'conditions.filter.all': 'Wszystkie specjalności',
   'drugs.title': 'Przeglądaj leki',
   'drugs.subtitle':
     'Każdy lek w atlasie, powiązany z chorobami, w których jest zalecany. Otwórz lek, aby zobaczyć wskazania, linię leczenia i standardowe dawkowanie w różnych wytycznych.',
@@ -410,6 +431,21 @@ const pl: Dict = {
   'societies.filter.title': 'Przeglądaj według specjalności',
   'societies.filter.all': 'Wszystkie specjalności',
   'societies.filter.count': 'towarzystw',
+
+  'coverage.title': 'Panel zasięgu',
+  'coverage.subtitle':
+    'Jak atlas pokrywa poszczególne specjalności w różnych regionach — aktualne wytyczne według dziedziny i regionu, zindeksowane dla nich choroby oraz liczba starzejących się aktualnych wytycznych. Luki (dziedzina z chorobami, ale nielicznymi wytycznymi) to kierunki dalszego rozwoju atlasu.',
+  'coverage.stat.guidelines': 'Aktualne wytyczne',
+  'coverage.stat.specialties': 'Specjalności',
+  'coverage.stat.regions': 'Uwzględnione regiony',
+  'coverage.stat.conditions': 'Choroby',
+  'coverage.col.specialty': 'Specjalność',
+  'coverage.col.total': 'Razem',
+  'coverage.col.conditions': 'Choroby',
+  'coverage.col.aging': 'Starzejące się',
+  'coverage.row.total': 'Wszystkie specjalności',
+  'coverage.note':
+    'Liczby odzwierciedlają aktualne (niezastąpione) wytyczne w tym demonstracyjnym zbiorze danych. „Starzejące się” to aktualne wytyczne starsze niż 5 lat — sygnał, aby sprawdzić u źródła nowsze wydanie. Wybierz specjalność, aby przeglądać jej choroby.',
 
   'about.title': 'O aplikacji GuidelineAtlas',
   'about.intro':
