@@ -218,13 +218,17 @@ const en: Dict = {
   'coverage.row.total': 'All specialties',
   'coverage.note':
     'Counts reflect current (non-superseded) guidelines in this demo dataset. “Aging” counts current guidelines older than 5 years — a prompt to check the source for a newer edition. Select a specialty to browse its conditions.',
+  'coverage.aging.title': 'Due for review',
+  'coverage.aging.subtitle':
+    'Current guidelines more than 5 years old, oldest first — each is a prompt to check the source for a newer edition.',
+  'coverage.aging.more': 'more older than 5 years',
 
   'about.title': 'About GuidelineAtlas',
   'about.intro':
     'GuidelineAtlas is a proof-of-concept for a bilingual index of clinical practice guidelines. It gathers treatment recommendations from medical societies in the United States, Europe and Poland into one searchable place, so a clinician can find the current guidance for a condition — in English or Polish — in seconds instead of hunting across dozens of society websites.',
   'about.contains.title': 'What this demo contains',
   'about.contains.note':
-    'A hand-curated sample covering gastroenterology and hepatology in depth, plus diabetes and hypertension for breadth. It is deliberately limited and is not a complete or authoritative catalogue.',
+    'A hand-curated sample covering gastroenterology and hepatology in depth, with a growing spread across cardiology, diabetology, nephrology, pulmonology, oncology, urology, ophthalmology, infectious disease and primary-care prevention — drawn from US, European, Polish and international societies. It is deliberately limited and is not a complete or authoritative catalogue.',
   'about.search.title': 'How search works',
   'about.search.body':
     'Every condition carries its English and Polish names, common synonyms, and abbreviations. A query is first resolved against this bilingual thesaurus — so “colitis”, “UC”, “WZJG” and “wrzodziejące zapalenie jelita grubego” all find ulcerative colitis — and then run through a fuzzy full-text index that also matches drug names and society names. Results show which term matched, so the cross-language behaviour is transparent.',
@@ -446,13 +450,17 @@ const pl: Dict = {
   'coverage.row.total': 'Wszystkie specjalności',
   'coverage.note':
     'Liczby odzwierciedlają aktualne (niezastąpione) wytyczne w tym demonstracyjnym zbiorze danych. „Starzejące się” to aktualne wytyczne starsze niż 5 lat — sygnał, aby sprawdzić u źródła nowsze wydanie. Wybierz specjalność, aby przeglądać jej choroby.',
+  'coverage.aging.title': 'Do przeglądu',
+  'coverage.aging.subtitle':
+    'Aktualne wytyczne starsze niż 5 lat, od najstarszych — każda to sygnał, aby sprawdzić u źródła nowsze wydanie.',
+  'coverage.aging.more': 'więcej starszych niż 5 lat',
 
   'about.title': 'O aplikacji GuidelineAtlas',
   'about.intro':
     'GuidelineAtlas to prototyp dwujęzycznego indeksu wytycznych praktyki klinicznej. Zbiera zalecenia terapeutyczne towarzystw medycznych ze Stanów Zjednoczonych, Europy i Polski w jednym przeszukiwalnym miejscu, aby klinicysta mógł znaleźć aktualne wytyczne dla danej choroby — po polsku lub angielsku — w kilka sekund, zamiast przeszukiwać dziesiątki stron towarzystw.',
   'about.contains.title': 'Co zawiera ta wersja demonstracyjna',
   'about.contains.note':
-    'Ręcznie przygotowana próbka obejmująca szczegółowo gastroenterologię i hepatologię oraz cukrzycę i nadciśnienie dla szerszego kontekstu. Jest celowo ograniczona i nie stanowi kompletnego ani autorytatywnego katalogu.',
+    'Ręcznie przygotowana próbka obejmująca szczegółowo gastroenterologię i hepatologię, z rosnącym zasięgiem w kardiologii, diabetologii, nefrologii, pulmonologii, onkologii, urologii, okulistyce, chorobach zakaźnych oraz profilaktyce w podstawowej opiece zdrowotnej — z towarzystw amerykańskich, europejskich, polskich i międzynarodowych. Jest celowo ograniczona i nie stanowi kompletnego ani autorytatywnego katalogu.',
   'about.search.title': 'Jak działa wyszukiwanie',
   'about.search.body':
     'Każda choroba ma swoje nazwy angielskie i polskie, częste synonimy i skróty. Zapytanie jest najpierw rozwiązywane w tym dwujęzycznym tezaurusie — więc „colitis”, „UC”, „WZJG” i „wrzodziejące zapalenie jelita grubego” prowadzą do wrzodziejącego zapalenia jelita grubego — a następnie przetwarzane przez rozmyty indeks pełnotekstowy, który dopasowuje także nazwy leków i towarzystw. Wyniki pokazują, który termin pasował, więc zachowanie międzyjęzykowe jest przejrzyste.',

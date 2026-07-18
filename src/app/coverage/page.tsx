@@ -5,6 +5,7 @@ import {
   guidelines,
   conditions,
   countryOf,
+  getSociety,
   isAging,
   AGING_THRESHOLD_YEARS,
 } from '@/lib/data';
@@ -14,6 +15,8 @@ import { T } from '@/components/i18n';
 export const metadata: Metadata = { title: 'Coverage — GuidelineAtlas' };
 
 const REGIONS: Country[] = ['US', 'EU', 'UK', 'PL', 'INT'];
+const NOW = 2026;
+const AGING_LIST_LIMIT = 15;
 
 /** Light teal heat tint scaled by cell count — kept pale so text stays legible. */
 function tint(count: number): string {
@@ -136,6 +139,51 @@ export default function CoveragePage() {
       </div>
 
       <p className="mt-3 text-xs text-slate-400"><T k="coverage.note" /></p>
+
+      {/* Aging worklist — the "Aging" column made actionable: the oldest current
+          guidelines, oldest first, each a prompt to re-check the source. */}
+      {(() => {
+        const aging = current.filter((g) => isAging(g)).sort((a, b) => a.year - b.year);
+        if (aging.length === 0) return null;
+        const shown = aging.slice(0, AGING_LIST_LIMIT);
+        return (
+          <section className="mt-10">
+            <h2 className="text-lg font-semibold text-slate-900">
+              <T k="coverage.aging.title" />
+              <span className="ml-2 text-sm font-normal text-slate-400">({aging.length})</span>
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-500"><T k="coverage.aging.subtitle" /></p>
+            <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+              {shown.map((g) => {
+                const society = getSociety(g.societyId);
+                const age = NOW - g.year;
+                return (
+                  <li key={g.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium tabular-nums text-amber-800">
+                      {age}y
+                    </span>
+                    <Link
+                      href={`/guideline/${g.id}`}
+                      className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800 hover:text-teal-700"
+                      title={g.title}
+                    >
+                      {g.title}
+                    </Link>
+                    <span className="hidden shrink-0 text-xs text-slate-400 sm:inline">
+                      {society?.abbreviation ?? g.societyId} · {g.year}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            {aging.length > shown.length && (
+              <p className="mt-2 text-xs text-slate-400">
+                + {aging.length - shown.length} <T k="coverage.aging.more" />
+              </p>
+            )}
+          </section>
+        );
+      })()}
     </div>
   );
 }
