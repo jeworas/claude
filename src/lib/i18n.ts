@@ -170,6 +170,9 @@ const en: Dict = {
   'societies.index': 'Guidelines index',
   'societies.none':
     'No guidelines have been ingested into the atlas for this society yet — it is mapped as a source. Open its guidelines index above to browse them at the publisher.',
+  'societies.filter.title': 'Browse by specialty',
+  'societies.filter.all': 'All specialties',
+  'societies.filter.count': 'societies',
 
   'about.title': 'About GuidelineAtlas',
   'about.intro':
@@ -350,6 +353,9 @@ const pl: Dict = {
   'societies.index': 'Indeks wytycznych',
   'societies.none':
     'Do atlasu nie dodano jeszcze wytycznych tego towarzystwa — jest ono zmapowane jako źródło. Otwórz indeks wytycznych powyżej, aby przeglądać je u wydawcy.',
+  'societies.filter.title': 'Przeglądaj według specjalności',
+  'societies.filter.all': 'Wszystkie specjalności',
+  'societies.filter.count': 'towarzystw',
 
   'about.title': 'O aplikacji GuidelineAtlas',
   'about.intro':
