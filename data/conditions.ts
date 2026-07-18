@@ -1297,6 +1297,31 @@ export const conditions: Condition[] = [
     "specialty": "nephrology"
   },
   {
+    "id": "rsv-infection",
+    "nameEn": "Respiratory syncytial virus infection",
+    "namePl": "Zakażenie syncytialnym wirusem oddechowym (RSV)",
+    "synonymsEn": [
+      "RSV infection",
+      "respiratory syncytial virus disease",
+      "RSV vaccination"
+    ],
+    "synonymsPl": [
+      "zakażenie RSV",
+      "syncytialny wirus oddechowy",
+      "szczepienie przeciw RSV"
+    ],
+    "abbreviations": [
+      "RSV"
+    ],
+    "icd10": [
+      "J12.1",
+      "J20.5",
+      "J21.0",
+      "B97.4"
+    ],
+    "specialty": "infectious-disease"
+  },
+  {
     "id": "hydroxychloroquine-retinopathy",
     "nameEn": "Hydroxychloroquine retinopathy",
     "namePl": "Retinopatia po hydroksychlorochinie",

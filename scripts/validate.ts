@@ -258,6 +258,45 @@ check('“difelikefalin” indexed with dosing', (() => {
   return !!d && d.conditions.some((c) => c.guidelines.some((u) => u.doses.length > 0));
 })());
 
+console.log('\nCross-specialty ingestion (PTN nephrology: nephroprotection + RSV)');
+check(
+  'English “nephroprotection” finds the PTN non-diabetic CKD statement',
+  search('nephroprotection').some((r) => r.guideline.id === 'ptn-nephroprotection-nondiabetic-ckd-2023'),
+);
+check(
+  'Polish “przewlekła choroba nerek” surfaces the PTN nephroprotection statement',
+  search('przewlekła choroba nerek').some((r) => r.guideline.id === 'ptn-nephroprotection-nondiabetic-ckd-2023'),
+);
+check(
+  'dapagliflozin now spans diabetology and nephrology (cross-specialty drug)',
+  (() => {
+    const specs = new Set((drugsForQuery('dapagliflozin')[0]?.conditions ?? []).map((c) => c.condition.specialty));
+    return specs.has('diabetology') && specs.has('nephrology');
+  })(),
+);
+check(
+  '“tolvaptan” is cross-referenced to CKD (ADPKD nephroprotection)',
+  (drugsForQuery('tolvaptan')[0]?.conditions ?? []).some((c) => c.condition.id === 'chronic-kidney-disease'),
+);
+check(
+  'Polish “wodorowęglan sodu” collapses to the same drug as “sodium bicarbonate”',
+  !!drugsForQuery('sodium bicarbonate')[0] &&
+    drugsForQuery('wodorowęglan sodu')[0]?.slug === drugsForQuery('sodium bicarbonate')[0]?.slug,
+);
+check('RSV infection condition exists (infectious-disease)', getCondition('rsv-infection')?.specialty === 'infectious-disease');
+check(
+  '“RSV” finds the PTN/PTW vaccination guideline',
+  search('RSV').some((r) => r.guideline.id === 'ptn-ptw-rsv-vaccination-ckd-2025'),
+);
+check(
+  'Polish “szczepienie przeciw RSV” finds the vaccination guideline',
+  search('szczepienie przeciw RSV').some((r) => r.guideline.id === 'ptn-ptw-rsv-vaccination-ckd-2025'),
+);
+check(
+  'RSV vaccination guideline cross-links to CKD',
+  guidelines.find((g) => g.id === 'ptn-ptw-rsv-vaccination-ckd-2025')?.conditionIds.includes('chronic-kidney-disease') === true,
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);

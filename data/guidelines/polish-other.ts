@@ -118,4 +118,122 @@ export const polishOtherGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'ptn-nephroprotection-nondiabetic-ckd-2023',
+    societyId: 'ptn',
+    conditionIds: ['chronic-kidney-disease'],
+    title:
+      'Pharmacological Nephroprotection in Non-Diabetic Chronic Kidney Disease — Clinical Practice Position Statement of the Polish Society of Nephrology',
+    titleLocal:
+      'Farmakologiczna nefroprotekcja w niecukrzycowej przewlekłej chorobie nerek — stanowisko Polskiego Towarzystwa Nefrologicznego w zakresie praktyki klinicznej',
+    language: 'pl',
+    specialty: 'nephrology',
+    year: 2023,
+    status: 'current',
+    sourceUrl: 'https://www.mdpi.com/2077-0383/12/16/5184',
+    citation:
+      'Stompór T, Adamczak M, Kurnatowska I, et al. Pharmacological Nephroprotection in Non-Diabetic Chronic Kidney Disease — Clinical Practice Position Statement of the Polish Society of Nephrology. J Clin Med. 2023;12(16):5184. Polish translation: Forum Nefrologiczne — Edukacja 2023;3(3):65–103.',
+    summary:
+      'Position statement of the Polish Society of Nephrology on pharmacological nephroprotection in adults with non-diabetic chronic kidney disease. It lays out a stepwise strategy to slow progression: renin–angiotensin system inhibition (ACE inhibitors preferred, ARBs as an alternative) titrated to the maximum tolerated dose, addition of an SGLT2 inhibitor with proven benefit in non-diabetic CKD (dapagliflozin or empagliflozin), blood-pressure control with combination therapy, correction of metabolic acidosis with sodium bicarbonate, and disease-specific treatment for ADPKD (tolvaptan) and Fabry disease (enzyme replacement or migalastat). It also flags therapies that should not be used solely for nephroprotection.',
+    keyRecommendations: [
+      {
+        topic: 'Blood-pressure targets (docelowe ciśnienie tętnicze)',
+        text: 'Treat adults with CKD and hypertension to an office blood pressure of at least 130–139/70–79 mmHg, and possibly lower (120–129/70–79 mmHg) in many patients — especially younger patients or those with proteinuria.',
+        evidenceGrade: 'Expert opinion',
+        lineOfTherapy: 'first-line',
+      },
+      {
+        topic: 'RAS inhibition (hamowanie układu renina–angiotensyna)',
+        text: 'ACE inhibitors (preferred agents: benazepril, ramipril, lisinopril) — or ARBs if ACEi-intolerant — are first-line for both blood-pressure lowering and nephroprotection in non-diabetic CKD, particularly with albuminuria. Titrate to the maximum tolerated dose and check potassium and creatinine 7–14 days after starting or increasing the dose.',
+        evidenceGrade: '1B',
+        lineOfTherapy: 'first-line',
+        drugs: ['ramipryl', 'benazepryl', 'lizynopryl'],
+      },
+      {
+        topic: 'Continuing RAS inhibitors (kontynuacja leczenia RAS)',
+        text: 'Do not routinely stop an ACEi/ARB in advanced CKD (G4–G5) to try to raise eGFR. Continue if serum creatinine rises less than 30% after initiation; if it rises more than 30%, withdraw and investigate for renal artery stenosis. Do not combine an ACEi with an ARB.',
+        evidenceGrade: '1A',
+        lineOfTherapy: 'maintenance',
+      },
+      {
+        topic: 'SGLT2 inhibitors (inhibitory SGLT2)',
+        text: 'Add an SGLT2 inhibitor with proven benefit in non-diabetic CKD — dapagliflozin or empagliflozin — for patients with eGFR below 60 mL/min/1.73 m² to slow progression, ideally alongside an ACEi/ARB and especially with albuminuria. Do not start below eGFR 25 (dapagliflozin) or 20 (empagliflozin), but continue until dialysis or transplantation if tolerated.',
+        evidenceGrade: '1A',
+        lineOfTherapy: 'first-line',
+        drugs: ['dapagliflozyna', 'empagliflozyna'],
+      },
+      {
+        topic: 'Combination and add-on therapy (leczenie skojarzone)',
+        text: 'Most patients need combination therapy: add a dihydropyridine calcium-channel blocker (amlodipine) and/or a diuretic — thiazide/thiazide-like (indapamide, chlorthalidone) if eGFR is above 30, or chlorthalidone/loop diuretics (furosemide, torasemide) if eGFR is 30 or below. Add spironolactone for resistant hypertension or persistent albuminuria when potassium is 4.5 mmol/L or lower, with close potassium monitoring.',
+        evidenceGrade: '1B',
+        lineOfTherapy: 'escalation',
+        drugs: ['amlodypina', 'indapamid', 'chlortalidon', 'furosemid', 'torasemid', 'spironolakton'],
+      },
+      {
+        topic: 'Metabolic acidosis (kwasica metaboliczna)',
+        text: 'Measure serum bicarbonate in all CKD patients and diagnose metabolic acidosis below 22 mmol/L. Give oral sodium bicarbonate to slow CKD progression, targeting serum bicarbonate of 24–28 mmol/L.',
+        evidenceGrade: '2B',
+        lineOfTherapy: 'supportive',
+        drugs: ['wodorowęglan sodu'],
+      },
+      {
+        topic: 'Disease-specific nephroprotection (leczenie swoiste)',
+        text: 'For autosomal dominant polycystic kidney disease (ADPKD) at high risk of progression, use tolvaptan. For Fabry disease, use enzyme replacement therapy with agalsidase alfa or beta, or the oral chaperone migalastat.',
+        evidenceGrade: '1A',
+        lineOfTherapy: 'first-line',
+        drugs: ['tolwaptan', 'agalzydaza alfa', 'agalzydaza beta', 'migalastat'],
+      },
+      {
+        topic: 'Therapies not recommended for nephroprotection (leczenie niezalecane)',
+        text: 'Do not use erythropoiesis-stimulating agents or HIF-PHIs, CKD–MBD drugs (calcimimetics, vitamin D analogues, phosphate binders), or antioxidant/anti-inflammatory agents specifically to slow CKD progression — although several remain indicated for their own complications.',
+        evidenceGrade: '1B',
+        lineOfTherapy: 'supportive',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
+  {
+    id: 'ptn-ptw-rsv-vaccination-ckd-2025',
+    societyId: 'ptn',
+    conditionIds: ['rsv-infection', 'chronic-kidney-disease'],
+    title:
+      'Expert Recommendations of the Polish Society of Nephrology and the Polish Society of Vaccinology on RSV Vaccination in Patients with Chronic Kidney Disease',
+    titleLocal:
+      'Zalecenia Ekspertów Polskiego Towarzystwa Nefrologicznego i Polskiego Towarzystwa Wakcynologii dotyczące szczepień przeciwko RSV pacjentów z przewlekłą chorobą nerek',
+    language: 'pl',
+    specialty: 'nephrology',
+    year: 2025,
+    status: 'current',
+    sourceUrl: 'https://doi.org/10.5603/rdatf.108124',
+    citation:
+      'Durlik M, Dębska-Ślizień A, Krajewska M, et al. Expert recommendations of the Polish Society of Nephrology and the Polish Society of Vaccinology on RSV vaccination in patients with chronic kidney disease. Renal Disease and Transplantation Forum. 2025;18:30–34. DOI: 10.5603/rdatf.108124.',
+    summary:
+      'Joint expert recommendations of the Polish Society of Nephrology and the Polish Society of Vaccinology on preventing respiratory syncytial virus (RSV) disease in patients with chronic kidney disease, who face a roughly 6–8-fold higher risk of RSV-related hospitalization. Vaccination is recommended for all adults aged 60 or older, and for CKD, dialysis, and transplant patients aged 50 or older, using one of the two recombinant protein vaccines available in Poland — Arexvy (GSK) or Abrysvo (Pfizer) — each given as a single intramuscular dose. Both are non-live and suitable for transplant recipients; household members and healthcare staff should also be vaccinated.',
+    keyRecommendations: [
+      {
+        topic: 'Who to vaccinate (wskazania do szczepienia)',
+        text: 'RSV vaccination is recommended for all adults aged 60 or older; for patients with CKD or on dialysis aged 50 or older; and for transplant recipients aged 50 or older. It is also advised for patients being worked up for kidney transplantation.',
+        lineOfTherapy: 'prevention',
+      },
+      {
+        topic: 'Available vaccines (dostępne szczepionki)',
+        text: 'Two recombinant protein RSV vaccines are available in Poland, each given as a single intramuscular dose: Arexvy (GSK; adjuvanted RSVPreF3) and Abrysvo (Pfizer; bivalent prefusion-F, subgroups A and B).',
+        lineOfTherapy: 'prevention',
+        drugs: ['Arexvy', 'Abrysvo'],
+      },
+      {
+        topic: 'Rationale (uzasadnienie)',
+        text: 'Patients with CKD have roughly a 6–8-fold higher risk of RSV-related hospitalization. In trials of adults 60 or older, Arexvy reduced RSV lower-respiratory-tract disease by about 83% (up to ~95% in those with comorbidities) and Abrysvo by about 67% (over 85% for severe disease).',
+        lineOfTherapy: 'prevention',
+      },
+      {
+        topic: 'Immunocompromised and transplant patients (pacjenci z immunosupresją)',
+        text: 'Both vaccines are non-live recombinant products and may be given to transplant recipients, in whom live vaccines remain contraindicated. Uremia and immunosuppression can blunt the response, but vaccination is still recommended; household members and healthcare staff should be vaccinated as well.',
+        lineOfTherapy: 'prevention',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];

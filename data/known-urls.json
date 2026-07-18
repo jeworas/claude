@@ -57,6 +57,11 @@
       "indexUrl": "https://www.era-online.org/guidelines/"
     },
     {
+      "societyId": "ptn",
+      "abbreviation": "PTNef",
+      "indexUrl": "https://ptnefro.com.pl/zalecenia-i-stanowiska-ptn"
+    },
+    {
       "societyId": "ptnt",
       "abbreviation": "PTNT",
       "indexUrl": "https://www.nadcisnienietetnicze.pl/"
@@ -648,6 +653,24 @@
       "title": "Guidelines for the Management of Arterial Hypertension 2024 — Polish Society of Hypertension",
       "titleLocal": "Wytyczne postępowania w nadciśnieniu tętniczym 2024",
       "url": "https://nadcisnienietetnicze.pl/ptnt/wytyczne_ptnt",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptn-nephroprotection-nondiabetic-ckd-2023",
+      "societyId": "ptn",
+      "country": "PL",
+      "title": "Pharmacological Nephroprotection in Non-Diabetic Chronic Kidney Disease — Clinical Practice Position Statement of the Polish Society of Nephrology",
+      "titleLocal": "Farmakologiczna nefroprotekcja w niecukrzycowej przewlekłej chorobie nerek — stanowisko Polskiego Towarzystwa Nefrologicznego w zakresie praktyki klinicznej",
+      "url": "https://www.mdpi.com/2077-0383/12/16/5184",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptn-ptw-rsv-vaccination-ckd-2025",
+      "societyId": "ptn",
+      "country": "PL",
+      "title": "Expert Recommendations of the Polish Society of Nephrology and the Polish Society of Vaccinology on RSV Vaccination in Patients with Chronic Kidney Disease",
+      "titleLocal": "Zalecenia Ekspertów Polskiego Towarzystwa Nefrologicznego i Polskiego Towarzystwa Wakcynologii dotyczące szczepień przeciwko RSV pacjentów z przewlekłą chorobą nerek",
+      "url": "https://doi.org/10.5603/rdatf.108124",
       "pdfUrl": null
     },
     {

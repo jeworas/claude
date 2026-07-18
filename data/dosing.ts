@@ -9,6 +9,20 @@ import type { DoseEntry } from '../src/lib/types';
  * formulary before prescribing.
  */
 export const dosingByGuideline: Record<string, DoseEntry[]> = {
+  'ptn-nephroprotection-nondiabetic-ckd-2023': [
+    { drug: 'Ramipril', indication: 'RAS inhibition / nephroprotection', regimen: 'Start 2.5–5 mg orally once daily; titrate to the maximum tolerated dose (up to 10 mg/day), monitoring potassium and creatinine' },
+    { drug: 'Dapagliflozin', indication: 'Non-diabetic CKD, eGFR ≥25', regimen: '10 mg orally once daily' },
+    { drug: 'Empagliflozin', indication: 'Non-diabetic CKD, eGFR ≥20', regimen: '10 mg orally once daily' },
+    { drug: 'Spironolactone', indication: 'Resistant hypertension / persistent albuminuria', regimen: '25 mg orally once daily, with potassium and creatinine monitoring' },
+    { drug: 'Sodium bicarbonate', indication: 'Metabolic acidosis', regimen: 'Oral, titrated to a serum bicarbonate target of 24–28 mmol/L' },
+    { drug: 'Tolvaptan', indication: 'ADPKD at high risk of progression', regimen: 'Split daily dose titrated from 45 mg + 15 mg toward 90 mg + 30 mg (morning + ~8 h later) as tolerated' },
+    { drug: 'Agalsidase beta', indication: 'Fabry disease (enzyme replacement)', regimen: '1 mg/kg IV every 2 weeks' },
+    { drug: 'Migalastat', indication: 'Fabry disease with amenable GLA variant', regimen: '123 mg orally once every other day' },
+  ],
+  'ptn-ptw-rsv-vaccination-ckd-2025': [
+    { drug: 'Arexvy (RSVPreF3, GSK)', indication: 'RSV prevention in adults', regimen: 'Single 0.5 mL intramuscular dose' },
+    { drug: 'Abrysvo (bivalent prefusion-F, Pfizer)', indication: 'RSV prevention in adults', regimen: 'Single 0.5 mL intramuscular dose' },
+  ],
   'acg-h-pylori-2024': [
     { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy', regimen: 'Standard dose orally twice daily (e.g. omeprazole 20 mg BID) for 14 days' },
     { drug: 'Bismuth subsalicylate', indication: 'Bismuth quadruple therapy', regimen: '300–524 mg orally four times daily for 14 days' },
