@@ -1,0 +1,5 @@
+# Generated data files are written with LF by the Node scripts (npm run sources /
+# gen:known-urls). Force LF so Windows (core.autocrlf) doesn't flag them as
+# modified after regeneration, which otherwise blocks `git pull`.
+data/guideline-sources.json text eol=lf
+data/known-urls.json text eol=lf
