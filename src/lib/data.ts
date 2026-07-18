@@ -1,10 +1,16 @@
-import type { Country, Condition, Guideline, Society } from './types';
+import type { Country, Condition, DoseEntry, Guideline, Society } from './types';
 import { societies } from '../../data/societies';
 import { conditions } from '../../data/conditions';
 import { guidelines } from '../../data/guidelines';
 import { SUPERSEDED_BY } from '../../data/guidelines/lineage';
+import { dosingByGuideline } from '../../data/dosing';
 
 export { societies, conditions, guidelines };
+
+/** Standard dosing reference for a guideline (empty if none curated yet). */
+export function getDosing(guidelineId: string): DoseEntry[] {
+  return dosingByGuideline[guidelineId] ?? [];
+}
 
 /** Follow the supersession chain (older → newer) to the terminal current edition. */
 function headOf(id: string): string {

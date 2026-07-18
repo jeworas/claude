@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { lineagesForCondition } from '@/lib/data';
 import { SocietyBadge, CountryBadge } from '@/components/badges';
 import { countryOf } from '@/lib/data';
+import { T } from '@/components/i18n';
 
 /**
  * "How the guidance evolved" — for each society with more than one edition of a
@@ -14,11 +15,8 @@ export default function RevisionTimeline({ conditionId }: { conditionId: string 
 
   return (
     <section className="mt-8">
-      <h2 className="text-lg font-semibold text-slate-900">How the guidance evolved</h2>
-      <p className="mt-1 text-sm text-slate-500">
-        Successive editions from each society. The most recent is current; earlier editions are
-        superseded but kept for reference.
-      </p>
+      <h2 className="text-lg font-semibold text-slate-900"><T k="condition.timeline.title" /></h2>
+      <p className="mt-1 text-sm text-slate-500"><T k="condition.timeline.subtitle" /></p>
 
       <div className="mt-4 space-y-5">
         {lineages.map((lineage) => (
@@ -55,7 +53,7 @@ export default function RevisionTimeline({ conditionId }: { conditionId: string 
                           isCurrent ? 'text-teal-700' : 'text-slate-400'
                         }`}
                       >
-                        {isCurrent ? 'current' : 'superseded'}
+                        <T k={isCurrent ? 'condition.timeline.current' : 'condition.timeline.superseded'} />
                       </span>
                     </Link>
                     {!isLast && (

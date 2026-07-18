@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useT } from '@/components/i18n';
 
 /**
  * Query input. Submitting navigates to /search?q=… so results are shareable
@@ -17,6 +18,7 @@ export default function SearchBar({
   size?: 'md' | 'lg';
 }) {
   const router = useRouter();
+  const t = useT();
   const [value, setValue] = useState(initialQuery);
 
   function submit(e: React.FormEvent) {
@@ -39,8 +41,8 @@ export default function SearchBar({
             type="search"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="Search a condition, drug, or society — e.g. colitis, WZJG, H. pylori"
-            aria-label="Search guidelines"
+            placeholder={t('searchbar.placeholder')}
+            aria-label={t('searchbar.aria')}
             className={`w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 text-slate-900 shadow-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 ${
               big ? 'py-3 text-base' : 'py-2 text-sm'
             }`}
@@ -52,7 +54,7 @@ export default function SearchBar({
             big ? 'px-6 text-base' : 'px-4 text-sm'
           }`}
         >
-          Search
+          {t('searchbar.button')}
         </button>
       </div>
     </form>

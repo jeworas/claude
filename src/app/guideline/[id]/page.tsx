@@ -9,9 +9,12 @@ import {
   conditionsForGuideline,
   guidelinesForCondition,
   currentReplacementFor,
+  getDosing,
 } from '@/lib/data';
 import { CountryBadge, SocietyBadge, SpecialtyBadge, FreshnessBadge } from '@/components/badges';
 import RecommendationList from '@/components/RecommendationList';
+import DosingTable from '@/components/DosingTable';
+import { T } from '@/components/i18n';
 
 export function generateStaticParams() {
   return guidelines.map((g) => ({ id: g.id }));
@@ -50,7 +53,7 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
       <nav className="text-sm text-slate-500">
-        <Link href="/search" className="hover:text-teal-700">Search</Link>
+        <Link href="/search" className="hover:text-teal-700"><T k="nav.search" /></Link>
         <span className="mx-1">/</span>
         <span className="text-slate-700">{society?.abbreviation}</span>
       </nav>
@@ -80,10 +83,10 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
 
       {guideline.status === 'superseded' && (
         <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">
-          ⚠ This is a <strong>superseded</strong> edition, shown for historical reference.
+          ⚠ <T k="guideline.superseded.warn" />
           {replacement && (
             <>
-              {' '}The current version is{' '}
+              {' '}<T k="guideline.superseded.current" />{' '}
               <Link href={`/guideline/${replacement.id}`} className="font-medium underline">
                 {replacement.title} ({replacement.year})
               </Link>
@@ -109,21 +112,21 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
 
       {/* Summary */}
       <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Overview</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400"><T k="guideline.overview" /></h2>
         <p className="mt-2 text-slate-700">{guideline.summary}</p>
       </section>
 
       {/* Key recommendations */}
       <section className="mt-6">
-        <h2 className="text-lg font-semibold text-slate-900">Key treatment recommendations</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Condensed for quick reference — consult the full guideline for complete criteria, dosing,
-          and caveats.
-        </p>
+        <h2 className="text-lg font-semibold text-slate-900"><T k="guideline.keyrec.title" /></h2>
+        <p className="mt-1 text-sm text-slate-500"><T k="guideline.keyrec.subtitle" /></p>
         <div className="mt-4">
           <RecommendationList recommendations={guideline.keyRecommendations} />
         </div>
       </section>
+
+      {/* Dosing quick-reference */}
+      <DosingTable doses={getDosing(guideline.id)} />
 
       {/* Source / provenance */}
       <section className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
@@ -134,7 +137,7 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700"
           >
-            Read the full guideline ↗
+            <T k="guideline.read" /> ↗
           </a>
           {guideline.pdfUrl && (
             <a
@@ -148,12 +151,11 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
           )}
         </div>
         <p className="mt-3 text-xs text-slate-500">
-          Last verified {guideline.lastVerified} · Source of record:{' '}
+          <T k="guideline.lastverified" /> {guideline.lastVerified} · <T k="guideline.sourceofrecord" />{' '}
           <span className="break-all">{guideline.sourceUrl}</span>
         </p>
         <p className="mt-2 text-xs text-amber-700">
-          ⚠ Hand-curated demo summary. Verify every recommendation against the original publication
-          before clinical use.
+          ⚠ <T k="guideline.demo.warn" />
         </p>
       </section>
 
@@ -161,7 +163,7 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
       {related.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold text-slate-900">
-            Other guidelines for the same condition
+            <T k="guideline.related" />
           </h2>
           <ul className="mt-3 space-y-2">
             {related.map((g) => {

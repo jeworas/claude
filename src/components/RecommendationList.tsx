@@ -1,17 +1,6 @@
 import type { Recommendation } from '@/lib/types';
 import { EvidenceBadge } from '@/components/badges';
-
-const LINE_LABEL: Record<string, string> = {
-  diagnosis: 'Diagnosis',
-  screening: 'Screening',
-  'first-line': 'First-line',
-  'second-line': 'Second-line',
-  escalation: 'Escalation',
-  maintenance: 'Maintenance',
-  refractory: 'Refractory',
-  prevention: 'Prevention',
-  supportive: 'Supportive',
-};
+import { T } from '@/components/i18n';
 
 const LINE_STYLE: Record<string, string> = {
   diagnosis: 'bg-slate-100 text-slate-700',
@@ -38,7 +27,7 @@ export default function RecommendationList({ recommendations }: { recommendation
                   LINE_STYLE[r.lineOfTherapy] ?? 'bg-slate-100 text-slate-700'
                 }`}
               >
-                {LINE_LABEL[r.lineOfTherapy] ?? r.lineOfTherapy}
+                <T k={`line.${r.lineOfTherapy}`} />
               </span>
             )}
             <span className="text-sm font-semibold text-slate-800">{r.topic}</span>

@@ -1,4 +1,5 @@
 import type { Country, GuidelineStatus } from '@/lib/types';
+import { T } from '@/components/i18n';
 
 const countryStyles: Record<Country, string> = {
   US: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -68,7 +69,7 @@ export function FreshnessBadge({
   if (status === 'superseded') {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-800">
-        ⚠ Superseded
+        ⚠ <T k="fresh.superseded" />
       </span>
     );
   }
@@ -76,13 +77,13 @@ export function FreshnessBadge({
   if (age > agingThreshold) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-        ↻ {age} yrs old — check for update
+        ↻ {age} <T k="fresh.old" />
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
-      ✓ Current
+      ✓ <T k="fresh.current" />
     </span>
   );
 }

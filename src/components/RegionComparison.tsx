@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Country } from '@/lib/types';
 import { buildComparison, isConsensus, type CompareRow } from '@/lib/compare';
-import { REGION_LABEL } from '@/components/badges';
+import { T } from '@/components/i18n';
 
 const REGION_FLAG: Record<Country, string> = { US: '🇺🇸', EU: '🇪🇺', PL: '🇵🇱' };
 
@@ -17,15 +17,15 @@ export default function RegionComparison({ conditionId }: { conditionId: string 
 
   return (
     <section className="mt-8">
-      <h2 className="text-lg font-semibold text-slate-900">How the regions compare</h2>
+      <h2 className="text-lg font-semibold text-slate-900"><T k="condition.compare.title" /></h2>
       <p className="mt-1 text-sm text-slate-500">
-        Current recommendations aligned by line of therapy.{' '}
+        <T k="condition.compare.subtitle.a" />{' '}
         <span className="rounded bg-teal-100 px-1.5 py-0.5 text-xs font-medium text-teal-800">
           teal
         </span>{' '}
-        = the same drug is recommended in another region (consensus);{' '}
-        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">grey</span> =
-        region-specific. Polish and English drug names are matched across languages.
+        <T k="condition.compare.subtitle.consensus" />{' '}
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">grey</span>{' '}
+        <T k="condition.compare.subtitle.specific" />
       </p>
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
@@ -33,7 +33,7 @@ export default function RegionComparison({ conditionId }: { conditionId: string 
           <thead>
             <tr className="bg-slate-50">
               <th className="w-28 border-b border-slate-200 px-3 py-2 text-left font-semibold text-slate-500">
-                Therapy line
+                <T k="condition.compare.therapyline" />
               </th>
               {matrix.regions.map((r) => (
                 <th
@@ -41,7 +41,7 @@ export default function RegionComparison({ conditionId }: { conditionId: string 
                   className="border-b border-l border-slate-200 px-3 py-2 text-left font-semibold text-slate-700"
                 >
                   <span aria-hidden className="mr-1">{REGION_FLAG[r]}</span>
-                  {REGION_LABEL[r]}
+                  <T k={`region.${r}`} />
                 </th>
               ))}
             </tr>
@@ -51,7 +51,7 @@ export default function RegionComparison({ conditionId }: { conditionId: string 
               <tr key={row.line} className="align-top">
                 <th className="border-b border-slate-100 px-3 py-3 text-left">
                   <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                    {row.label}
+                    <T k={`line.${row.line}`} />
                   </span>
                 </th>
                 {matrix.regions.map((region) => (

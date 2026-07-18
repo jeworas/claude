@@ -3,30 +3,28 @@ import type { Metadata } from 'next';
 import type { Country } from '@/lib/types';
 import { societies, currentGuidelinesForSociety } from '@/lib/data';
 import { CountryBadge, SpecialtyBadge } from '@/components/badges';
+import { T } from '@/components/i18n';
 
 export const metadata: Metadata = { title: 'Societies — GuidelineAtlas' };
 
-const COUNTRY_GROUPS: { country: Country; label: string; flag: string }[] = [
-  { country: 'US', label: 'United States', flag: '🇺🇸' },
-  { country: 'EU', label: 'Europe', flag: '🇪🇺' },
-  { country: 'PL', label: 'Poland', flag: '🇵🇱' },
+const COUNTRY_GROUPS: { country: Country; flag: string }[] = [
+  { country: 'US', flag: '🇺🇸' },
+  { country: 'EU', flag: '🇪🇺' },
+  { country: 'PL', flag: '🇵🇱' },
 ];
 
 export default function SocietiesPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="text-2xl font-bold text-slate-900">Mapped societies</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        The guideline-issuing bodies currently indexed. The registry is intentionally small for this
-        proof of concept and will expand across specialties and countries.
-      </p>
+      <h1 className="text-2xl font-bold text-slate-900"><T k="societies.title" /></h1>
+      <p className="mt-1 text-sm text-slate-500"><T k="societies.subtitle" /></p>
 
-      {COUNTRY_GROUPS.map(({ country, label, flag }) => {
+      {COUNTRY_GROUPS.map(({ country, flag }) => {
         const group = societies.filter((s) => s.country === country);
         return (
           <section key={country} className="mt-8">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-              <span aria-hidden>{flag}</span> {label}
+              <span aria-hidden>{flag}</span> <T k={`region.${country}`} />
               <span className="text-sm font-normal text-slate-400">({group.length})</span>
             </h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -42,7 +40,7 @@ export default function SocietiesPage() {
                       {s.specialties.map((sp) => (
                         <SpecialtyBadge key={sp} specialty={sp} />
                       ))}
-                      <span className="ml-auto text-xs text-slate-400">{count} guidelines</span>
+                      <span className="ml-auto text-xs text-slate-400">{count} <T k="societies.guidelines" /></span>
                     </div>
                     <h3 className="mt-2 font-semibold text-slate-900">
                       <Link href={`/societies/${s.id}`} className="hover:text-teal-700">
@@ -53,7 +51,7 @@ export default function SocietiesPage() {
                     {s.description && <p className="mt-2 text-sm text-slate-600">{s.description}</p>}
                     <div className="mt-3 flex gap-4 text-sm">
                       <Link href={`/societies/${s.id}`} className="font-medium text-teal-700 hover:text-teal-900">
-                        View guidelines →
+                        <T k="societies.viewguidelines" /> →
                       </Link>
                       <a
                         href={s.guidelinesIndexUrl}
@@ -61,7 +59,7 @@ export default function SocietiesPage() {
                         rel="noopener noreferrer"
                         className="text-slate-500 hover:text-teal-700"
                       >
-                        Society site ↗
+                        <T k="societies.site" /> ↗
                       </a>
                     </div>
                   </div>

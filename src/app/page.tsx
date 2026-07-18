@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import SearchBar from '@/components/SearchBar';
 import { guidelines, societies, conditions, currentGuidelinesForCondition } from '@/lib/data';
+import type { Country } from '@/lib/types';
 import { CountryBadge } from '@/components/badges';
+import { T } from '@/components/i18n';
 
-const EXAMPLE_QUERIES = ['colitis', 'WZJG', 'ulcerative colitis', 'H. pylori', 'refluks', 'budesonide', 'cukrzyca'];
+const EXAMPLE_QUERIES = ['colitis', 'WZJG', 'H. pylori dosing', 'celiac dosage', 'refluks', 'budesonide', 'cukrzyca'];
 
 const FEATURED_CONDITION_IDS = [
   'ulcerative-colitis',
@@ -27,13 +29,11 @@ export default function Home() {
       <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
         <div className="mx-auto max-w-4xl px-4 py-14 text-center">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            Find current treatment guidelines,{' '}
-            <span className="text-teal-600">in English or Polish</span>
+            <T k="home.hero.title1" />{' '}
+            <span className="text-teal-600"><T k="home.hero.title2" /></span>
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-slate-600">
-            One search across US, European and Polish medical societies. Type a condition, drug, or
-            abbreviation in either language — see a treatment summary and jump straight to the
-            source guideline.
+            <T k="home.hero.subtitle" />
           </p>
 
           <div className="mx-auto mt-7 max-w-2xl">
@@ -41,7 +41,7 @@ export default function Home() {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm">
-            <span className="text-slate-400">Try:</span>
+            <span className="text-slate-400"><T k="home.try" /></span>
             {EXAMPLE_QUERIES.map((q) => (
               <Link
                 key={q}
@@ -54,20 +54,18 @@ export default function Home() {
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-8 text-center">
-            <Stat value={currentCount} label="Guidelines" />
-            <Stat value={societies.length} label="Societies" />
-            <Stat value={countries.size} label="Regions" />
-            <Stat value={conditions.length} label="Conditions" />
+            <Stat value={currentCount} labelKey="home.stat.guidelines" />
+            <Stat value={societies.length} labelKey="home.stat.societies" />
+            <Stat value={countries.size} labelKey="home.stat.regions" />
+            <Stat value={conditions.length} labelKey="home.stat.conditions" />
           </div>
         </div>
       </section>
 
       {/* Featured conditions */}
       <section className="mx-auto max-w-6xl px-4 py-10">
-        <h2 className="text-lg font-semibold text-slate-900">Browse common conditions</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Each condition gathers the matching guidelines from every mapped society, side by side.
-        </p>
+        <h2 className="text-lg font-semibold text-slate-900"><T k="home.browse.title" /></h2>
+        <p className="mt-1 text-sm text-slate-500"><T k="home.browse.subtitle" /></p>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((c) => {
             const gs = currentGuidelinesForCondition(c.id);
@@ -82,10 +80,11 @@ export default function Home() {
               >
                 <div className="flex items-center gap-2">
                   {[...cardCountries].map((country) => (
-                    <CountryBadge key={country} country={country as 'US' | 'PL'} />
+                    <CountryBadge key={country} country={country as Country} />
                   ))}
                   <span className="ml-auto text-xs text-slate-400">
-                    {gs.length} {gs.length === 1 ? 'guideline' : 'guidelines'}
+                    {gs.length}{' '}
+                    <T k={gs.length === 1 ? 'home.card.guideline' : 'home.card.guidelines'} />
                   </span>
                 </div>
                 <h3 className="mt-2 font-semibold text-slate-900 group-hover:text-teal-700">
@@ -104,20 +103,11 @@ export default function Home() {
       {/* How it works */}
       <section className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h2 className="text-lg font-semibold text-slate-900">Why GuidelineAtlas</h2>
+          <h2 className="text-lg font-semibold text-slate-900"><T k="home.why.title" /></h2>
           <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <Feature
-              title="Bilingual by design"
-              body="Search in English or Polish. “WZJG”, “wrzodziejące zapalenie jelita grubego”, “UC” and “ulcerative colitis” all resolve to the same condition — and we show you which term matched."
-            />
-            <Feature
-              title="Freshness at a glance"
-              body="Every guideline shows its publication year and a currency badge, so an out-of-date recommendation is obvious before you rely on it."
-            />
-            <Feature
-              title="Straight to the source"
-              body="Structured treatment summaries are attributed to one guideline and link directly to the original publication for the full text."
-            />
+            <Feature titleKey="home.feature.bilingual.title" bodyKey="home.feature.bilingual.body" />
+            <Feature titleKey="home.feature.freshness.title" bodyKey="home.feature.freshness.body" />
+            <Feature titleKey="home.feature.source.title" bodyKey="home.feature.source.body" />
           </div>
         </div>
       </section>
@@ -125,20 +115,20 @@ export default function Home() {
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }) {
+function Stat({ value, labelKey }: { value: number; labelKey: string }) {
   return (
     <div>
       <div className="text-2xl font-bold text-slate-900">{value}</div>
-      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-slate-500"><T k={labelKey} /></div>
     </div>
   );
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({ titleKey, bodyKey }: { titleKey: string; bodyKey: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm text-slate-600">{body}</p>
+      <h3 className="font-semibold text-slate-900"><T k={titleKey} /></h3>
+      <p className="mt-1 text-sm text-slate-600"><T k={bodyKey} /></p>
     </div>
   );
 }

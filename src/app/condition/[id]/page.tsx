@@ -6,7 +6,7 @@ import { conditions, getCondition, countryOf, currentGuidelinesForCondition } fr
 import GuidelineCard from '@/components/GuidelineCard';
 import RegionComparison from '@/components/RegionComparison';
 import RevisionTimeline from '@/components/RevisionTimeline';
-import { REGION_LABEL } from '@/components/badges';
+import { T } from '@/components/i18n';
 
 export function generateStaticParams() {
   return conditions.map((c) => ({ id: c.id }));
@@ -48,9 +48,9 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <nav className="text-sm text-slate-500">
-        <Link href="/" className="hover:text-teal-700">Home</Link>
+        <Link href="/" className="hover:text-teal-700"><T k="nav.home" /></Link>
         <span className="mx-1">/</span>
-        <span className="text-slate-700">Condition</span>
+        <span className="text-slate-700"><T k="condition.crumb" /></span>
       </nav>
 
       <header className="mt-3">
@@ -66,17 +66,20 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
         </div>
         {synonyms.length > 0 && (
           <p className="mt-2 text-sm text-slate-500">
-            <span className="text-slate-400">Also known as: </span>
+            <span className="text-slate-400"><T k="condition.alsoknown" /> </span>
             {synonyms.join(' · ')}
           </p>
         )}
       </header>
 
       <p className="mt-4 text-sm text-slate-600">
-        <span className="font-semibold">{all.length}</span> current{' '}
-        {all.length === 1 ? 'guideline' : 'guidelines'} across{' '}
-        {presentColumns.length === 1 ? '1 region' : `${presentColumns.length} regions`} — see where
-        US, European and Polish societies agree and where they differ.
+        <span className="font-semibold">{all.length}</span>{' '}
+        <T k="condition.summary.current" />{' '}
+        <T k={all.length === 1 ? 'condition.summary.guideline' : 'condition.summary.guidelines'} />{' '}
+        <T k="condition.summary.across" /> {presentColumns.length}{' '}
+        <T k={presentColumns.length === 1 ? 'condition.summary.region' : 'condition.summary.regions'} />
+        {' — '}
+        <T k="condition.summary.tail" />
       </p>
 
       {/* Cross-region comparison + revision history */}
@@ -85,14 +88,14 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
 
       {/* Current guidelines grouped by region */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-slate-900">Current guidelines by region</h2>
+        <h2 className="text-lg font-semibold text-slate-900"><T k="condition.byregion.title" /></h2>
         <div className={`mt-4 grid grid-cols-1 gap-6 ${gridCols}`}>
           {presentColumns.map(({ country, flag }) => {
             const list = all.filter((g) => countryOf(g) === country);
             return (
               <section key={country}>
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
-                  <span aria-hidden>{flag}</span> {REGION_LABEL[country]}
+                  <span aria-hidden>{flag}</span> <T k={`region.${country}`} />
                   <span className="text-sm font-normal text-slate-400">({list.length})</span>
                 </h3>
                 <div className="space-y-4">

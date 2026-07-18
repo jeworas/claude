@@ -4,12 +4,12 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { search } from '@/lib/search';
+import { answerFor } from '@/lib/answer';
 import { getSociety, countryOf } from '@/lib/data';
-import type { Country } from '@/lib/types';
 import SearchBar from '@/components/SearchBar';
 import GuidelineCard from '@/components/GuidelineCard';
-
-const COUNTRY_LABEL: Record<Country, string> = { US: 'United States', PL: 'Poland', EU: 'Europe' };
+import AnswerPanel from '@/components/AnswerPanel';
+import { useT } from '@/components/i18n';
 
 /**
  * Full client-side search page: reads the query and filters from the URL,
@@ -20,6 +20,7 @@ export default function SearchExperience() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const t = useT();
 
   const query = params.get('q') ?? '';
   const countryFilter = params.get('country') ?? '';
@@ -27,6 +28,7 @@ export default function SearchExperience() {
   const specialtyFilter = params.get('specialty') ?? '';
 
   const results = useMemo(() => search(query), [query]);
+  const answer = useMemo(() => answerFor(query), [query]);
 
   // Facets derived from the unfiltered result set (so counts reflect this query).
   const facets = useMemo(() => {
@@ -66,21 +68,21 @@ export default function SearchExperience() {
     <div className="mx-auto max-w-6xl px-4 py-6">
       <SearchBar initialQuery={query} />
 
+      {answer && <AnswerPanel answer={answer} />}
+
       {query && (
         <p className="mt-4 text-sm text-slate-600">
-          {filtered.length} {filtered.length === 1 ? 'guideline' : 'guidelines'}
-          {hasFilters && ` of ${results.length}`} for{' '}
+          {filtered.length}{' '}
+          {t(filtered.length === 1 ? 'search.results.guideline' : 'search.results.guidelines')}
+          {hasFilters && ` ${t('search.results.of')} ${results.length}`} {t('search.results.for')}{' '}
           <span className="font-semibold text-slate-900">“{query}”</span>
         </p>
       )}
 
       {query && results.length === 0 && (
         <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-center text-slate-600">
-          <p className="font-medium">No guidelines matched “{query}”.</p>
-          <p className="mt-1 text-sm">
-            Try a condition (colitis, GERD), an abbreviation (UC, WZJG, IBS), a drug (budesonide),
-            or a Polish term (refluks, cukrzyca).
-          </p>
+          <p className="font-medium">{t('search.none.title')} “{query}”.</p>
+          <p className="mt-1 text-sm">{t('search.none.hint')}</p>
         </div>
       )}
 
@@ -89,30 +91,30 @@ export default function SearchExperience() {
           {/* Filters */}
           <aside className="space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-slate-700">Filters</h2>
+              <h2 className="text-sm font-semibold text-slate-700">{t('search.filters')}</h2>
               {hasFilters && (
                 <button
                   onClick={() => router.replace(`${pathname}?q=${encodeURIComponent(query)}`)}
                   className="text-xs text-teal-700 hover:underline"
                 >
-                  Clear
+                  {t('search.filters.clear')}
                 </button>
               )}
             </div>
 
             <FacetGroup
-              title="Country"
+              title={t('search.filter.country')}
               active={countryFilter}
               onSelect={(v) => setParam('country', v)}
               options={[...facets.countries.entries()].map(([id, count]) => ({
                 id,
-                label: COUNTRY_LABEL[id as Country] ?? id,
+                label: t(`region.${id}`),
                 count,
               }))}
             />
 
             <FacetGroup
-              title="Society"
+              title={t('search.filter.society')}
               active={societyFilter}
               onSelect={(v) => setParam('society', v)}
               options={[...facets.societies.entries()].map(([id, count]) => ({
@@ -123,7 +125,7 @@ export default function SearchExperience() {
             />
 
             <FacetGroup
-              title="Specialty"
+              title={t('search.filter.specialty')}
               active={specialtyFilter}
               onSelect={(v) => setParam('specialty', v)}
               options={[...facets.specialties.entries()].map(([id, count]) => ({
@@ -141,12 +143,12 @@ export default function SearchExperience() {
             ))}
             {filtered.length === 0 && (
               <p className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-600">
-                No results with these filters.{' '}
+                {t('search.nofilter')}{' '}
                 <button
                   onClick={() => router.replace(`${pathname}?q=${encodeURIComponent(query)}`)}
                   className="text-teal-700 hover:underline"
                 >
-                  Clear filters
+                  {t('search.nofilter.clear')}
                 </button>
               </p>
             )}
@@ -156,10 +158,10 @@ export default function SearchExperience() {
 
       {!query && (
         <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
-          <p className="font-medium text-slate-800">Start typing to search.</p>
+          <p className="font-medium text-slate-800">{t('search.start.title')}</p>
           <p className="mt-1 text-sm">
-            Try:{' '}
-            {['colitis', 'WZJG', 'H. pylori', 'refluks', 'budesonide', 'cukrzyca'].map((ex) => (
+            {t('search.start.try')}{' '}
+            {['colitis', 'WZJG', 'H. pylori dosing', 'refluks', 'budesonide', 'cukrzyca'].map((ex) => (
               <Link
                 key={ex}
                 href={`/search?q=${encodeURIComponent(ex)}`}

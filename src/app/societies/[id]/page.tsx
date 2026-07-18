@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { societies, getSociety, currentGuidelinesForSociety } from '@/lib/data';
 import { CountryBadge, SpecialtyBadge } from '@/components/badges';
 import GuidelineCard from '@/components/GuidelineCard';
+import { T } from '@/components/i18n';
 
 export function generateStaticParams() {
   return societies.map((s) => ({ id: s.id }));
@@ -29,7 +30,7 @@ export default async function SocietyPage({ params }: { params: Promise<{ id: st
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
       <nav className="text-sm text-slate-500">
-        <Link href="/societies" className="hover:text-teal-700">Societies</Link>
+        <Link href="/societies" className="hover:text-teal-700"><T k="nav.societies" /></Link>
         <span className="mx-1">/</span>
         <span className="text-slate-700">{society.abbreviation}</span>
       </nav>
@@ -52,7 +53,7 @@ export default async function SocietyPage({ params }: { params: Promise<{ id: st
           rel="noopener noreferrer"
           className="font-medium text-teal-700 hover:text-teal-900"
         >
-          Homepage ↗
+          <T k="societies.homepage" /> ↗
         </a>
         <a
           href={society.guidelinesIndexUrl}
@@ -60,12 +61,12 @@ export default async function SocietyPage({ params }: { params: Promise<{ id: st
           rel="noopener noreferrer"
           className="text-slate-500 hover:text-teal-700"
         >
-          Guidelines index ↗
+          <T k="societies.index" /> ↗
         </a>
       </div>
 
       <h2 className="mt-8 text-lg font-semibold text-slate-900">
-        Guidelines ({list.length})
+        <T k="societies.guidelines.title" /> ({list.length})
       </h2>
       <div className="mt-4 space-y-4">
         {list.map((g) => (

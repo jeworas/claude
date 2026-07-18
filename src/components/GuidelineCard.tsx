@@ -4,6 +4,7 @@ import type { ThesaurusMatch } from '@/lib/thesaurus';
 import { getSociety, countryOf } from '@/lib/data';
 import { CountryBadge, SocietyBadge, FreshnessBadge } from '@/components/badges';
 import LanguageHint from '@/components/LanguageHint';
+import { T } from '@/components/i18n';
 
 /**
  * Compact guideline summary card used in search results and condition/society
@@ -46,7 +47,7 @@ export default function GuidelineCard({
           href={`/guideline/${guideline.id}`}
           className="text-sm font-medium text-teal-700 hover:text-teal-900"
         >
-          View summary →
+          <T k="card.view" /> →
         </Link>
       </div>
     </article>

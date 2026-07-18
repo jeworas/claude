@@ -66,6 +66,21 @@ export interface Recommendation {
   drugs?: string[];
 }
 
+/**
+ * A standard dosing reference line. Dosing is kept in a separate, auditable
+ * module (data/dosing.ts) keyed by guideline id — never inline in the
+ * recommendation prose — because it is the most safety-sensitive content and
+ * must always be read against the source.
+ */
+export interface DoseEntry {
+  /** Generic drug name, English (e.g. "Budesonide"). */
+  drug: string;
+  /** Short clinical context, e.g. "Induction, mild-moderate ileocecal Crohn's". */
+  indication?: string;
+  /** Concise dose + route + frequency + duration. */
+  regimen: string;
+}
+
 export interface Guideline {
   id: string;
   societyId: string;
