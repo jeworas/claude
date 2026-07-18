@@ -122,7 +122,7 @@ The PoC runs **fully offline after `npm install`**; only the update-checker touc
 - **Sources** are the societies' own published guidelines (journals / society sites), linked directly.
 - **Editorial trust model.** PoC content is **hand-curated demo data** (`dataProvenance: 'hand-curated-demo'`), each record carrying a `lastVerified` date and a source link. Production requires a defined **editor role** (qualified clinician), a **documented review cadence**, and a verification step before publish.
 - **Copyright.** Store only **metadata, links, and original short paraphrase summaries** — *not* verbatim abstracts, full text, or mirrored PDFs. Deep-link to the publisher for the full document. Publisher/journal terms (e.g. AJG/*Gastroenterology*, Termedia/Via Medica for Polish journals) must be reviewed per source before launch.
-- **i18n boundary.** Bilingual **search and condition labels** are in scope; **translating guideline body text is not** (accuracy + copyright).
+- **i18n boundary.** Bilingual **search, a full PL/EN interface toggle, and condition labels** are in scope; **translating guideline body text is not** (accuracy + copyright) — guideline content is shown in its source language.
 
 ## 8. Regulatory & safety
 
@@ -141,7 +141,7 @@ The PoC runs **fully offline after `npm install`**; only the update-checker touc
 ## 10. Roadmap
 
 **PoC (this repo) — done**
-Bilingual search over **85 current guidelines (102 including prior editions)** from 10 societies across **US, Europe and Poland** — the complete current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs plus AGA and diabetes/hypertension for breadth, spanning 50 conditions; structured summaries; a **US↔Europe↔Poland comparison matrix** (agree vs. diverge, drug names matched across languages); a **revision timeline** of successive guideline editions; freshness/supersession UI; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
+Bilingual search over **85 current guidelines (102 including prior editions)** from 10 societies across **US, Europe and Poland** — the complete current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs plus AGA and diabetes/hypertension for breadth, spanning 50 conditions; structured summaries; a **full PL/EN interface toggle**; **quick answers** for specific queries (dosing / line-of-therapy / named drug) and a **dosing quick-reference** on flagship guidelines; a **US↔Europe↔Poland comparison matrix** (agree vs. diverge, drug names matched across languages); a **revision timeline** of successive guideline editions; freshness/supersession UI; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
 
 **MVP (next)**
 Move data to a database with an editor CMS and verification workflow; expand GI coverage to near-complete for ACG/AGA/PTG-E; add 2–3 more Polish societies and specialties; scheduled update-monitoring feeding an editor queue; basic analytics; production hosting; per-source copyright sign-off.

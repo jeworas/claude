@@ -26,8 +26,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     // is unavailable during SSR, and reading it eagerly would cause a hydration
     // mismatch when the stored language differs from the default.
     const stored = window.localStorage.getItem(LANG_STORAGE_KEY);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (stored === 'en' || stored === 'pl') setLangState(stored);
+    if (stored === 'en' || stored === 'pl') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLangState(stored);
+    } else if (window.navigator.language?.toLowerCase().startsWith('pl')) {
+      // No saved choice yet: default to Polish for Polish-locale browsers.
+      setLangState('pl');
+    }
   }, []);
 
   const setLang = useCallback((l: Lang) => {

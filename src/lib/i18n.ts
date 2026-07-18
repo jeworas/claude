@@ -18,8 +18,12 @@ type Dict = Record<string, string>;
 const en: Dict = {
   'nav.home': 'Home',
   'nav.search': 'Search',
+  'nav.conditions': 'Conditions',
   'nav.societies': 'Societies',
   'nav.about': 'About',
+  'conditions.title': 'Browse conditions',
+  'conditions.subtitle':
+    'Every condition in the index, grouped by specialty. Each gathers the matching guidelines from all mapped societies.',
   'lang.toggle.aria': 'Switch language',
 
   'disclaimer.text':
@@ -188,8 +192,12 @@ const en: Dict = {
 const pl: Dict = {
   'nav.home': 'Strona główna',
   'nav.search': 'Szukaj',
+  'nav.conditions': 'Choroby',
   'nav.societies': 'Towarzystwa',
   'nav.about': 'O aplikacji',
+  'conditions.title': 'Przeglądaj choroby',
+  'conditions.subtitle':
+    'Wszystkie choroby w indeksie, pogrupowane według specjalności. Każda zbiera pasujące wytyczne ze wszystkich uwzględnionych towarzystw.',
   'lang.toggle.aria': 'Zmień język',
 
   'disclaimer.text':

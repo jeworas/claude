@@ -13,9 +13,10 @@ import { societies } from '../data/societies';
 import { conditions } from '../data/conditions';
 import { guidelines } from '../data/guidelines';
 import { societiesSchema, conditionsSchema, guidelinesSchema } from '../src/lib/schema';
-import { countryOf, lineagesForCondition } from '../src/lib/data';
+import { countryOf, lineagesForCondition, getDosing } from '../src/lib/data';
 import { search } from '../src/lib/search';
 import { buildComparison } from '../src/lib/compare';
+import { answerFor } from '../src/lib/answer';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -149,6 +150,26 @@ check('“budesonide” finds microscopic colitis (drug-field match)', idsFor('b
 const hp = countriesFor('H. pylori');
 check('“H. pylori” spans US + PL', hp.has('US') && hp.has('PL'), [...hp].join(','));
 check('“refluks” (PL) finds GERD', idsFor('refluks').includes('ptge-gerd-2022'));
+
+console.log('\nDosing + quick-answer');
+check('flagship guidelines carry dosing', getDosing('acg-h-pylori-2024').length >= 3);
+check('bare condition query yields no answer panel', answerFor('colitis') === null);
+check('“celiac dosage” answers via first-line (no drug)', (() => {
+  const a = answerFor('celiac dosage');
+  return !!a && a.conditionId === 'celiac-disease' && a.entries.some((e) => e.rec);
+})());
+check('“H. pylori dosing” answers with dose entries', (() => {
+  const a = answerFor('H. pylori dosing');
+  return !!a && a.entries.some((e) => (e.doses?.length ?? 0) > 0);
+})());
+check('“budesonide dose” answers via named drug', (() => {
+  const a = answerFor('budesonide dose');
+  return !!a && a.intent === 'drug' && a.entries.length > 0;
+})());
+check('Polish “…dawkowanie” triggers dosing intent', (() => {
+  const a = answerFor('wrzodziejące zapalenie jelita grubego dawkowanie');
+  return !!a && a.intent === 'dosing';
+})());
 
 console.log('');
 if (failures > 0) {

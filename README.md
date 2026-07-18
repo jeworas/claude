@@ -13,6 +13,9 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 - **Maps societies** across the US, Europe and Poland (ACG, AGA, ECCO, UEG, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC) — ACG, PTG-E and ECCO/UEG covered in full.
 - **Indexes 85 current guidelines** (102 including prior editions) with structured treatment summaries — the full current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
 - **Bilingual search** — `colitis`, `UC`, `WZJG` and `wrzodziejące zapalenie jelita grubego` all resolve to ulcerative colitis; the UI shows *which* term matched.
+- **Bilingual interface** — a full PL/EN language toggle (persisted per browser) translates all navigation, labels and disclaimers; guideline content stays in its source language.
+- **Quick answers** — a specific query like `celiac dosage`, `H. pylori dosing`, or `budesonide dose` surfaces the most relevant recommendation and dosing directly above the results.
+- **Dosing quick-reference** — flagship guidelines carry a standard-regimen table (kept in a separate, auditable module) with a strong verify-against-source framing.
 - **Region comparison** — a US ↔ Europe ↔ Poland matrix aligned by therapy line, highlighting where societies **agree** vs. **diverge** (drug names matched across languages).
 - **Revision timeline** — for conditions where guidance was revised (e.g. ACG UC 2010 → 2019 → 2025), a timeline of successive editions; superseded editions stay viewable but are kept out of search.
 - **Freshness tracking** — every guideline shows its year and a currency badge (current / aging / superseded).
