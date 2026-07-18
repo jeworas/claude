@@ -9,7 +9,8 @@
     "lint": "eslint",
     "validate": "tsx scripts/validate.ts",
     "gen:known-urls": "tsx scripts/gen-known-urls.ts",
-    "check-updates": "node scripts/check-updates.mjs"
+    "check-updates": "node scripts/check-updates.mjs",
+    "sources": "tsx scripts/fetch-guidelines.ts"
   },
   "dependencies": {
     "minisearch": "^7.2.0",

@@ -48,12 +48,25 @@ The `scripts/` tooling (the update-checker, validators) is not part of the web b
 npm run build            # production build (fully static; runs offline)
 npm run start            # serve the production build
 npm run validate         # Zod data validation + flagship search assertions
+npm run sources          # build the guideline-source download worklist
 npm run check-updates    # demo update-checker (live fetch, fixture fallback)
 npm run gen:known-urls   # regenerate data/known-urls.json from the seed data
 npm run lint
 ```
 
-The web app is **fully offline after `npm install`** — all data is in the repo. Only `check-updates` touches the network.
+The web app is **fully offline after `npm install`** — all data is in the repo. Only `sources --fetch` and `check-updates` touch the network.
+
+## The guideline-source worklist
+
+The registry (`data/societies.ts`) maps *where* guidelines are published; this turns it into an actionable ingestion worklist — every society with its guideline-index URL and how many guidelines are already ingested — written to `data/guideline-sources.json`. With `--fetch` it reaches each index and counts the candidate documents linked from it; with `--download` it saves discovered PDFs under `downloads/` (git-ignored). It degrades gracefully when outbound HTTPS is blocked.
+
+```bash
+npm run sources                          # write + print the worklist (no network)
+npm run sources -- --specialty=cardiology
+npm run sources -- --region=PL --json
+npm run sources -- --fetch               # reach each index (needs network)
+npm run sources -- --download --society=acg
+```
 
 ## The bilingual update-checker
 
@@ -78,6 +91,7 @@ data/
   conditions.ts           Bilingual condition thesaurus (EN/PL synonyms, ICD-10)
   guidelines/             Seed guidelines, one file per source (acg, aga, ptg-e, …)
   known-urls.json         Generated: what the update-checker diffs against
+  guideline-sources.json  Generated: the download worklist (npm run sources)
 src/lib/
   types.ts                Data model
   schema.ts               Zod schemas (build-time validation)
@@ -89,6 +103,7 @@ src/app/                   Routes: /, /search, /guideline/[id], /condition/[id],
                            /societies, /societies/[id], /about
 scripts/
   validate.ts             npm run validate
+  fetch-guidelines.ts     npm run sources
   gen-known-urls.ts       npm run gen:known-urls
   check-updates.mjs        npm run check-updates
   fixtures/               Mock HTML for offline scraper demo

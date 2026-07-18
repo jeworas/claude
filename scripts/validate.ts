@@ -82,6 +82,18 @@ try {
   check('known-urls.json present', false, String(e));
 }
 
+console.log('\nguideline-sources.json freshness');
+try {
+  const sources = JSON.parse(readFileSync(join(root, 'data/guideline-sources.json'), 'utf8'));
+  check(
+    'guideline-sources.json covers every society',
+    sources.entries.length === societies.length && sources.societyCount === societies.length,
+    `${sources.entries.length} vs ${societies.length} societies — run: npm run sources`,
+  );
+} catch (e) {
+  check('guideline-sources.json present', false, String(e));
+}
+
 console.log('\nCoverage');
 check('at least 25 guidelines', guidelines.length >= 25, `have ${guidelines.length}`);
 const countries = new Set(guidelines.map((g) => countryOf(g)));
