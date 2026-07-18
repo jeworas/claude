@@ -1405,5 +1405,67 @@ export const conditions: Condition[] = [
       "L29.8"
     ],
     "specialty": "nephrology"
+  },
+  {
+    "id": "breast-cancer-screening",
+    "nameEn": "Breast cancer screening",
+    "namePl": "Badania przesiewowe w kierunku raka piersi",
+    "synonymsEn": [
+      "mammography screening",
+      "screening mammogram",
+      "breast cancer early detection"
+    ],
+    "synonymsPl": [
+      "mammografia przesiewowa",
+      "przesiew raka piersi",
+      "wczesne wykrywanie raka piersi"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "Z12.31"
+    ],
+    "specialty": "primary-care"
+  },
+  {
+    "id": "childhood-obesity",
+    "nameEn": "Childhood obesity (high BMI)",
+    "namePl": "Otyłość u dzieci (wysokie BMI)",
+    "synonymsEn": [
+      "high body mass index in children",
+      "high BMI in children and adolescents",
+      "paediatric obesity",
+      "childhood overweight"
+    ],
+    "synonymsPl": [
+      "otyłość dziecięca",
+      "wysokie BMI u dzieci",
+      "nadwaga u dzieci"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "E66",
+      "Z68.54"
+    ],
+    "specialty": "primary-care"
+  },
+  {
+    "id": "falls-prevention",
+    "nameEn": "Falls prevention in older adults",
+    "namePl": "Zapobieganie upadkom u osób starszych",
+    "synonymsEn": [
+      "fall prevention",
+      "falls in the elderly",
+      "preventing falls"
+    ],
+    "synonymsPl": [
+      "profilaktyka upadków",
+      "upadki osób starszych",
+      "zapobieganie upadkom"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "Z91.81"
+    ],
+    "specialty": "primary-care"
   }
 ];

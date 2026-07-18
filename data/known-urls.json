@@ -85,6 +85,11 @@
       "societyId": "aua",
       "abbreviation": "AUA",
       "indexUrl": "https://www.auanet.org/guidelines-and-quality/guidelines"
+    },
+    {
+      "societyId": "uspstf",
+      "abbreviation": "USPSTF",
+      "indexUrl": "https://www.uspreventiveservicestaskforce.org/uspstf/recommendation-topics"
     }
   ],
   "known": [
@@ -725,6 +730,33 @@
       "title": "AUA/SUO Guideline: Early Detection of Prostate Cancer (2023)",
       "titleLocal": null,
       "url": "https://www.auanet.org/guidelines-and-quality/guidelines",
+      "pdfUrl": null
+    },
+    {
+      "id": "uspstf-breast-cancer-screening-2024",
+      "societyId": "uspstf",
+      "country": "US",
+      "title": "Screening for Breast Cancer: US Preventive Services Task Force Recommendation Statement",
+      "titleLocal": null,
+      "url": "https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening",
+      "pdfUrl": null
+    },
+    {
+      "id": "uspstf-child-high-bmi-2024",
+      "societyId": "uspstf",
+      "country": "US",
+      "title": "Interventions for High Body Mass Index in Children and Adolescents: US Preventive Services Task Force Recommendation Statement",
+      "titleLocal": null,
+      "url": "https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/obesity-in-children-and-adolescents-screening",
+      "pdfUrl": null
+    },
+    {
+      "id": "uspstf-falls-prevention-2024",
+      "societyId": "uspstf",
+      "country": "US",
+      "title": "Interventions to Prevent Falls in Community-Dwelling Older Adults: US Preventive Services Task Force Recommendation Statement",
+      "titleLocal": null,
+      "url": "https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/falls-prevention-community-dwelling-older-adults-interventions",
       "pdfUrl": null
     },
     {

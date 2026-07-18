@@ -287,4 +287,101 @@ export const usNonGiGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'uspstf-breast-cancer-screening-2024',
+    societyId: 'uspstf',
+    conditionIds: ['breast-cancer-screening'],
+    title: 'Screening for Breast Cancer: US Preventive Services Task Force Recommendation Statement',
+    language: 'en',
+    specialty: 'primary-care',
+    year: 2024,
+    status: 'current',
+    sourceUrl: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening',
+    citation:
+      'US Preventive Services Task Force. Screening for Breast Cancer: US Preventive Services Task Force Recommendation Statement. JAMA. 2024;331(22):1918–1930.',
+    summary:
+      'The USPSTF recommends biennial screening mammography for women at average risk beginning at age 40 and continuing through 74 (grade B) — lowering the previous start age of 50. Evidence is insufficient to assess the balance of benefits and harms of screening in women 75 and older, and of supplemental screening with breast ultrasound or MRI in women with dense breasts on an otherwise negative mammogram (I statements).',
+    keyRecommendations: [
+      {
+        topic: 'Biennial mammography from age 40 (grade B)',
+        text: 'Screen women at average risk with mammography every 2 years from age 40 through 74. This lowers the prior start age of 50 and applies to those with a family history and with dense breasts.',
+        evidenceGrade: 'B (recommended)',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Women 75 and older (I statement)',
+        text: 'Evidence is insufficient to recommend for or against screening mammography in women aged 75 or older.',
+        evidenceGrade: 'I (insufficient evidence)',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Dense breasts — supplemental imaging (I statement)',
+        text: 'Evidence is insufficient to assess the benefits and harms of supplemental screening with breast ultrasound or MRI in women with dense breasts.',
+        evidenceGrade: 'I (insufficient evidence)',
+        lineOfTherapy: 'screening',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
+  {
+    id: 'uspstf-child-high-bmi-2024',
+    societyId: 'uspstf',
+    conditionIds: ['childhood-obesity'],
+    title:
+      'Interventions for High Body Mass Index in Children and Adolescents: US Preventive Services Task Force Recommendation Statement',
+    language: 'en',
+    specialty: 'primary-care',
+    year: 2024,
+    status: 'current',
+    sourceUrl:
+      'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/obesity-in-children-and-adolescents-screening',
+    citation:
+      'US Preventive Services Task Force. Interventions for High Body Mass Index in Children and Adolescents: US Preventive Services Task Force Recommendation Statement. JAMA. 2024;332(3):226–232.',
+    summary:
+      'The USPSTF recommends that clinicians provide or refer children and adolescents aged 6 years and older with a high body mass index (BMI at or above the 95th percentile for age and sex) to comprehensive, intensive behavioral interventions (grade B). The most effective programs total at least 26 contact hours and combine supervised physical activity, healthy-eating guidance, and behavior-change support.',
+    keyRecommendations: [
+      {
+        topic: 'Intensive behavioral intervention (grade B)',
+        text: 'Provide or refer children and adolescents 6 years and older with a high BMI to comprehensive, intensive behavioral interventions; the most effective programs deliver at least 26 contact hours over up to a year.',
+        evidenceGrade: 'B (recommended)',
+        lineOfTherapy: 'prevention',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
+  {
+    id: 'uspstf-falls-prevention-2024',
+    societyId: 'uspstf',
+    conditionIds: ['falls-prevention'],
+    title:
+      'Interventions to Prevent Falls in Community-Dwelling Older Adults: US Preventive Services Task Force Recommendation Statement',
+    language: 'en',
+    specialty: 'primary-care',
+    year: 2024,
+    status: 'current',
+    sourceUrl:
+      'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/falls-prevention-community-dwelling-older-adults-interventions',
+    citation:
+      'US Preventive Services Task Force. Interventions to Prevent Falls in Community-Dwelling Older Adults: US Preventive Services Task Force Recommendation Statement. JAMA. 2024.',
+    summary:
+      'For community-dwelling adults aged 65 or older who are at increased risk of falls, the USPSTF recommends exercise interventions to prevent falls (grade B), and advises clinicians to individually decide whether to offer multifactorial interventions based on the patient’s circumstances (grade C). Exercise programs — typically gait, balance, and functional training — show the most consistent benefit.',
+    keyRecommendations: [
+      {
+        topic: 'Exercise interventions (grade B)',
+        text: 'Recommend exercise interventions to prevent falls in adults 65 and older living at home who are at increased fall risk.',
+        evidenceGrade: 'B (recommended)',
+        lineOfTherapy: 'prevention',
+      },
+      {
+        topic: 'Multifactorial interventions (grade C)',
+        text: 'Selectively offer multifactorial interventions (individualized risk assessment plus tailored measures) based on clinical judgement rather than routinely to everyone.',
+        evidenceGrade: 'C (selectively offer)',
+        lineOfTherapy: 'prevention',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];

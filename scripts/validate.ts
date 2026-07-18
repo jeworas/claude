@@ -297,6 +297,31 @@ check(
   guidelines.find((g) => g.id === 'ptn-ptw-rsv-vaccination-ckd-2025')?.conditionIds.includes('chronic-kidney-disease') === true,
 );
 
+console.log('\nCross-specialty ingestion (USPSTF preventive services)');
+check('breast-cancer-screening condition exists (primary-care)', getCondition('breast-cancer-screening')?.specialty === 'primary-care');
+check('childhood-obesity condition exists (primary-care)', getCondition('childhood-obesity')?.specialty === 'primary-care');
+check('falls-prevention condition exists (primary-care)', getCondition('falls-prevention')?.specialty === 'primary-care');
+check(
+  'USPSTF now has ingested current guidelines',
+  guidelines.filter((g) => g.societyId === 'uspstf' && g.status === 'current').length >= 3,
+);
+check(
+  '“breast cancer screening” finds the USPSTF statement',
+  search('breast cancer screening').some((r) => r.guideline.id === 'uspstf-breast-cancer-screening-2024'),
+);
+check(
+  '“mammography” (synonym) finds the USPSTF breast screening statement',
+  search('mammography').some((r) => r.guideline.id === 'uspstf-breast-cancer-screening-2024'),
+);
+check(
+  'Polish “mammografia przesiewowa” finds the USPSTF breast screening statement',
+  search('mammografia przesiewowa').some((r) => r.guideline.id === 'uspstf-breast-cancer-screening-2024'),
+);
+check(
+  '“falls” finds the USPSTF falls-prevention statement',
+  search('falls prevention').some((r) => r.guideline.id === 'uspstf-falls-prevention-2024'),
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);
