@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import type { Country, Guideline } from '@/lib/types';
-import { conditions, getCondition, countryOf, guidelinesForCondition } from '@/lib/data';
+import type { Country } from '@/lib/types';
+import { conditions, getCondition, countryOf, currentGuidelinesForCondition } from '@/lib/data';
 import GuidelineCard from '@/components/GuidelineCard';
+import RegionComparison from '@/components/RegionComparison';
+import RevisionTimeline from '@/components/RevisionTimeline';
+import { REGION_LABEL } from '@/components/badges';
 
 export function generateStaticParams() {
   return conditions.map((c) => ({ id: c.id }));
@@ -19,9 +22,10 @@ export async function generateMetadata({
   return { title: c ? `${c.nameEn} / ${c.namePl} — GuidelineAtlas` : 'Condition — GuidelineAtlas' };
 }
 
-const COLUMN: { country: Country; label: string; flag: string }[] = [
-  { country: 'US', label: 'United States', flag: '🇺🇸' },
-  { country: 'PL', label: 'Poland', flag: '🇵🇱' },
+const COLUMN: { country: Country; flag: string }[] = [
+  { country: 'US', flag: '🇺🇸' },
+  { country: 'EU', flag: '🇪🇺' },
+  { country: 'PL', flag: '🇵🇱' },
 ];
 
 export default async function ConditionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,10 +33,17 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
   const condition = getCondition(id);
   if (!condition) notFound();
 
-  const all = guidelinesForCondition(condition.id).sort((a, b) => b.year - a.year);
-  const byCountry = (country: Country): Guideline[] => all.filter((g) => countryOf(g) === country);
+  const all = currentGuidelinesForCondition(condition.id).sort((a, b) => b.year - a.year);
+  const presentColumns = COLUMN.filter(({ country }) => all.some((g) => countryOf(g) === country));
 
   const synonyms = [...condition.synonymsEn, ...condition.synonymsPl, ...condition.abbreviations];
+
+  const gridCols =
+    presentColumns.length >= 3
+      ? 'lg:grid-cols-3'
+      : presentColumns.length === 2
+        ? 'md:grid-cols-2'
+        : '';
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -62,34 +73,38 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
       </header>
 
       <p className="mt-4 text-sm text-slate-600">
-        Comparing <span className="font-semibold">{all.length}</span> guidelines across countries.
-        Use this to see how US and Polish societies approach the same condition.
+        <span className="font-semibold">{all.length}</span> current{' '}
+        {all.length === 1 ? 'guideline' : 'guidelines'} across{' '}
+        {presentColumns.length === 1 ? '1 region' : `${presentColumns.length} regions`} — see where
+        US, European and Polish societies agree and where they differ.
       </p>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {COLUMN.map(({ country, label, flag }) => {
-          const list = byCountry(country);
-          return (
-            <section key={country}>
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900">
-                <span aria-hidden>{flag}</span> {label}
-                <span className="text-sm font-normal text-slate-400">({list.length})</span>
-              </h2>
-              {list.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
-                  No guideline from this country in the current dataset.
-                </p>
-              ) : (
+      {/* Cross-region comparison + revision history */}
+      <RegionComparison conditionId={condition.id} />
+      <RevisionTimeline conditionId={condition.id} />
+
+      {/* Current guidelines grouped by region */}
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold text-slate-900">Current guidelines by region</h2>
+        <div className={`mt-4 grid grid-cols-1 gap-6 ${gridCols}`}>
+          {presentColumns.map(({ country, flag }) => {
+            const list = all.filter((g) => countryOf(g) === country);
+            return (
+              <section key={country}>
+                <h3 className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+                  <span aria-hidden>{flag}</span> {REGION_LABEL[country]}
+                  <span className="text-sm font-normal text-slate-400">({list.length})</span>
+                </h3>
                 <div className="space-y-4">
                   {list.map((g) => (
                     <GuidelineCard key={g.id} guideline={g} />
                   ))}
                 </div>
-              )}
-            </section>
-          );
-        })}
-      </div>
+              </section>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

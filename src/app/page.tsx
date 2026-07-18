@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import SearchBar from '@/components/SearchBar';
-import { guidelines, societies, conditions, guidelinesForCondition } from '@/lib/data';
+import { guidelines, societies, conditions, currentGuidelinesForCondition } from '@/lib/data';
 import { CountryBadge } from '@/components/badges';
 
 const EXAMPLE_QUERIES = ['colitis', 'WZJG', 'ulcerative colitis', 'H. pylori', 'refluks', 'budesonide', 'cukrzyca'];
@@ -16,6 +16,7 @@ const FEATURED_CONDITION_IDS = [
 
 export default function Home() {
   const countries = new Set(societies.map((s) => s.country));
+  const currentCount = guidelines.filter((g) => g.status === 'current').length;
   const featured = FEATURED_CONDITION_IDS.map((id) => conditions.find((c) => c.id === id)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),
   );
@@ -30,7 +31,7 @@ export default function Home() {
             <span className="text-teal-600">in English or Polish</span>
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-slate-600">
-            One search across US and Polish medical societies. Type a condition, drug, or
+            One search across US, European and Polish medical societies. Type a condition, drug, or
             abbreviation in either language — see a treatment summary and jump straight to the
             source guideline.
           </p>
@@ -53,9 +54,9 @@ export default function Home() {
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-8 text-center">
-            <Stat value={guidelines.length} label="Guidelines" />
+            <Stat value={currentCount} label="Guidelines" />
             <Stat value={societies.length} label="Societies" />
-            <Stat value={countries.size} label="Countries" />
+            <Stat value={countries.size} label="Regions" />
             <Stat value={conditions.length} label="Conditions" />
           </div>
         </div>
@@ -69,7 +70,7 @@ export default function Home() {
         </p>
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((c) => {
-            const gs = guidelinesForCondition(c.id);
+            const gs = currentGuidelinesForCondition(c.id);
             const cardCountries = new Set(
               gs.map((g) => societies.find((s) => s.id === g.societyId)?.country).filter(Boolean),
             );

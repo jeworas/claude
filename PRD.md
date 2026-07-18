@@ -66,7 +66,7 @@ Start narrow (gastroenterology; US + Poland), prove the model, then widen covera
 ## 6. Features
 
 ### F1 — Society registry
-A directory of guideline-issuing bodies: name (English + local), abbreviation, country, specialties, homepage, and **guideline index URL** (the page monitored for updates). Grouped by country. *PoC: 8 societies (ACG, AGA, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC).*
+A directory of guideline-issuing bodies: name (English + local), abbreviation, region, specialties, homepage, and **guideline index URL** (the page monitored for updates). Grouped by region (US / Europe / Poland). *PoC: 10 societies (ACG, AGA, ECCO, UEG, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC).*
 
 ### F2 — Guideline database with freshness & supersession
 Structured guideline records (see §7.1). Each shows **publication year**, a **currency badge** (current / aging >5y / superseded), a **last-verified date**, and a link. A guideline may reference the record it `supersedes`. *Freshness is a first-class feature, not just a data field* — an out-of-date recommendation must be obvious before a clinician relies on it.
@@ -141,7 +141,7 @@ The PoC runs **fully offline after `npm install`**; only the update-checker touc
 ## 10. Roadmap
 
 **PoC (this repo) — done**
-Bilingual search over 65 curated guidelines from 8 societies (US + PL) — the **complete current ACG and PTG-E gastroenterology/hepatology catalogs** plus AGA and diabetes/hypertension for breadth, spanning 46 conditions; structured summaries; freshness/supersession UI; condition comparison; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
+Bilingual search over **85 current guidelines (102 including prior editions)** from 10 societies across **US, Europe and Poland** — the complete current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs plus AGA and diabetes/hypertension for breadth, spanning 50 conditions; structured summaries; a **US↔Europe↔Poland comparison matrix** (agree vs. diverge, drug names matched across languages); a **revision timeline** of successive guideline editions; freshness/supersession UI; societies directory; disclaimers; a demo update-checker with fixtures; build-time validation.
 
 **MVP (next)**
 Move data to a database with an editor CMS and verification workflow; expand GI coverage to near-complete for ACG/AGA/PTG-E; add 2–3 more Polish societies and specialties; scheduled update-monitoring feeding an editor queue; basic analytics; production hosting; per-source copyright sign-off.

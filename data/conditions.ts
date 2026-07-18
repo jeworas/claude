@@ -3,8 +3,8 @@ import type { Condition } from '../src/lib/types';
 /**
  * The bilingual condition thesaurus — the heart of cross-language search.
  * Names and synonyms match by normalized substring in either language;
- * abbreviations match as exact tokens. Extended to cover the full ACG + PTG-E
- * guideline catalogs (US + PL).
+ * abbreviations match as exact tokens. Covers the full ACG, PTG-E, ECCO and UEG
+ * catalogs (US + PL + EU).
  */
 export const conditions: Condition[] = [
   {
@@ -674,7 +674,9 @@ export const conditions: Condition[] = [
     "synonymsPl": [
       "gastropareza",
       "opoznione oproznianie zoladka",
-      "porazenie zoladka"
+      "porazenie zoladka",
+      "opóźnione opróżnianie żołądka",
+      "porażenie żołądka"
     ],
     "abbreviations": [],
     "icd10": [
@@ -1165,5 +1167,89 @@ export const conditions: Condition[] = [
       "O14.2"
     ],
     "specialty": "hepatology"
+  },
+  {
+    "id": "igg4-related-digestive-disease",
+    "nameEn": "IgG4-related digestive disease",
+    "namePl": "Choroba przewodu pokarmowego zależna od IgG4",
+    "synonymsEn": [
+      "IgG4-related disease of the digestive system",
+      "type 1 autoimmune pancreatitis",
+      "IgG4-related cholangitis"
+    ],
+    "synonymsPl": [
+      "choroba IgG4-zależna przewodu pokarmowego",
+      "autoimmunologiczne zapalenie trzustki typu 1"
+    ],
+    "abbreviations": [
+      "IgG4-RD",
+      "AIP"
+    ],
+    "icd10": [
+      "K86.1"
+    ],
+    "specialty": "gastroenterology"
+  },
+  {
+    "id": "chronic-mesenteric-ischaemia",
+    "nameEn": "Chronic mesenteric ischaemia",
+    "namePl": "Przewlekłe niedokrwienie jelit",
+    "synonymsEn": [
+      "chronic mesenteric ischemia",
+      "intestinal angina",
+      "abdominal angina"
+    ],
+    "synonymsPl": [
+      "przewlekłe niedokrwienie krezkowe",
+      "dławica brzuszna"
+    ],
+    "abbreviations": [
+      "CMI"
+    ],
+    "icd10": [
+      "K55.1"
+    ],
+    "specialty": "gastroenterology"
+  },
+  {
+    "id": "chronic-nausea-vomiting",
+    "nameEn": "Chronic nausea and vomiting",
+    "namePl": "Przewlekłe nudności i wymioty",
+    "synonymsEn": [
+      "chronic nausea and vomiting syndrome",
+      "cyclic vomiting syndrome",
+      "rumination syndrome"
+    ],
+    "synonymsPl": [
+      "zespół przewlekłych nudności i wymiotów",
+      "zespół cyklicznych wymiotów"
+    ],
+    "abbreviations": [
+      "CNVS",
+      "CVS"
+    ],
+    "icd10": [
+      "R11"
+    ],
+    "specialty": "gastroenterology"
+  },
+  {
+    "id": "pouchitis",
+    "nameEn": "Pouchitis",
+    "namePl": "Zapalenie zbiornika jelitowego",
+    "synonymsEn": [
+      "pouch disorders",
+      "inflammation of the ileal pouch",
+      "ileoanal pouch inflammation"
+    ],
+    "synonymsPl": [
+      "zapalenie zbiornika krętniczo-odbytowego",
+      "zapalenie zbiornika jelita krętego"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "K91.850"
+    ],
+    "specialty": "gastroenterology"
   }
 ];

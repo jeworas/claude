@@ -69,7 +69,9 @@ function getIndex(): MiniSearch<IndexDoc> {
       combineWith: 'AND',
     },
   });
-  index.addAll(guidelines.map(buildDoc));
+  // Only current guidelines are searchable; superseded versions are reachable
+  // through the revision timeline, not the main results.
+  index.addAll(guidelines.filter((g) => g.status === 'current').map(buildDoc));
   indexSingleton = index;
   return index;
 }
@@ -90,6 +92,7 @@ export function search(query: string): SearchResult[] {
   for (const m of conditionMatches) bestConditionMatch.set(m.condition.id, m);
 
   for (const g of guidelines) {
+    if (g.status !== 'current') continue; // superseded versions are not surfaced in search
     let best: ThesaurusMatch | null = null;
     for (const cid of g.conditionIds) {
       const m = bestConditionMatch.get(cid);

@@ -13,8 +13,9 @@ import { societies } from '../data/societies';
 import { conditions } from '../data/conditions';
 import { guidelines } from '../data/guidelines';
 import { societiesSchema, conditionsSchema, guidelinesSchema } from '../src/lib/schema';
-import { countryOf } from '../src/lib/data';
+import { countryOf, lineagesForCondition } from '../src/lib/data';
 import { search } from '../src/lib/search';
+import { buildComparison } from '../src/lib/compare';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -70,10 +71,11 @@ for (const g of guidelines) {
 console.log('\nknown-urls.json freshness');
 try {
   const knownFile = JSON.parse(readFileSync(join(root, 'data/known-urls.json'), 'utf8'));
+  const currentCount = guidelines.filter((g) => g.status === 'current').length;
   check(
-    'known-urls.json entry count matches guidelines',
-    knownFile.known.length === guidelines.length,
-    `${knownFile.known.length} vs ${guidelines.length} — run: npm run gen:known-urls`,
+    'known-urls.json matches current guidelines',
+    knownFile.known.length === currentCount,
+    `${knownFile.known.length} vs ${currentCount} current — run: npm run gen:known-urls`,
   );
 } catch (e) {
   check('known-urls.json present', false, String(e));
@@ -82,7 +84,25 @@ try {
 console.log('\nCoverage');
 check('at least 25 guidelines', guidelines.length >= 25, `have ${guidelines.length}`);
 const countries = new Set(guidelines.map((g) => countryOf(g)));
-check('covers US and PL', countries.has('US') && countries.has('PL'));
+check('covers US, PL and EU', countries.has('US') && countries.has('PL') && countries.has('EU'));
+
+// Superseded editions must not leak into search.
+const supersededIds = new Set(guidelines.filter((g) => g.status === 'superseded').map((g) => g.id));
+check('has superseded editions for the timeline', supersededIds.size >= 10, `${supersededIds.size}`);
+const ucResultIds = search('ulcerative colitis').map((r) => r.guideline.id);
+check(
+  'search excludes superseded editions',
+  ucResultIds.every((id) => !supersededIds.has(id)),
+  ucResultIds.filter((id) => supersededIds.has(id)).join(','),
+);
+check(
+  'ulcerative colitis has a revision timeline',
+  lineagesForCondition('ulcerative-colitis').some((l) => l.versions.length >= 2),
+);
+check(
+  'colitis comparison spans ≥2 regions',
+  buildComparison('ulcerative-colitis').regions.length >= 2,
+);
 
 console.log('\nFlagship search queries');
 function countriesFor(q: string) {
@@ -94,14 +114,25 @@ function idsFor(q: string) {
 
 const colitis = search('colitis');
 check('“colitis” returns ≥ 6 guidelines', colitis.length >= 6, `got ${colitis.length}`);
-check('“colitis” spans US + PL', countriesFor('colitis').size === 2);
+const colitisCountries = countriesFor('colitis');
+check(
+  '“colitis” spans US, PL and EU',
+  colitisCountries.has('US') && colitisCountries.has('PL') && colitisCountries.has('EU'),
+  [...colitisCountries].join(','),
+);
 
+// WZJG (abbreviation → condition) resolves to the same core UC cluster as the
+// English name; the English free-text query additionally matches broader ECCO
+// IBD guidelines, so WZJG results are a subset of the "ulcerative colitis" set.
 const wzjg = new Set(idsFor('WZJG'));
 const uc = new Set(idsFor('ulcerative colitis'));
+const coreUC = ['acg-ulcerative-colitis-2025', 'aga-ulcerative-colitis-2024', 'ptge-wzjg-2023'];
 check(
-  '“WZJG” ≡ “ulcerative colitis” result set',
-  wzjg.size > 0 && wzjg.size === uc.size && [...wzjg].every((id) => uc.has(id)),
-  `WZJG=${[...wzjg].join(',')} | UC=${[...uc].join(',')}`,
+  '“WZJG” resolves like “ulcerative colitis” (subset + shared core)',
+  wzjg.size > 0 &&
+    [...wzjg].every((id) => uc.has(id)) &&
+    coreUC.every((id) => wzjg.has(id) && uc.has(id)),
+  `WZJG=${wzjg.size} ⊆ UC=${uc.size}`,
 );
 
 const polishUC = search('wrzodziejące zapalenie jelita grubego').map((r) => r.guideline.id);
@@ -115,7 +146,8 @@ check('“cukrzyca” and “diabetes” both find PTD + ADA', (() => {
 })());
 
 check('“budesonide” finds microscopic colitis (drug-field match)', idsFor('budesonide').includes('aga-microscopic-colitis-2016'));
-check('“H. pylori” spans US + PL', countriesFor('H. pylori').size === 2);
+const hp = countriesFor('H. pylori');
+check('“H. pylori” spans US + PL', hp.has('US') && hp.has('PL'), [...hp].join(','));
 check('“refluks” (PL) finds GERD', idsFor('refluks').includes('ptge-gerd-2022'));
 
 console.log('');

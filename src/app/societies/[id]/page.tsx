@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { societies, getSociety, guidelinesForSociety } from '@/lib/data';
+import { societies, getSociety, currentGuidelinesForSociety } from '@/lib/data';
 import { CountryBadge, SpecialtyBadge } from '@/components/badges';
 import GuidelineCard from '@/components/GuidelineCard';
 
@@ -24,7 +24,7 @@ export default async function SocietyPage({ params }: { params: Promise<{ id: st
   const society = getSociety(id);
   if (!society) notFound();
 
-  const list = guidelinesForSociety(society.id).sort((a, b) => b.year - a.year);
+  const list = currentGuidelinesForSociety(society.id).sort((a, b) => b.year - a.year);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">

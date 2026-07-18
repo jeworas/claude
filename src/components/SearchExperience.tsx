@@ -9,7 +9,7 @@ import type { Country } from '@/lib/types';
 import SearchBar from '@/components/SearchBar';
 import GuidelineCard from '@/components/GuidelineCard';
 
-const COUNTRY_LABEL: Record<Country, string> = { US: 'United States', PL: 'Poland' };
+const COUNTRY_LABEL: Record<Country, string> = { US: 'United States', PL: 'Poland', EU: 'Europe' };
 
 /**
  * Full client-side search page: reads the query and filters from the URL,

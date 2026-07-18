@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { Country } from '@/lib/types';
-import { societies, guidelinesForSociety } from '@/lib/data';
+import { societies, currentGuidelinesForSociety } from '@/lib/data';
 import { CountryBadge, SpecialtyBadge } from '@/components/badges';
 
 export const metadata: Metadata = { title: 'Societies — GuidelineAtlas' };
 
 const COUNTRY_GROUPS: { country: Country; label: string; flag: string }[] = [
   { country: 'US', label: 'United States', flag: '🇺🇸' },
+  { country: 'EU', label: 'Europe', flag: '🇪🇺' },
   { country: 'PL', label: 'Poland', flag: '🇵🇱' },
 ];
 
@@ -30,7 +31,7 @@ export default function SocietiesPage() {
             </h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {group.map((s) => {
-                const count = guidelinesForSociety(s.id).length;
+                const count = currentGuidelinesForSociety(s.id).length;
                 return (
                   <div
                     key={s.id}

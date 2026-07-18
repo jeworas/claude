@@ -96,4 +96,27 @@ export const societies: Society[] = [
     description:
       'Joint AHA/ACC clinical practice guidelines covering cardiovascular prevention and disease management.',
   },
+  {
+    id: 'ecco',
+    name: "European Crohn's and Colitis Organisation",
+    abbreviation: 'ECCO',
+    country: 'EU',
+    specialties: ['gastroenterology'],
+    homepage: 'https://ecco-ibd.eu',
+    guidelinesIndexUrl:
+      'https://ecco-ibd.eu/publications/ecco-guidelines-science/published-ecco-guidelines.html',
+    description:
+      "Pan-European organisation focused on inflammatory bowel disease; publishes topical, regularly updated ECCO guidelines in the Journal of Crohn's and Colitis.",
+  },
+  {
+    id: 'ueg',
+    name: 'United European Gastroenterology',
+    abbreviation: 'UEG',
+    country: 'EU',
+    specialties: ['gastroenterology', 'hepatology'],
+    homepage: 'https://ueg.eu',
+    guidelinesIndexUrl: 'https://ueg.eu/guideline',
+    description:
+      'Umbrella organisation of European GI societies; develops and endorses pan-European evidence-based guidelines and standards.',
+  },
 ];

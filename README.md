@@ -10,11 +10,12 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 
 ## What it does
 
-- **Maps societies** in the US and Poland (ACG, AGA, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC) — with ACG and PTG-E covered in full.
-- **Indexes 65 real guidelines** with structured treatment summaries — the full current ACG and PTG-E gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
+- **Maps societies** across the US, Europe and Poland (ACG, AGA, ECCO, UEG, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC) — ACG, PTG-E and ECCO/UEG covered in full.
+- **Indexes 85 current guidelines** (102 including prior editions) with structured treatment summaries — the full current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
 - **Bilingual search** — `colitis`, `UC`, `WZJG` and `wrzodziejące zapalenie jelita grubego` all resolve to ulcerative colitis; the UI shows *which* term matched.
+- **Region comparison** — a US ↔ Europe ↔ Poland matrix aligned by therapy line, highlighting where societies **agree** vs. **diverge** (drug names matched across languages).
+- **Revision timeline** — for conditions where guidance was revised (e.g. ACG UC 2010 → 2019 → 2025), a timeline of successive editions; superseded editions stay viewable but are kept out of search.
 - **Freshness tracking** — every guideline shows its year and a currency badge (current / aging / superseded).
-- **Condition comparison** — see US vs Polish guidance side by side.
 - **Update-checker** — a demo script that diffs a society's public guideline index against the database to find guidelines we don't yet track.
 
 ## Quick start

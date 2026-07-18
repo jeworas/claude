@@ -8,6 +8,7 @@ import {
   countryOf,
   conditionsForGuideline,
   guidelinesForCondition,
+  currentReplacementFor,
 } from '@/lib/data';
 import { CountryBadge, SocietyBadge, SpecialtyBadge, FreshnessBadge } from '@/components/badges';
 import RecommendationList from '@/components/RecommendationList';
@@ -34,13 +35,14 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
   const society = getSociety(guideline.societyId);
   const country = countryOf(guideline);
   const conditions = conditionsForGuideline(guideline);
+  const replacement = currentReplacementFor(guideline);
 
-  // "Related" = other guidelines that share a condition (the cross-country comparison hook).
+  // "Related" = other *current* guidelines that share a condition (comparison hook).
   const related = Array.from(
     new Map(
       guideline.conditionIds
         .flatMap((cid) => guidelinesForCondition(cid))
-        .filter((g) => g.id !== guideline.id)
+        .filter((g) => g.id !== guideline.id && g.status === 'current')
         .map((g) => [g.id, g]),
     ).values(),
   );
@@ -75,6 +77,21 @@ export default async function GuidelinePage({ params }: { params: Promise<{ id: 
         {guideline.year}
         {guideline.citation && <span className="block text-slate-400">{guideline.citation}</span>}
       </div>
+
+      {guideline.status === 'superseded' && (
+        <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">
+          ⚠ This is a <strong>superseded</strong> edition, shown for historical reference.
+          {replacement && (
+            <>
+              {' '}The current version is{' '}
+              <Link href={`/guideline/${replacement.id}`} className="font-medium underline">
+                {replacement.title} ({replacement.year})
+              </Link>
+              .
+            </>
+          )}
+        </div>
+      )}
 
       {/* Conditions */}
       <div className="mt-3 flex flex-wrap gap-2">

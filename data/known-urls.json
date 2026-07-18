@@ -40,6 +40,16 @@
       "societyId": "aha-acc",
       "abbreviation": "AHA/ACC",
       "indexUrl": "https://professional.heart.org/en/guidelines-and-statements"
+    },
+    {
+      "societyId": "ecco",
+      "abbreviation": "ECCO",
+      "indexUrl": "https://ecco-ibd.eu/publications/ecco-guidelines-science/published-ecco-guidelines.html"
+    },
+    {
+      "societyId": "ueg",
+      "abbreviation": "UEG",
+      "indexUrl": "https://ueg.eu/guideline"
     }
   ],
   "known": [
@@ -626,6 +636,186 @@
       "title": "2025 Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults",
       "titleLocal": null,
       "url": "https://professional.heart.org/en/guidelines-and-statements",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-uc-medical-2022",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Therapeutics in Ulcerative Colitis: Medical Treatment",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/16/1/2/6390052",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-uc-surgical-2022",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Therapeutics in Ulcerative Colitis: Surgical Treatment",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/16/2/179/6390023",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-cd-medical-2024",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Therapeutics in Crohn's Disease: Medical Treatment",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/18/10/1531/7693895",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-cd-surgical-2024",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Therapeutics in Crohn's Disease: Surgical Treatment",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/18/10/1556/7693896",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-diagnostics-monitoring-part1-2025",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO-ESGAR-ESP-IBUS Guideline on Diagnostics and Monitoring of Patients with Inflammatory Bowel Disease: Part 1",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/19/7/jjaf106/8219802",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-diagnostics-monitoring-part2-2025",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO-ESGAR-ESP-IBUS Guideline on Diagnostics and Monitoring of Patients with Inflammatory Bowel Disease: Part 2",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/19/7/jjaf107/8220327",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-malignancies-2023",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Inflammatory Bowel Disease and Malignancies",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/17/6/827/6931718",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-eim-2024",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on Extraintestinal Manifestations in Inflammatory Bowel Disease",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/18/1/1/7205776",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-pregnancy-2023",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "European Crohn's and Colitis Guidelines on Sexuality, Fertility, Pregnancy, and Lactation",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/17/1/1/6675338",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-infections-2026",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Guidelines on the Prevention, Diagnosis, and Management of Infections in Inflammatory Bowel Disease",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/20/7/jjag071/8728072",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-pouchitis-2025",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "ECCO Topical Review on Pouch Disorders",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/19/7/jjaf103/8165474",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-elderly-2017",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "European Crohn's and Colitis Organisation Topical Review on IBD in the Elderly",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/11/3/263/2527542",
+      "pdfUrl": null
+    },
+    {
+      "id": "ecco-uc-definitions-2017",
+      "societyId": "ecco",
+      "country": "EU",
+      "title": "Third European Evidence-based Consensus on Diagnosis and Management of Ulcerative Colitis. Part 1: Definitions, Diagnosis, Extra-intestinal Manifestations, Pregnancy, Cancer Surveillance, Surgery, and Ileo-anal Pouch Disorders",
+      "titleLocal": null,
+      "url": "https://academic.oup.com/ecco-jcc/article/11/6/649/2966917",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-chronic-pancreatitis-2017",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "United European Gastroenterology evidence-based guidelines for the diagnosis and therapy of chronic pancreatitis (HaPanEU)",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1177/2050640616684695",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-eosinophilic-esophagitis-2017",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "Guidelines on eosinophilic esophagitis: evidence-based statements and recommendations for diagnosis and management in children and adults",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1177/2050640616689525",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-igg4-digestive-2020",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "European Guideline on IgG4-related digestive disease - UEG and SGF evidence-based recommendations",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1177/2050640620934911",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-chronic-mesenteric-ischaemia-2020",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "European guidelines on chronic mesenteric ischaemia - joint UEG, EAGEN, ESGAR, CIRSE and partner-society clinical guidelines",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1177/2050640620916681",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-functional-dyspepsia-2021",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "United European Gastroenterology (UEG) and European Society for Neurogastroenterology and Motility (ESNM) consensus on functional dyspepsia",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1002/ueg2.12061",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-gastroparesis-2021",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "United European Gastroenterology (UEG) and European Society for Neurogastroenterology and Motility (ESNM) consensus on gastroparesis",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/10.1002/ueg2.12060",
+      "pdfUrl": null
+    },
+    {
+      "id": "ueg-chronic-nausea-vomiting-2025",
+      "societyId": "ueg",
+      "country": "EU",
+      "title": "European Guideline on Chronic Nausea and Vomiting - A UEG and ESNM Consensus for Clinical Management",
+      "titleLocal": null,
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/ueg2.12711",
       "pdfUrl": null
     }
   ]
