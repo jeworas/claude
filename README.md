@@ -1,6 +1,6 @@
 # GuidelineAtlas
 
-**A bilingual index of clinical practice guidelines from US and Polish medical societies — proof of concept.**
+**A bilingual index of clinical practice guidelines from US, European and Polish medical societies — proof of concept.**
 
 Find the current treatment guidelines for a condition in one search, in **English or Polish**, with a concise structured summary and a direct link to the source. Built because finding current clinical guidelines across dozens of society websites is slow and error-prone.
 
@@ -11,13 +11,14 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 ## What it does
 
 - **Maps 82 societies** across ~24 specialties and five regions — the US, Europe (pan-European bodies), the UK, Poland and international organisations (ESC, KDIGO, NCCN, IDSA, NICE, WHO, FIGO, GOLD, ACR, EULAR…). Each society carries the guideline-index URL its documents are published on. Full guideline text is ingested for the gastroenterology / IBD cluster first (ACG, PTG-E and ECCO/UEG in full); the rest of the registry maps the sources to ingest next.
-- **Indexes 85 current guidelines** (102 including prior editions) with structured treatment summaries — the full current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
+- **Indexes 96 current guidelines** (113 including prior editions) with structured treatment summaries — the full current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs, plus growing coverage of cardiology, diabetology, nephrology (KDIGO + Polish Society of Nephrology), pulmonology (GOLD), oncology, urology, ophthalmology, infectious disease and US preventive services (USPSTF).
 - **Bilingual search** — `colitis`, `UC`, `WZJG` and `wrzodziejące zapalenie jelita grubego` all resolve to ulcerative colitis; the UI shows *which* term matched.
 - **Bilingual interface** — a full PL/EN language toggle (persisted per browser) translates all navigation, labels and disclaimers; guideline content stays in its source language.
 - **Quick answers** — a specific query like `celiac dosage`, `H. pylori dosing`, or `budesonide dose` surfaces the most relevant recommendation and dosing directly above the results.
 - **Dosing quick-reference** — flagship guidelines carry a standard-regimen table (kept in a separate, auditable module) with a strong verify-against-source framing.
 - **Drug cross-reference** — the inverse view: search a medicine (e.g. `infliximab`) and see **every condition it is recommended for**, with therapy line, evidence grade and standard dosing per guideline, across US/EU/PL. Polish and English drug names (`infliksymab` ≡ `infliximab`) resolve to one medicine. Browsable at `/drugs`; introduces no new clinical facts — it re-groups curated data by drug.
 - **Region comparison** — a US ↔ Europe ↔ Poland matrix aligned by therapy line, highlighting where societies **agree** vs. **diverge** (drug names matched across languages).
+- **Coverage dashboard** (`/coverage`) — a specialty × region matrix of current-guideline counts with per-specialty condition counts and a "due for review" worklist of the oldest current guidelines; makes gaps and staleness visible at a glance. Browse the conditions index filtered by specialty via `/conditions?specialty=…`.
 - **Revision timeline** — for conditions where guidance was revised (e.g. ACG UC 2010 → 2019 → 2025), a timeline of successive editions; superseded editions stay viewable but are kept out of search.
 - **Freshness tracking** — every guideline shows its year and a currency badge (current / aging / superseded).
 - **Update-checker** — a demo script that diffs a society's public guideline index against the database to find guidelines we don't yet track.
@@ -119,7 +120,7 @@ src/lib/
 src/components/            SearchBar, SearchExperience, GuidelineCard, badges, …
 src/app/                   Routes: /, /search, /guideline/[id], /condition/[id],
                            /conditions, /drugs, /drug/[slug],
-                           /societies, /societies/[id], /about
+                           /societies, /societies/[id], /coverage, /about
 scripts/
   validate.ts             npm run validate
   fetch-guidelines.ts     npm run sources  (--download / --browser / --deep)
