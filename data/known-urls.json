@@ -70,6 +70,11 @@
       "societyId": "acr",
       "abbreviation": "ACR",
       "indexUrl": "https://rheumatology.org/clinical-practice-guidelines"
+    },
+    {
+      "societyId": "aua",
+      "abbreviation": "AUA",
+      "indexUrl": "https://www.auanet.org/guidelines-and-quality/guidelines"
     }
   ],
   "known": [
@@ -680,9 +685,18 @@
       "id": "ata-anaplastic-thyroid-cancer-2020",
       "societyId": "ata",
       "country": "US",
-      "title": "2020 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer",
+      "title": "2021 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer",
       "titleLocal": null,
       "url": "https://www.thyroid.org/professionals/ata-professional-guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "aua-suo-prostate-early-detection-2023",
+      "societyId": "aua",
+      "country": "US",
+      "title": "AUA/SUO Guideline: Early Detection of Prostate Cancer (2023)",
+      "titleLocal": null,
+      "url": "https://www.auanet.org/guidelines-and-quality/guidelines",
       "pdfUrl": null
     },
     {

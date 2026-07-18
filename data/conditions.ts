@@ -1338,5 +1338,26 @@ export const conditions: Condition[] = [
       "C73"
     ],
     "specialty": "oncology"
+  },
+  {
+    "id": "prostate-cancer",
+    "nameEn": "Prostate cancer",
+    "namePl": "Rak prostaty",
+    "synonymsEn": [
+      "prostate carcinoma",
+      "prostate cancer screening",
+      "PSA screening"
+    ],
+    "synonymsPl": [
+      "rak gruczołu krokowego",
+      "rak stercza"
+    ],
+    "abbreviations": [
+      "PCa"
+    ],
+    "icd10": [
+      "C61"
+    ],
+    "specialty": "urology"
   }
 ];

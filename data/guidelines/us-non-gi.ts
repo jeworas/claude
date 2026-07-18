@@ -183,16 +183,16 @@ export const usNonGiGuidelines: Guideline[] = [
     id: 'ata-anaplastic-thyroid-cancer-2020',
     societyId: 'ata',
     conditionIds: ['anaplastic-thyroid-cancer'],
-    title: '2020 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer',
+    title: '2021 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer',
     language: 'en',
     specialty: 'oncology',
-    year: 2020,
+    year: 2021,
     status: 'current',
     sourceUrl: 'https://www.thyroid.org/professionals/ata-professional-guidelines/',
     citation:
       'Bible KC, Kebebew E, Brierley J, et al. 2021 American Thyroid Association Guidelines for Management of Patients with Anaplastic Thyroid Cancer. Thyroid 2021;31(3):337–386.',
     summary:
-      'The ATA guideline for anaplastic thyroid cancer (ATC), a rare and aggressive malignancy. It urges rapid, biopsy-confirmed diagnosis with expedited BRAF V600E and molecular testing to enable targeted therapy, multimodal treatment (surgery for resectable disease, radiotherapy with radiosensitizing chemotherapy for locoregional control), BRAF/MEK-inhibitor therapy for BRAF-mutant tumours, and early attention to airway management and goals of care.',
+      'The ATA guideline for anaplastic thyroid cancer (ATC), a rare and highly aggressive malignancy requiring urgent multidisciplinary care. It calls for biopsy-confirmed diagnosis with expedited BRAF V600E and molecular profiling, rapid preoperative staging and airway assessment, surgical resection for confined resectable disease, IMRT with systemic chemotherapy for locoregional control, mutation-directed systemic therapy for advanced disease (BRAF/MEK, NTRK, RET and immune-checkpoint targets), and early goals-of-care, palliative and hospice involvement.',
     keyRecommendations: [
       {
         topic: 'Diagnosis',
@@ -201,24 +201,86 @@ export const usNonGiGuidelines: Guideline[] = [
       },
       {
         topic: 'Molecular testing',
-        text: 'At diagnosis, expedite BRAF V600E assessment by immunohistochemistry with molecular confirmation and broader molecular profiling, to inform mutation-specific targeted therapy; loss of p53 (TP53) and TERT-promoter alterations are characteristic.',
+        text: 'At diagnosis, expedite BRAF V600E assessment by immunohistochemistry with molecular confirmation and profile for NTRK/RET fusions and PD-L1 to guide targeted therapy; loss of p53 (TP53) and TERT-promoter alterations are characteristic.',
         lineOfTherapy: 'diagnosis',
       },
       {
+        topic: 'Preoperative evaluation',
+        text: 'Complete laboratory testing (CBC, CMP, TSH/FT4) and cross-sectional staging — CT of neck, chest, abdomen and pelvis with contrast (or MRI), FDG-PET/CT where available, and brain MRI if indicated — plus vocal-cord evaluation, without delaying primary treatment.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'Airway and surgery',
+        text: 'Assess the airway immediately (reserve tracheostomy for impending obstruction rather than pre-emptive placement); for confined, resectable stage IVA/IVB disease aim for an R0/R1 resection, avoiding radical resection given the poor prognosis.',
+        lineOfTherapy: 'first-line',
+      },
+      {
+        topic: 'Radiotherapy and chemotherapy',
+        text: 'After R0/R1 resection, or for unresectable non-metastatic disease in good performance status, offer intensity-modulated radiotherapy (starting within 6 weeks of surgery) with concurrent systemic therapy — a taxane (paclitaxel or docetaxel), with or without an anthracycline (doxorubicin) or platinum (cisplatin or carboplatin).',
+        lineOfTherapy: 'first-line',
+        drugs: ['paclitaxel', 'docetaxel', 'doxorubicin', 'cisplatin', 'carboplatin'],
+      },
+      {
         topic: 'BRAF-targeted therapy',
-        text: 'For BRAF V600E-mutated ATC, start BRAF/MEK-inhibitor therapy (dabrafenib plus trametinib), which can achieve rapid tumour control and, in selected cases, enable subsequent surgery.',
+        text: 'For BRAF V600E-mutated ATC, start BRAF/MEK-inhibitor therapy (dabrafenib plus trametinib), which can achieve rapid tumour control and be used neoadjuvantly to enable subsequent surgery.',
         evidenceGrade: 'Strong recommendation',
         lineOfTherapy: 'first-line',
         drugs: ['dabrafenib', 'trametinib'],
       },
       {
-        topic: 'Surgery and radiotherapy',
-        text: 'For intrathyroidal, resectable ATC, consider surgical resection as part of multimodal therapy; offer definitive or adjuvant radiotherapy, often with radiosensitizing chemotherapy, for locoregional control in patients with good performance status.',
-        lineOfTherapy: 'first-line',
+        topic: 'Advanced disease by molecular target',
+        text: 'For unresectable stage IVB/IVC, bridge with cytotoxic chemotherapy while awaiting molecular results; treat NTRK fusions with larotrectinib or entrectinib, RET fusions with selpercatinib or pralsetinib, and high PD-L1 tumours with an immune-checkpoint inhibitor (pembrolizumab) — preferably within a clinical trial.',
+        lineOfTherapy: 'escalation',
+        drugs: ['larotrectinib', 'entrectinib', 'selpercatinib', 'pralsetinib', 'pembrolizumab'],
       },
       {
-        topic: 'Multidisciplinary care and goals of care',
-        text: 'Move rapidly from diagnosis to treatment through a multidisciplinary pathway, discuss goals of care early given the aggressive course, address airway management proactively, and offer clinical-trial enrolment.',
+        topic: 'Metastases, palliative and goals of care',
+        text: 'Treat brain metastases with dexamethasone for compressive symptoms plus surgery, stereotactic or whole-brain radiotherapy, and bone metastases with palliative radiotherapy, orthopedic fixation and antiresorptive therapy (a bisphosphonate or denosumab with calcium/vitamin D); integrate palliative care and hospice, and hold early goals-of-care and advance-directive discussions.',
+        lineOfTherapy: 'supportive',
+        drugs: ['dexamethasone', 'denosumab'],
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
+  {
+    id: 'aua-suo-prostate-early-detection-2023',
+    societyId: 'aua',
+    conditionIds: ['prostate-cancer'],
+    title: 'AUA/SUO Guideline: Early Detection of Prostate Cancer (2023)',
+    language: 'en',
+    specialty: 'urology',
+    year: 2023,
+    status: 'current',
+    sourceUrl: 'https://www.auanet.org/guidelines-and-quality/guidelines',
+    citation:
+      'Wei JT, Barocas D, Carlsson S, et al. Early Detection of Prostate Cancer: AUA/SUO Guideline. J Urol 2023;210:45.',
+    summary:
+      'The AUA/SUO guideline on early detection of prostate cancer through PSA-based screening within a shared-decision-making framework. It sets age- and risk-based screening (earlier for Black men, germline carriers and strong family history), requires a confirmatory PSA before further workup, uses MRI and risk calculators to inform the biopsy decision, and favours active surveillance for low-risk disease to curb overtreatment.',
+    keyRecommendations: [
+      {
+        topic: 'Shared decision-making',
+        text: 'Offer PSA-based screening within a shared-decision-making conversation that weighs earlier detection against the harms of overdiagnosis and overtreatment.',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Who and when to screen',
+        text: 'Begin routine screening around age 45–50 for average-risk men and offer it earlier (from 40–45, biennially) to higher-risk men — Black ancestry, a germline mutation, or a strong family history; individualise screening for men over 70 or with under 10 years’ life expectancy.',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Confirmatory testing',
+        text: 'Repeat an initially elevated PSA before further workup; do not use the digital rectal exam as an initial screening test, and do not give empiric antibiotics for an asymptomatic elevated PSA.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'Deciding on biopsy',
+        text: 'Use prostate MRI, validated risk calculators and serum/urine markers within shared decision-making to decide on biopsy, aiming to detect clinically significant cancer while limiting unnecessary biopsies.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'Low-risk management',
+        text: 'Active surveillance is the preferred management for low-risk prostate cancer; watchful waiting suits men with an asymptomatic cancer and limited life expectancy.',
         lineOfTherapy: 'supportive',
       },
     ],

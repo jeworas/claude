@@ -248,6 +248,9 @@ check('“hydroxychloroquine” is indexed as a medicine with dosing', (() => {
 check('oncology condition exists (anaplastic thyroid cancer)', getCondition('anaplastic-thyroid-cancer')?.specialty === 'oncology');
 check('“anaplastic thyroid cancer” finds the ATA guideline', search('anaplastic thyroid cancer').some((r) => r.guideline.id === 'ata-anaplastic-thyroid-cancer-2020'));
 check('“dabrafenib” is cross-referenced to ATC', (drugsForQuery('dabrafenib')[0]?.conditions ?? []).some((c) => c.condition.id === 'anaplastic-thyroid-cancer'));
+check('urology condition exists (prostate cancer)', getCondition('prostate-cancer')?.specialty === 'urology');
+check('“prostate cancer” finds the AUA guideline', search('prostate cancer').some((r) => r.guideline.id === 'aua-suo-prostate-early-detection-2023'));
+check('pembrolizumab cross-references ATC (enriched systemic therapy)', (drugsForQuery('pembrolizumab')[0]?.conditions ?? []).some((c) => c.condition.id === 'anaplastic-thyroid-cancer'));
 
 console.log('');
 if (failures > 0) {
