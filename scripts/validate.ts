@@ -229,6 +229,16 @@ check(
   'a COPD drug class is cross-referenced to COPD',
   (drugsForQuery('LABA')[0]?.conditions ?? []).some((c) => c.condition.id === 'copd'),
 );
+check('CKD condition exists (nephrology)', getCondition('chronic-kidney-disease')?.specialty === 'nephrology');
+check('“CKD” finds the NKF guideline', search('CKD').some((r) => r.guideline.id === 'nkf-ckd-changepack-2023'));
+check('Polish “przewlekła choroba nerek” finds CKD', search('przewlekła choroba nerek').some((r) => r.guideline.id === 'nkf-ckd-changepack-2023'));
+check(
+  'metformin now spans diabetes and CKD (cross-specialty drug)',
+  (() => {
+    const specs = new Set((drugsForQuery('metformin')[0]?.conditions ?? []).map((c) => c.condition.specialty));
+    return specs.has('nephrology') && (specs.has('diabetology') || specs.has('diabetes'));
+  })(),
+);
 
 console.log('');
 if (failures > 0) {

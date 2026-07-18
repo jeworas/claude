@@ -42,6 +42,11 @@
       "indexUrl": "https://ptdiab.pl/zalecenia-ptd"
     },
     {
+      "societyId": "nkf",
+      "abbreviation": "NKF",
+      "indexUrl": "https://www.kidney.org/professionals/guidelines"
+    },
+    {
       "societyId": "ptnt",
       "abbreviation": "PTNT",
       "indexUrl": "https://www.nadcisnienietetnicze.pl/"
@@ -641,6 +646,15 @@
       "title": "2025 Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults",
       "titleLocal": null,
       "url": "https://professional.heart.org/en/guidelines-and-statements",
+      "pdfUrl": null
+    },
+    {
+      "id": "nkf-ckd-changepack-2023",
+      "societyId": "nkf",
+      "country": "US",
+      "title": "CKD Change Package: Population Health Strategies for Cardiovascular and Kidney Disease Risk Reduction (2023)",
+      "titleLocal": null,
+      "url": "https://www.kidney.org/professionals/guidelines",
       "pdfUrl": null
     },
     {

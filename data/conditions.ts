@@ -1273,5 +1273,27 @@ export const conditions: Condition[] = [
       "J44"
     ],
     "specialty": "pulmonology"
+  },
+  {
+    "id": "chronic-kidney-disease",
+    "nameEn": "Chronic kidney disease",
+    "namePl": "Przewlekła choroba nerek",
+    "synonymsEn": [
+      "chronic renal failure",
+      "chronic renal insufficiency",
+      "chronic kidney failure"
+    ],
+    "synonymsPl": [
+      "przewlekła niewydolność nerek",
+      "przewlekła choroba nerek"
+    ],
+    "abbreviations": [
+      "CKD",
+      "PChN"
+    ],
+    "icd10": [
+      "N18"
+    ],
+    "specialty": "nephrology"
   }
 ];
