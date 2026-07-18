@@ -5,7 +5,7 @@ import { z } from 'zod';
  * in scripts/validate.ts so a malformed record fails loudly before shipping.
  */
 
-export const countrySchema = z.enum(['US', 'PL', 'EU']);
+export const countrySchema = z.enum(['US', 'PL', 'EU', 'UK', 'INT']);
 export const languageSchema = z.enum(['en', 'pl']);
 export const guidelineStatusSchema = z.enum(['current', 'superseded']);
 

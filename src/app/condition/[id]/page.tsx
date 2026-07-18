@@ -25,7 +25,9 @@ export async function generateMetadata({
 const COLUMN: { country: Country; flag: string }[] = [
   { country: 'US', flag: '🇺🇸' },
   { country: 'EU', flag: '🇪🇺' },
+  { country: 'UK', flag: '🇬🇧' },
   { country: 'PL', flag: '🇵🇱' },
+  { country: 'INT', flag: '🌍' },
 ];
 
 export default async function ConditionPage({ params }: { params: Promise<{ id: string }> }) {

@@ -3,7 +3,7 @@ import type { Country } from '@/lib/types';
 import { buildComparison, isConsensus, type CompareRow } from '@/lib/compare';
 import { T } from '@/components/i18n';
 
-const REGION_FLAG: Record<Country, string> = { US: '🇺🇸', EU: '🇪🇺', PL: '🇵🇱' };
+const REGION_FLAG: Record<Country, string> = { US: '🇺🇸', EU: '🇪🇺', UK: '🇬🇧', PL: '🇵🇱', INT: '🌍' };
 
 /**
  * Side-by-side comparison of how each region's societies approach a condition,

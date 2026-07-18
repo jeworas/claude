@@ -68,11 +68,17 @@ export default async function SocietyPage({ params }: { params: Promise<{ id: st
       <h2 className="mt-8 text-lg font-semibold text-slate-900">
         <T k="societies.guidelines.title" /> ({list.length})
       </h2>
-      <div className="mt-4 space-y-4">
-        {list.map((g) => (
-          <GuidelineCard key={g.id} guideline={g} />
-        ))}
-      </div>
+      {list.length === 0 ? (
+        <p className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+          <T k="societies.none" />
+        </p>
+      ) : (
+        <div className="mt-4 space-y-4">
+          {list.map((g) => (
+            <GuidelineCard key={g.id} guideline={g} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

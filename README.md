@@ -10,7 +10,7 @@ Find the current treatment guidelines for a condition in one search, in **Englis
 
 ## What it does
 
-- **Maps societies** across the US, Europe and Poland (ACG, AGA, ECCO, UEG, PTG-E, NPOA, PTD, PTNT, ADA, AHA/ACC) — ACG, PTG-E and ECCO/UEG covered in full.
+- **Maps 82 societies** across ~24 specialties and five regions — the US, Europe (pan-European bodies), the UK, Poland and international organisations (ESC, KDIGO, NCCN, IDSA, NICE, WHO, FIGO, GOLD, ACR, EULAR…). Each society carries the guideline-index URL its documents are published on. Full guideline text is ingested for the gastroenterology / IBD cluster first (ACG, PTG-E and ECCO/UEG in full); the rest of the registry maps the sources to ingest next.
 - **Indexes 85 current guidelines** (102 including prior editions) with structured treatment summaries — the full current ACG, PTG-E and ECCO/UEG gastroenterology/hepatology catalogs, plus AGA and diabetes/hypertension for breadth.
 - **Bilingual search** — `colitis`, `UC`, `WZJG` and `wrzodziejące zapalenie jelita grubego` all resolve to ulcerative colitis; the UI shows *which* term matched.
 - **Bilingual interface** — a full PL/EN language toggle (persisted per browser) translates all navigation, labels and disclaimers; guideline content stays in its source language.
@@ -74,7 +74,7 @@ It attempts a real fetch of [gi.org](https://gi.org/guidelines/) and [ptg-e.org.
 
 ```
 data/
-  societies.ts            Society registry (US + PL)
+  societies.ts            Society registry (US · EU · UK · PL · INT, ~24 specialties)
   conditions.ts           Bilingual condition thesaurus (EN/PL synonyms, ICD-10)
   guidelines/             Seed guidelines, one file per source (acg, aga, ptg-e, …)
   known-urls.json         Generated: what the update-checker diffs against

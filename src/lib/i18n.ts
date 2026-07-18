@@ -93,6 +93,8 @@ const en: Dict = {
   'region.US': 'United States',
   'region.EU': 'Europe',
   'region.PL': 'Poland',
+  'region.UK': 'United Kingdom',
+  'region.INT': 'International',
 
   'line.diagnosis': 'Diagnosis',
   'line.screening': 'Screening',
@@ -159,13 +161,15 @@ const en: Dict = {
 
   'societies.title': 'Mapped societies',
   'societies.subtitle':
-    'The guideline-issuing bodies currently indexed. The registry is intentionally small for this proof of concept and will expand across specialties and countries.',
+    'The guideline-issuing bodies mapped so far — major societies across many specialties in the US, Europe, the UK, Poland and international bodies. Full guideline text is ingested for the gastroenterology cluster first; every other society links out to its own guidelines index.',
   'societies.viewguidelines': 'View guidelines',
   'societies.site': 'Society site',
   'societies.guidelines': 'guidelines',
   'societies.guidelines.title': 'Guidelines',
   'societies.homepage': 'Homepage',
   'societies.index': 'Guidelines index',
+  'societies.none':
+    'No guidelines have been ingested into the atlas for this society yet — it is mapped as a source. Open its guidelines index above to browse them at the publisher.',
 
   'about.title': 'About GuidelineAtlas',
   'about.intro':
@@ -269,6 +273,8 @@ const pl: Dict = {
   'region.US': 'Stany Zjednoczone',
   'region.EU': 'Europa',
   'region.PL': 'Polska',
+  'region.UK': 'Wielka Brytania',
+  'region.INT': 'Międzynarodowe',
 
   'line.diagnosis': 'Rozpoznanie',
   'line.screening': 'Badania przesiewowe',
@@ -335,13 +341,15 @@ const pl: Dict = {
 
   'societies.title': 'Uwzględnione towarzystwa',
   'societies.subtitle':
-    'Obecnie zindeksowane organizacje wydające wytyczne. Rejestr jest celowo niewielki na potrzeby tego prototypu i będzie rozszerzany o kolejne specjalności i kraje.',
+    'Instytucje wydające wytyczne uwzględnione do tej pory — najważniejsze towarzystwa z wielu specjalności w USA, Europie, Wielkiej Brytanii i Polsce oraz organizacje międzynarodowe. Pełny tekst wytycznych zaindeksowano najpierw dla gastroenterologii; pozostałe towarzystwa odsyłają do własnych indeksów wytycznych.',
   'societies.viewguidelines': 'Zobacz wytyczne',
   'societies.site': 'Strona towarzystwa',
   'societies.guidelines': 'wytycznych',
   'societies.guidelines.title': 'Wytyczne',
   'societies.homepage': 'Strona główna',
   'societies.index': 'Indeks wytycznych',
+  'societies.none':
+    'Do atlasu nie dodano jeszcze wytycznych tego towarzystwa — jest ono zmapowane jako źródło. Otwórz indeks wytycznych powyżej, aby przeglądać je u wydawcy.',
 
   'about.title': 'O aplikacji GuidelineAtlas',
   'about.intro':

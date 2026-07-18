@@ -35,7 +35,7 @@ export const LINE_LABEL: Record<LineOfTherapy, string> = {
 };
 
 /** Column order for the comparison. */
-export const REGION_ORDER: Country[] = ['US', 'EU', 'PL'];
+export const REGION_ORDER: Country[] = ['US', 'EU', 'UK', 'PL', 'INT'];
 
 const POLISH_MAP: Record<string, string> = {
   ą: 'a', ć: 'c', ę: 'e', ł: 'l', ń: 'n', ó: 'o', ś: 's', ź: 'z', ż: 'z',

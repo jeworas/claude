@@ -10,7 +10,9 @@ export const metadata: Metadata = { title: 'Societies — GuidelineAtlas' };
 const COUNTRY_GROUPS: { country: Country; flag: string }[] = [
   { country: 'US', flag: '🇺🇸' },
   { country: 'EU', flag: '🇪🇺' },
+  { country: 'UK', flag: '🇬🇧' },
   { country: 'PL', flag: '🇵🇱' },
+  { country: 'INT', flag: '🌍' },
 ];
 
 export default function SocietiesPage() {

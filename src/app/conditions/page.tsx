@@ -7,7 +7,7 @@ import { T } from '@/components/i18n';
 
 export const metadata: Metadata = { title: 'Conditions — GuidelineAtlas' };
 
-const REGION_ORDER: Country[] = ['US', 'EU', 'PL'];
+const REGION_ORDER: Country[] = ['US', 'EU', 'UK', 'PL', 'INT'];
 
 export default function ConditionsPage() {
   // Group conditions by specialty, sorted; conditions alphabetical within each.

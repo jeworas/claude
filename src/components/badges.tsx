@@ -5,15 +5,25 @@ const countryStyles: Record<Country, string> = {
   US: 'bg-blue-100 text-blue-800 border-blue-200',
   PL: 'bg-red-100 text-red-800 border-red-200',
   EU: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  UK: 'bg-violet-100 text-violet-800 border-violet-200',
+  INT: 'bg-emerald-100 text-emerald-800 border-emerald-200',
 };
 
-const countryFlag: Record<Country, string> = { US: '🇺🇸', PL: '🇵🇱', EU: '🇪🇺' };
+const countryFlag: Record<Country, string> = {
+  US: '🇺🇸',
+  PL: '🇵🇱',
+  EU: '🇪🇺',
+  UK: '🇬🇧',
+  INT: '🌍',
+};
 
 /** Full region label for a country/region code. */
 export const REGION_LABEL: Record<Country, string> = {
   US: 'United States',
   PL: 'Poland',
   EU: 'Europe',
+  UK: 'United Kingdom',
+  INT: 'International',
 };
 
 export function CountryBadge({ country }: { country: Country }) {

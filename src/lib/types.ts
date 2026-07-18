@@ -6,8 +6,12 @@
  * (see src/lib/schema.ts and scripts/validate.ts).
  */
 
-/** Region a society belongs to. 'EU' covers pan-European bodies (ECCO, UEG). */
-export type Country = 'US' | 'PL' | 'EU';
+/**
+ * Region a society belongs to. 'EU' covers pan-European bodies (ESC, ECCO,
+ * UEG…), 'UK' covers the United Kingdom (NICE, royal colleges), and 'INT'
+ * covers global/international bodies (WHO, KDIGO, GOLD, FIGO…).
+ */
+export type Country = 'US' | 'PL' | 'EU' | 'UK' | 'INT';
 export type Language = 'en' | 'pl';
 export type GuidelineStatus = 'current' | 'superseded';
 
