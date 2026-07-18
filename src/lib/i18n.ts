@@ -25,6 +25,7 @@ const en: Dict = {
   'conditions.subtitle':
     'Every condition in the index, grouped by specialty. Each gathers the matching guidelines from all mapped societies.',
   'lang.toggle.aria': 'Switch language',
+  'a11y.skip': 'Skip to content',
 
   'disclaimer.text':
     'Reference tool for healthcare professionals. Summaries are hand-curated demo data and may be incomplete or out of date — always verify against the original guideline before making clinical decisions. Not a medical device and not a substitute for clinical judgement.',
@@ -200,6 +201,7 @@ const pl: Dict = {
   'conditions.subtitle':
     'Wszystkie choroby w indeksie, pogrupowane według specjalności. Każda zbiera pasujące wytyczne ze wszystkich uwzględnionych towarzystw.',
   'lang.toggle.aria': 'Zmień język',
+  'a11y.skip': 'Przejdź do treści',
 
   'disclaimer.text':
     'Narzędzie referencyjne dla pracowników ochrony zdrowia. Podsumowania są przygotowanymi ręcznie danymi demonstracyjnymi i mogą być niekompletne lub nieaktualne — przed podjęciem decyzji klinicznych zawsze zweryfikuj je z oryginalną wytyczną. To nie jest wyrób medyczny ani substytut oceny klinicznej.',
