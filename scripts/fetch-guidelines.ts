@@ -74,6 +74,7 @@ const BROWSER_HEADERS = {
 interface BrowserPage {
   goto: (url: string, opts: Record<string, unknown>) => Promise<unknown>;
   content: () => Promise<string>;
+  waitForTimeout: (ms: number) => Promise<void>;
   close: () => Promise<void>;
 }
 interface HeadlessBrowser {
@@ -104,9 +105,13 @@ async function fetchHtmlViaBrowser(url: string): Promise<{ html: string; status:
   const browser = await getBrowser();
   const page = await browser.newPage();
   try {
-    const res = (await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 })) as {
+    // Wait for the DOM, not network-idle: many society sites keep long-lived
+    // connections (analytics, chat) so `networkidle` never fires and times out.
+    // A short settle window then lets client-rendered guideline lists appear.
+    const res = (await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })) as {
       status: () => number;
     } | null;
+    await page.waitForTimeout(2500);
     const html = await page.content();
     return { html, status: res?.status() ?? 200 };
   } finally {
@@ -138,6 +143,12 @@ const NAV_WORDS = new Set([
   'download', 'share', 'print', 'subscribe', 'newsletter', 'careers', 'shop',
 ]);
 
+// Path segments that signal an individual guideline/recommendation document,
+// used to catch links that live as siblings of the index rather than children
+// (e.g. index /practice-guideline/practice-guidelines/, doc /practice-guideline/<name>).
+const GUIDELINE_PATH_RE =
+  /guideline|guidance|recommendation|wytyczne|zalecenia|rekomendacj|standard|consensus|practice-parameter|position/;
+
 function looksLikeDocument(href: string, text: string, indexUrl: string): boolean {
   if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('javascript:'))
     return false;
@@ -157,12 +168,17 @@ function looksLikeDocument(href: string, text: string, indexUrl: string): boolea
     return false;
   }
   if (u.host !== base.host) return false;
-  const basePath = base.pathname.replace(/\/+$/, '');
-  if (!u.pathname.startsWith(basePath) || u.pathname.replace(/\/+$/, '') === basePath) return false;
   const label = text.replace(/\s+/g, ' ').trim();
-  if (label.length < 15) return false;
   if (NAV_WORDS.has(label.toLowerCase())) return false;
-  return true;
+  const basePath = base.pathname.replace(/\/+$/, '');
+  const selfPath = u.pathname.replace(/\/+$/, '');
+  if (selfPath === basePath) return false; // the index page linking to itself
+  // (a) a sub-page under the index path, with a title-like label
+  if (u.pathname.startsWith(basePath) && label.length >= 15) return true;
+  // (b) a guideline-ish path elsewhere on the same site (individual documents
+  //     often sit as siblings of the index, not children)
+  if (GUIDELINE_PATH_RE.test(u.pathname.toLowerCase()) && label.length >= 8) return true;
+  return false;
 }
 
 interface DiscoveredDoc {

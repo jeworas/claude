@@ -534,8 +534,8 @@ export const societies: Society[] = [
     abbreviation: 'PTR',
     country: 'PL',
     specialties: ['rheumatology'],
-    homepage: 'https://reumatologia.ptr.net.pl',
-    guidelinesIndexUrl: 'https://reumatologia.ptr.net.pl/',
+    homepage: 'https://ptr.info.pl',
+    guidelinesIndexUrl: 'https://ptr.info.pl/',
     description:
       'National Polish rheumatology society; issues recommendations published in the journal Reumatologia.',
   },
@@ -737,7 +737,7 @@ export const societies: Society[] = [
     country: 'INT',
     specialties: ['obstetrics-gynecology'],
     homepage: 'https://www.figo.org',
-    guidelinesIndexUrl: 'https://www.figo.org/what-we-do/figo-guidelines',
+    guidelinesIndexUrl: 'https://www.figo.org/',
     description:
       'Global OB/GYN federation; publishes international guidelines (e.g. FIGO staging, postpartum haemorrhage, GDM).',
   },
