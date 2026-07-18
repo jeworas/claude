@@ -179,4 +179,50 @@ export const usNonGiGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'ata-anaplastic-thyroid-cancer-2020',
+    societyId: 'ata',
+    conditionIds: ['anaplastic-thyroid-cancer'],
+    title: '2020 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer',
+    language: 'en',
+    specialty: 'oncology',
+    year: 2020,
+    status: 'current',
+    sourceUrl: 'https://www.thyroid.org/professionals/ata-professional-guidelines/',
+    citation:
+      'Bible KC, Kebebew E, Brierley J, et al. 2021 American Thyroid Association Guidelines for Management of Patients with Anaplastic Thyroid Cancer. Thyroid 2021;31(3):337–386.',
+    summary:
+      'The ATA guideline for anaplastic thyroid cancer (ATC), a rare and aggressive malignancy. It urges rapid, biopsy-confirmed diagnosis with expedited BRAF V600E and molecular testing to enable targeted therapy, multimodal treatment (surgery for resectable disease, radiotherapy with radiosensitizing chemotherapy for locoregional control), BRAF/MEK-inhibitor therapy for BRAF-mutant tumours, and early attention to airway management and goals of care.',
+    keyRecommendations: [
+      {
+        topic: 'Diagnosis',
+        text: 'Suspect ATC in any rapidly enlarging thyroid mass and confirm it by biopsy — FNA cytology, with core biopsy when the cytological yield is insufficient — before surgery, since resection may be inappropriate.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'Molecular testing',
+        text: 'At diagnosis, expedite BRAF V600E assessment by immunohistochemistry with molecular confirmation and broader molecular profiling, to inform mutation-specific targeted therapy; loss of p53 (TP53) and TERT-promoter alterations are characteristic.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'BRAF-targeted therapy',
+        text: 'For BRAF V600E-mutated ATC, start BRAF/MEK-inhibitor therapy (dabrafenib plus trametinib), which can achieve rapid tumour control and, in selected cases, enable subsequent surgery.',
+        evidenceGrade: 'Strong recommendation',
+        lineOfTherapy: 'first-line',
+        drugs: ['dabrafenib', 'trametinib'],
+      },
+      {
+        topic: 'Surgery and radiotherapy',
+        text: 'For intrathyroidal, resectable ATC, consider surgical resection as part of multimodal therapy; offer definitive or adjuvant radiotherapy, often with radiosensitizing chemotherapy, for locoregional control in patients with good performance status.',
+        lineOfTherapy: 'first-line',
+      },
+      {
+        topic: 'Multidisciplinary care and goals of care',
+        text: 'Move rapidly from diagnosis to treatment through a multidisciplinary pathway, discuss goals of care early given the aggressive course, address airway management proactively, and offer clinical-trial enrolment.',
+        lineOfTherapy: 'supportive',
+      },
+    ],
+    lastVerified: '2026-07-18',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];

@@ -245,6 +245,9 @@ check('“hydroxychloroquine” is indexed as a medicine with dosing', (() => {
   return !!d && d.conditions.some((c) => c.condition.id === 'hydroxychloroquine-retinopathy') &&
     d.conditions.some((c) => c.guidelines.some((u) => u.doses.length > 0));
 })());
+check('oncology condition exists (anaplastic thyroid cancer)', getCondition('anaplastic-thyroid-cancer')?.specialty === 'oncology');
+check('“anaplastic thyroid cancer” finds the ATA guideline', search('anaplastic thyroid cancer').some((r) => r.guideline.id === 'ata-anaplastic-thyroid-cancer-2020'));
+check('“dabrafenib” is cross-referenced to ATC', (drugsForQuery('dabrafenib')[0]?.conditions ?? []).some((c) => c.condition.id === 'anaplastic-thyroid-cancer'));
 
 console.log('');
 if (failures > 0) {

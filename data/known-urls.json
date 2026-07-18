@@ -37,6 +37,11 @@
       "indexUrl": "https://professional.diabetes.org/standards-of-care"
     },
     {
+      "societyId": "ata",
+      "abbreviation": "ATA",
+      "indexUrl": "https://www.thyroid.org/professionals/ata-professional-guidelines/"
+    },
+    {
       "societyId": "ptd",
       "abbreviation": "PTD",
       "indexUrl": "https://ptdiab.pl/zalecenia-ptd"
@@ -669,6 +674,15 @@
       "title": "ACR/AAD/RDS/AAO Joint Statement on Hydroxychloroquine Use With Respect to Retinal Toxicity (2020)",
       "titleLocal": null,
       "url": "https://rheumatology.org/clinical-practice-guidelines",
+      "pdfUrl": null
+    },
+    {
+      "id": "ata-anaplastic-thyroid-cancer-2020",
+      "societyId": "ata",
+      "country": "US",
+      "title": "2020 ATA Guidelines for Management of Patients with Anaplastic Thyroid Cancer",
+      "titleLocal": null,
+      "url": "https://www.thyroid.org/professionals/ata-professional-guidelines/",
       "pdfUrl": null
     },
     {

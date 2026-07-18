@@ -1317,5 +1317,26 @@ export const conditions: Condition[] = [
       "H35.389"
     ],
     "specialty": "ophthalmology"
+  },
+  {
+    "id": "anaplastic-thyroid-cancer",
+    "nameEn": "Anaplastic thyroid cancer",
+    "namePl": "Rak anaplastyczny tarczycy",
+    "synonymsEn": [
+      "anaplastic thyroid carcinoma",
+      "undifferentiated thyroid carcinoma",
+      "thyroid cancer"
+    ],
+    "synonymsPl": [
+      "rak niezróżnicowany tarczycy",
+      "rak tarczycy"
+    ],
+    "abbreviations": [
+      "ATC"
+    ],
+    "icd10": [
+      "C73"
+    ],
+    "specialty": "oncology"
   }
 ];
