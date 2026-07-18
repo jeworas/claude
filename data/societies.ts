@@ -534,8 +534,8 @@ export const societies: Society[] = [
     abbreviation: 'PTR',
     country: 'PL',
     specialties: ['rheumatology'],
-    homepage: 'https://ptreum.pl',
-    guidelinesIndexUrl: 'https://ptreum.pl/rekomendacje',
+    homepage: 'https://reumatologia.ptr.net.pl',
+    guidelinesIndexUrl: 'https://reumatologia.ptr.net.pl/',
     description:
       'National Polish rheumatology society; issues recommendations published in the journal Reumatologia.',
   },
@@ -821,7 +821,7 @@ export const societies: Society[] = [
     country: 'PL',
     specialties: ['surgery'],
     homepage: 'https://tchp.pl',
-    guidelinesIndexUrl: 'https://tchp.pl/wytyczne',
+    guidelinesIndexUrl: 'https://tchp.pl/edukacja/wytyczne',
     description:
       'National Polish surgical society; issues recommendations and standards for general and GI surgery.',
   },
