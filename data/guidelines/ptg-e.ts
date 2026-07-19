@@ -21,7 +21,7 @@ export const ptgeGuidelines: Guideline[] = [
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/wytyczne-polskiego-towarzystwa-gastroenterologii-i-konsultanta-krajowego-w-dziedzinie-gastroenterologii-dotyczace-postepowania-z-pacjentem-z-wrzodziejacym-zapaleniem-jelita-grubego/",
     "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2023/09/wytyczne-PL-WZJG-2023-wersja-do-druku.pdf",
-    "citation": "Eder P, Łodyga M, Dobrowolska A, et al. Guidelines for the management of ulcerative colitis. Recommendations of the Polish Society of Gastroenterology and the Polish National Consultant in Gastroenterology. Gastroenterology Review (Przegląd Gastroenterologiczny). 2023;18(1):1-42.",
+    "citation": "Eder P, Łodyga M, Dobrowolska A, et al. Guidelines for the management of ulcerative colitis. Recommendations of the Polish Society of Gastroenterology and the Polish National Consultant in Gastroenterology. Gastroenterology Review (Przegląd Gastroenterologiczny). 2023;18(1):1-42. DOI: 10.5114/pg.2023.125882 (verified via PubMed).",
     "summary": "Comprehensive update of the 2013 Polish recommendations, comprising 49 GRADE-based statements on the diagnosis and pharmacological and surgical treatment of ulcerative colitis in adults. Treatment is stratified by disease extent and severity, using 5-aminosalicylates for mild-to-moderate disease and escalating to corticosteroids, immunomodulators, biologics and small-molecule drugs, with a treat-to-target strategy aiming at clinical and endoscopic remission.",
     "keyRecommendations": [
       {
@@ -88,7 +88,7 @@ export const ptgeGuidelines: Guideline[] = [
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/wytyczne-ptge-konsultanta-krajowego-w-dziedzinie-gastroenterologii-dotyczace-postepowania-z-pacjentem-z-choroba-lesniowskiego-crohna/",
     "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/06/Wytyczne_chorba-Crohna_PL-1.pdf",
-    "citation": "Łodyga M, Eder P, Gawron-Kiszka M, et al. Guidelines for the management of Crohn's disease. Recommendations of the Polish Society of Gastroenterology and the Polish National Consultant in Gastroenterology. Gastroenterology Review (Przegląd Gastroenterologiczny). 2021;16(4):257-296.",
+    "citation": "Łodyga M, Eder P, Gawron-Kiszka M, et al. Guidelines for the management of Crohn's disease. Recommendations of the Polish Society of Gastroenterology and the Polish National Consultant in Gastroenterology. Gastroenterology Review (Przegląd Gastroenterologiczny). 2021;16(4):257-296. DOI: 10.5114/pg.2021.110914 (verified via PubMed).",
     "summary": "Update of the 2012 Polish recommendations, comprising 46 GRADE-based statements on the diagnosis and pharmacological and surgical treatment of Crohn's disease in adults. Management is tailored to disease location, phenotype and prognosis, favouring early introduction of immunosuppression/biologics in high-risk patients and a treat-to-target approach targeting mucosal healing.",
     "keyRecommendations": [
       {
@@ -153,7 +153,7 @@ export const ptgeGuidelines: Guideline[] = [
     "year": 2023,
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/",
-    "citation": "Working Group of the Polish Society of Gastroenterology. Diagnostic and therapeutic recommendations on Helicobacter pylori infection (33 statements). Gastroenterology Review (Przegląd Gastroenterologiczny). 2023. Lay summary: Gąsiorowska A. Lekarz POZ. 2023;9(5):251-256. (exact volume/issue to verify)",
+    "citation": "Working Group of the Polish Society of Gastroenterology. Diagnostic and therapeutic recommendations on Helicobacter pylori infection (33 statements). Gastroenterology Review (Przegląd Gastroenterologiczny). 2023. Lay summary: Gąsiorowska A. Lekarz POZ. 2023;9(5):251-256. DOI: 10.5114/pg.2023.131998 (verified via PubMed).",
     "summary": "Update of the 2014 recommendations, comprising 33 statements on the routes of infection, clinical consequences, choice of diagnostic tests and pharmacotherapy of Helicobacter pylori, adapted to Polish epidemiology and rising antibiotic resistance. Because clarithromycin resistance in Poland exceeds acceptable thresholds, bismuth quadruple therapy is favoured as empirical first-line treatment.",
     "keyRecommendations": [
       {
@@ -216,7 +216,7 @@ export const ptgeGuidelines: Guideline[] = [
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/rekomendacje-diagnostyczno-terapeutyczne-w-zespole-jelita-nadwrazliwego/",
     "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/Wytyczne-IBS-pol-2018.pdf",
-    "citation": "Pietrzak A, Skrzydło-Radomańska B, Mulak A, et al. Guidelines on the management of irritable bowel syndrome. Recommendations of the Polish Society of Gastroenterology Working Group. Gastroenterology Review (Przegląd Gastroenterologiczny). 2018;13(4):167-196. (author order to verify)",
+    "citation": "Pietrzak A, Skrzydło-Radomańska B, Mulak A, et al. Guidelines on the management of irritable bowel syndrome. Recommendations of the Polish Society of Gastroenterology Working Group. Gastroenterology Review (Przegląd Gastroenterologiczny). 2018;13(4):167-196. DOI: 10.5114/pg.2018.78343 (verified via PubMed).",
     "summary": "Update of the 2008 recommendations, establishing a positive diagnosis of IBS based on Rome IV criteria with a limited set of alarm-directed investigations rather than exhaustive exclusion. Treatment is symptom- and subtype-based (IBS-D, IBS-C, IBS-M), combining dietary modification, gut-directed pharmacotherapy and neuromodulators.",
     "keyRecommendations": [
       {
@@ -330,7 +330,7 @@ export const ptgeGuidelines: Guideline[] = [
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/zalecenia-diagnostyczne-i-terapeutyczne-w-przewleklym-zapaleniu-trzustki-rekomendacje-grupy-roboczej-ptg-e-oraz-pkt/",
     "pdfUrl": "https://ptg-e.org.pl/wp-content/uploads/2022/03/RPG_1_2018.pdf",
-    "citation": "Working Group of the Polish National Consultant in Gastroenterology and the Polish Pancreatic Club. Diagnostic and therapeutic recommendations for chronic pancreatitis. Gastroenterology Review (Przegląd Gastroenterologiczny). 2018;13(3):167-181. (NB: catalog id retains '2021'; current published version is 2018, updating the 2011 recommendations)",
+    "citation": "Working Group of the Polish National Consultant in Gastroenterology and the Polish Pancreatic Club. Diagnostic and therapeutic recommendations for chronic pancreatitis. Gastroenterology Review (Przegląd Gastroenterologiczny). 2018;13(3):167-181. DOI: 10.5114/pg.2018.78067 (verified via PubMed). (NB: catalog id retains '2021'; current published version is 2018, updating the 2011 recommendations)",
     "summary": "Thirty-four recommendations updating the 2011 Polish document, covering diagnosis of chronic and autoimmune pancreatitis, conservative treatment, management of pain and of exocrine and endocrine insufficiency, endoscopic and surgical therapy, and oncological surveillance. Management emphasizes alcohol and tobacco cessation, pancreatic enzyme replacement and a stepwise approach to pain.",
     "keyRecommendations": [
       {
@@ -524,7 +524,7 @@ export const ptgeGuidelines: Guideline[] = [
     "year": 2019,
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/diagnostic-and-therapeutic-recommendations-in-pancreatic-ductal-adenocarcinoma-recommendations-of-the-working-group-of-the-polish-pancreatic-club/",
-    "citation": "Working Group of the Polish Pancreatic Club. Diagnostic and therapeutic recommendations in pancreatic ductal adenocarcinoma. Gastroenterology Review (Przegląd Gastroenterologiczny). 2019.",
+    "citation": "Working Group of the Polish Pancreatic Club. Diagnostic and therapeutic recommendations in pancreatic ductal adenocarcinoma. Gastroenterology Review (Przegląd Gastroenterologiczny). 2019. DOI: 10.5114/pg.2019.83422 (verified via PubMed).",
     "summary": "Recommendations of the Polish Pancreatic Club on the diagnosis and multidisciplinary treatment of pancreatic ductal adenocarcinoma. Management requires a multidisciplinary team, with resectability-based stratification determining upfront surgery versus neoadjuvant chemotherapy, and defined roles for adjuvant chemotherapy and palliative care.",
     "keyRecommendations": [
       {
@@ -575,7 +575,7 @@ export const ptgeGuidelines: Guideline[] = [
     "status": "current",
     "sourceUrl": "https://ptg-e.org.pl/wytyczne/pankreatologia/",
     "pdfUrl": "https://www.termedia.pl/Management-of-acute-pancreatitis-AP-Polish-Pancreatic-Club-recommendations,41,27681,1,1.html",
-    "citation": "Rosołowski M, Lipiński M, Dobosz M, et al. Management of acute pancreatitis (AP) - Polish Pancreatic Club recommendations. Gastroenterology Review (Przegląd Gastroenterologiczny). 2016;11(2):65-72.",
+    "citation": "Rosołowski M, Lipiński M, Dobosz M, et al. Management of acute pancreatitis (AP) - Polish Pancreatic Club recommendations. Gastroenterology Review (Przegląd Gastroenterologiczny). 2016;11(2):65-72. DOI: 10.5114/pg.2016.60251 (verified via PubMed).",
     "summary": "Recommendations of the Polish Pancreatic Club on the diagnosis and treatment of the early and late phases of acute pancreatitis and its complications, based on the revised Atlanta classification and largely concordant with IAP guidance. They emphasize early aggressive fluid resuscitation, severity assessment, and a step-up, delayed approach to intervention for necrosis.",
     "keyRecommendations": [
       {
@@ -616,7 +616,7 @@ export const ptgeGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://www.termedia.pl/Diagnostic-and-therapeutic-guidelines-for-pancreatic-cystic-tumors-recommendations-of-Polish-Pancreatic-Club-experts,41,56822,1,1.html",
-    "citation": "Durko Ł, Lipiński M, Adrych K, Daniluk J, Dąbrowski A, et al. Diagnostic and therapeutic guidelines for pancreatic cystic tumors: recommendations of Polish Pancreatic Club experts. Gastroenterology Review (Przegląd Gastroenterologiczny). 2025;20(3):223-240.",
+    "citation": "Durko Ł, Lipiński M, Adrych K, Daniluk J, Dąbrowski A, et al. Diagnostic and therapeutic guidelines for pancreatic cystic tumors: recommendations of Polish Pancreatic Club experts. Gastroenterology Review (Przegląd Gastroenterologiczny). 2025;20(3):223-240. DOI: 10.5114/pg.2025.154686 (verified via PubMed).",
     "summary": "Expert recommendations of the Polish Pancreatic Club on the diagnosis, treatment and surveillance of pancreatic cystic tumours, whose variable malignant potential requires careful risk stratification. The document guides differentiation of mucinous (IPMN, MCN) from non-mucinous cysts and defines high-risk stigmata and worrisome features indicating surgery versus surveillance.",
     "keyRecommendations": [
       {
