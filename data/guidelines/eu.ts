@@ -981,5 +981,155 @@ export const euGuidelines: Guideline[] = [
     ],
     "lastVerified": "2026-07-19",
     "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "easl-hbv-2025",
+    "societyId": "easl",
+    "conditionIds": ["chronic-hepatitis-b"],
+    "title": "EASL Clinical Practice Guidelines on the Management of Hepatitis B Virus Infection",
+    "language": "en",
+    "specialty": "hepatology",
+    "year": 2025,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.1016/j.jhep.2025.03.018",
+    "citation": "European Association for the Study of the Liver. EASL Clinical Practice Guidelines on the management of hepatitis B virus infection. J Hepatol. 2025;83(2):502-583. doi:10.1016/j.jhep.2025.03.018. Identified via PubMed.",
+    "summary": "Updated EASL guidance on chronic hepatitis B across ten themes — diagnostics, treatment goals and indications, therapeutic options, HCC surveillance, special populations, reactivation prophylaxis, post-transplant care and prevention. It emphasises early diagnosis, viral and host risk stratification, tailored antiviral therapy, and simplified algorithms and vaccination to support global HBV elimination, while discussing emerging biomarkers and evolving definitions of functional cure.",
+    "keyRecommendations": [
+      {
+        "topic": "Diagnosis and risk stratification",
+        "text": "Diagnose and stage chronic HBV using HBV DNA, HBeAg status, ALT and fibrosis assessment; stratify risk by viral and host factors to guide treatment and surveillance.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Antiviral therapy",
+        "text": "First-line treatment is a high-barrier nucleos(t)ide analogue — entecavir, tenofovir disoproxil or tenofovir alafenamide; pegylated interferon is an option in selected patients.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["entecavir", "tenofovir", "peginterferon alfa"]
+      },
+      {
+        "topic": "Surveillance and reactivation",
+        "text": "Offer hepatocellular carcinoma surveillance to at-risk patients, and give antiviral prophylaxis to prevent HBV reactivation during immunosuppression or chemotherapy.",
+        "lineOfTherapy": "screening"
+      },
+      {
+        "topic": "Prevention",
+        "text": "Vaccination, screening and prevention of mother-to-infant transmission are central to HBV control and elimination targets.",
+        "lineOfTherapy": "prevention"
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "easl-hcc-2024",
+    "societyId": "easl",
+    "conditionIds": ["hepatocellular-carcinoma"],
+    "title": "EASL Clinical Practice Guidelines on the Management of Hepatocellular Carcinoma",
+    "language": "en",
+    "specialty": "hepatology",
+    "year": 2024,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.1016/j.jhep.2024.08.028",
+    "citation": "European Association for the Study of the Liver. EASL Clinical Practice Guidelines on the management of hepatocellular carcinoma. J Hepatol. 2025;82(2):315-374. doi:10.1016/j.jhep.2024.08.028. Identified via PubMed.",
+    "summary": "Updated EASL guidance on hepatocellular carcinoma — the commonest primary liver cancer — covering risk-based surveillance, standardised imaging diagnosis, and stage-guided treatment spanning surgery, liver transplantation, locoregional and systemic therapy, with expanded roles for minimally invasive surgery, radiation and combination immunotherapy. It stresses multidisciplinary, individualised risk-benefit assessment.",
+    "keyRecommendations": [
+      {
+        "topic": "Surveillance",
+        "text": "Provide personalised, risk-based surveillance (typically 6-monthly ultrasound, with or without alpha-fetoprotein) for patients at risk, especially those with cirrhosis.",
+        "lineOfTherapy": "screening"
+      },
+      {
+        "topic": "Diagnosis",
+        "text": "Diagnose HCC using standardised contrast-enhanced imaging criteria (CT or MRI), with biopsy when imaging is inconclusive.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Curative treatment",
+        "text": "For early-stage disease, offer resection, ablation or liver transplantation according to tumour burden, liver function and portal pressure.",
+        "lineOfTherapy": "first-line"
+      },
+      {
+        "topic": "Advanced disease",
+        "text": "For intermediate or advanced HCC, use locoregional therapy (e.g. transarterial chemoembolisation) and systemic therapy, with combination immunotherapy (e.g. atezolizumab plus bevacizumab) a first-line systemic option.",
+        "lineOfTherapy": "escalation",
+        "drugs": ["atezolizumab", "bevacizumab"]
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "esc-hypertension-2024",
+    "societyId": "esc",
+    "conditionIds": ["hypertension"],
+    "title": "2024 ESC Guidelines for the Management of Elevated Blood Pressure and Hypertension",
+    "language": "en",
+    "specialty": "cardiology",
+    "year": 2024,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.1093/eurheartj/ehae178",
+    "citation": "McEvoy JW, McCarthy CP, Bruno RM, et al. 2024 ESC Guidelines for the management of elevated blood pressure and hypertension. Eur Heart J. 2024;45(38):3912-4018. doi:10.1093/eurheartj/ehae178. Identified via PubMed.",
+    "summary": "The 2024 ESC guidelines introduce an 'elevated blood pressure' category (120-139/70-89 mmHg) alongside hypertension (≥140/90 mmHg), and set a general office target of 120-129/70-79 mmHg where tolerated. They emphasise out-of-office confirmation, cardiovascular-risk-based treatment, and prompt combination therapy — typically a renin-angiotensin system blocker with a calcium-channel blocker and/or a thiazide/thiazide-like diuretic — with spironolactone for resistant hypertension.",
+    "keyRecommendations": [
+      {
+        "topic": "Classification and targets",
+        "text": "Adopt a new 'elevated blood pressure' category (120-139/70-89 mmHg) and treat to an office systolic target of 120-129 mmHg in most adults when tolerated, with individualised targets in older or frail patients.",
+        "evidenceGrade": "Class I",
+        "lineOfTherapy": "maintenance"
+      },
+      {
+        "topic": "Diagnosis",
+        "text": "Confirm hypertension with out-of-office measurement (home or ambulatory monitoring) wherever possible, and assess overall cardiovascular risk.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Initial therapy",
+        "text": "Start most patients on combination therapy — a RAS blocker (ACE inhibitor or ARB) with a calcium-channel blocker and/or a thiazide/thiazide-like diuretic — ideally as a single pill.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["perindopril", "amlodipine", "indapamide"]
+      },
+      {
+        "topic": "Resistant hypertension",
+        "text": "Add spironolactone for resistant hypertension after confirming adherence and excluding secondary causes.",
+        "lineOfTherapy": "escalation",
+        "drugs": ["spironolactone"]
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "esc-atrial-fibrillation-2024",
+    "societyId": "esc",
+    "conditionIds": ["atrial-fibrillation"],
+    "title": "2024 ESC Guidelines for the Management of Atrial Fibrillation (developed with EACTS)",
+    "language": "en",
+    "specialty": "cardiology",
+    "year": 2024,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.1093/eurheartj/ehae176",
+    "citation": "Van Gelder IC, Rienstra M, Bunting KV, et al. 2024 ESC Guidelines for the management of atrial fibrillation developed in collaboration with the European Association for Cardio-Thoracic Surgery (EACTS). Eur Heart J. 2024;45(36):3314-3414. doi:10.1093/eurheartj/ehae176. Identified via PubMed.",
+    "summary": "The 2024 ESC atrial fibrillation guidelines organise care around the AF-CARE pathway: [C] comorbidity and risk-factor management, [A] avoiding stroke and thromboembolism, [R] reducing symptoms with rate and rhythm control, and [E] evaluation and dynamic reassessment. Oral anticoagulation is guided by thromboembolic risk, and catheter ablation has an expanded first-line role for rhythm control in appropriate patients.",
+    "keyRecommendations": [
+      {
+        "topic": "AF-CARE: comorbidity management",
+        "text": "Systematically manage comorbidities and risk factors — hypertension, obesity, sleep apnoea, alcohol and diabetes — as a foundation of atrial fibrillation care.",
+        "lineOfTherapy": "maintenance"
+      },
+      {
+        "topic": "Stroke prevention",
+        "text": "Offer oral anticoagulation — preferably a direct oral anticoagulant — to patients at elevated thromboembolic risk; antiplatelet monotherapy is not recommended for stroke prevention.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["apixaban", "rivaroxaban", "dabigatran", "edoxaban"]
+      },
+      {
+        "topic": "Rate and rhythm control",
+        "text": "Control rate (e.g. with beta-blockers) and offer rhythm control with antiarrhythmic drugs or catheter ablation; ablation is a first-line option for rhythm control in selected patients, especially paroxysmal AF.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["beta-blocker", "amiodarone"]
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
   }
 ];

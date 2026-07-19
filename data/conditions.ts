@@ -1574,5 +1574,48 @@ export const conditions: Condition[] = [
       "B18.1"
     ],
     "specialty": "hepatology"
+  },
+  {
+    "id": "hepatocellular-carcinoma",
+    "nameEn": "Hepatocellular carcinoma",
+    "namePl": "Rak wątrobowokomórkowy",
+    "synonymsEn": [
+      "liver cancer",
+      "primary liver cancer",
+      "hepatoma"
+    ],
+    "synonymsPl": [
+      "rak wątroby",
+      "pierwotny rak wątroby"
+    ],
+    "abbreviations": [
+      "HCC"
+    ],
+    "icd10": [
+      "C22.0"
+    ],
+    "specialty": "hepatology"
+  },
+  {
+    "id": "atrial-fibrillation",
+    "nameEn": "Atrial fibrillation",
+    "namePl": "Migotanie przedsionków",
+    "synonymsEn": [
+      "AFib",
+      "irregular heartbeat",
+      "atrial flutter"
+    ],
+    "synonymsPl": [
+      "migotanie przedsionków",
+      "arytmia"
+    ],
+    "abbreviations": [
+      "AF",
+      "AFib"
+    ],
+    "icd10": [
+      "I48"
+    ],
+    "specialty": "cardiology"
   }
 ];

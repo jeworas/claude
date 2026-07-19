@@ -443,6 +443,32 @@ check(
     })(),
 );
 
+console.log('\nPubMed-assisted ingestion (EASL + ESC — flagship EU societies)');
+check('EASL now has ingested current guidelines (EU hepatology)', guidelines.filter((g) => g.societyId === 'easl' && g.status === 'current').length >= 2);
+check('ESC now has ingested current guidelines (EU cardiology)', guidelines.filter((g) => g.societyId === 'esc' && g.status === 'current').length >= 2);
+check(
+  'chronic hepatitis B now compares across US (AASLD) and EU (EASL)',
+  (() => {
+    const regions = new Set(currentGuidelinesForCondition('chronic-hepatitis-b').map((g) => countryOf(g)));
+    return regions.has('US') && regions.has('EU');
+  })(),
+);
+check(
+  'hypertension now compares across THREE regions (US, EU, PL)',
+  (() => {
+    const regions = new Set(currentGuidelinesForCondition('hypertension').map((g) => countryOf(g)));
+    return (['US', 'EU', 'PL'] as const).every((r) => regions.has(r));
+  })(),
+);
+check('atrial fibrillation condition exists (cardiology)', getCondition('atrial-fibrillation')?.specialty === 'cardiology');
+check(
+  '“atrial fibrillation” finds the ESC guideline and apixaban is cross-referenced',
+  search('atrial fibrillation').some((r) => r.guideline.id === 'esc-atrial-fibrillation-2024') &&
+    (drugsForQuery('apixaban')[0]?.conditions ?? []).some((c) => c.condition.id === 'atrial-fibrillation'),
+);
+check('hepatocellular carcinoma condition exists (hepatology)', getCondition('hepatocellular-carcinoma')?.specialty === 'hepatology');
+check('“hepatocellular carcinoma” finds the EASL guideline', search('hepatocellular carcinoma').some((r) => r.guideline.id === 'easl-hcc-2024'));
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);

@@ -45,6 +45,25 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Tenofovir', indication: 'Chronic hepatitis B, first-line', regimen: 'Tenofovir disoproxil 300 mg, or tenofovir alafenamide 25 mg, orally once daily' },
     { drug: 'Entecavir', indication: 'Chronic hepatitis B, first-line', regimen: '0.5 mg orally once daily (1 mg if lamivudine-experienced)' },
   ],
+  'easl-hbv-2025': [
+    { drug: 'Entecavir', indication: 'Chronic hepatitis B, first-line NA', regimen: '0.5 mg orally once daily (1 mg if lamivudine-experienced)' },
+    { drug: 'Tenofovir', indication: 'Chronic hepatitis B, first-line NA', regimen: 'Tenofovir disoproxil 245 mg, or tenofovir alafenamide 25 mg, orally once daily' },
+    { drug: 'Peginterferon alfa', indication: 'Selected patients, finite course', regimen: '180 µg subcutaneously once weekly for 48 weeks' },
+  ],
+  'easl-hcc-2024': [
+    { drug: 'Atezolizumab + bevacizumab', indication: 'First-line systemic therapy, advanced HCC', regimen: 'Atezolizumab 1200 mg + bevacizumab 15 mg/kg IV every 3 weeks' },
+  ],
+  'esc-hypertension-2024': [
+    { drug: 'Perindopril + amlodipine', indication: 'Single-pill combination, initial therapy', regimen: 'e.g. perindopril 4–8 mg + amlodipine 5–10 mg orally once daily' },
+    { drug: 'Indapamide', indication: 'Thiazide-like diuretic component', regimen: '1.5 mg (modified-release) orally once daily' },
+    { drug: 'Spironolactone', indication: 'Resistant hypertension add-on', regimen: '25–50 mg orally once daily, with potassium monitoring' },
+  ],
+  'esc-atrial-fibrillation-2024': [
+    { drug: 'Apixaban', indication: 'Stroke prevention (DOAC)', regimen: '5 mg orally twice daily (2.5 mg twice daily if dose-reduction criteria met)' },
+    { drug: 'Rivaroxaban', indication: 'Stroke prevention (DOAC)', regimen: '20 mg orally once daily (15 mg if CrCl 15–49 mL/min)' },
+    { drug: 'Edoxaban', indication: 'Stroke prevention (DOAC)', regimen: '60 mg orally once daily (30 mg if dose-reduction criteria met)' },
+    { drug: 'Dabigatran', indication: 'Stroke prevention (DOAC)', regimen: '150 mg orally twice daily (110 mg twice daily if higher bleeding risk)' },
+  ],
   'acg-h-pylori-2024': [
     { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy', regimen: 'Standard dose orally twice daily (e.g. omeprazole 20 mg BID) for 14 days' },
     { drug: 'Bismuth subsalicylate', indication: 'Bismuth quadruple therapy', regimen: '300–524 mg orally four times daily for 14 days' },

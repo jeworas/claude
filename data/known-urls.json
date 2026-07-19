@@ -37,9 +37,19 @@
       "indexUrl": "https://ueg.eu/quality-of-care"
     },
     {
+      "societyId": "easl",
+      "abbreviation": "EASL",
+      "indexUrl": "https://easl.eu/publication-category/clinical-practice-guidelines/"
+    },
+    {
       "societyId": "aha-acc",
       "abbreviation": "AHA/ACC",
       "indexUrl": "https://professional.heart.org/en/guidelines-and-statements"
+    },
+    {
+      "societyId": "esc",
+      "abbreviation": "ESC",
+      "indexUrl": "https://www.escardio.org/Guidelines"
     },
     {
       "societyId": "ada",
@@ -1038,6 +1048,42 @@
       "title": "EuroGuiDerm Guideline on Atopic Eczema (living guideline)",
       "titleLocal": null,
       "url": "https://doi.org/10.1111/jdv.20639",
+      "pdfUrl": null
+    },
+    {
+      "id": "easl-hbv-2025",
+      "societyId": "easl",
+      "country": "EU",
+      "title": "EASL Clinical Practice Guidelines on the Management of Hepatitis B Virus Infection",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1016/j.jhep.2025.03.018",
+      "pdfUrl": null
+    },
+    {
+      "id": "easl-hcc-2024",
+      "societyId": "easl",
+      "country": "EU",
+      "title": "EASL Clinical Practice Guidelines on the Management of Hepatocellular Carcinoma",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1016/j.jhep.2024.08.028",
+      "pdfUrl": null
+    },
+    {
+      "id": "esc-hypertension-2024",
+      "societyId": "esc",
+      "country": "EU",
+      "title": "2024 ESC Guidelines for the Management of Elevated Blood Pressure and Hypertension",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1093/eurheartj/ehae178",
+      "pdfUrl": null
+    },
+    {
+      "id": "esc-atrial-fibrillation-2024",
+      "societyId": "esc",
+      "country": "EU",
+      "title": "2024 ESC Guidelines for the Management of Atrial Fibrillation (developed with EACTS)",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1093/eurheartj/ehae176",
       "pdfUrl": null
     },
     {
