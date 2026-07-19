@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { search } from '@/lib/search';
+import { search, matchedConditions } from '@/lib/search';
 import { answerFor } from '@/lib/answer';
 import { drugsForQuery } from '@/lib/drugs';
 import { getSociety, countryOf } from '@/lib/data';
@@ -31,6 +31,7 @@ export default function SearchExperience() {
   const results = useMemo(() => search(query), [query]);
   const answer = useMemo(() => answerFor(query), [query]);
   const drugMatches = useMemo(() => (query ? drugsForQuery(query) : []), [query]);
+  const conditionMatches = useMemo(() => (query ? matchedConditions(query) : []), [query]);
 
   // Facets derived from the unfiltered result set (so counts reflect this query).
   const facets = useMemo(() => {
@@ -69,6 +70,31 @@ export default function SearchExperience() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <SearchBar initialQuery={query} />
+
+      {conditionMatches.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {conditionMatches.map((c) => (
+            <Link
+              key={c.condition.id}
+              href={`/condition/${c.condition.id}`}
+              className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm transition hover:border-teal-400"
+            >
+              <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs font-semibold text-white">
+                {t('search.condition')}
+              </span>
+              <span className="font-semibold text-slate-900">{c.condition.nameEn}</span>
+              <span className="text-sm italic text-slate-500">{c.condition.namePl}</span>
+              <span className="text-xs text-slate-400">
+                · {t('langhint.via')} {c.matchedTerm}
+              </span>
+              <span className="ml-auto text-sm font-medium text-teal-700">
+                {c.guidelineCount}{' '}
+                {t(c.guidelineCount === 1 ? 'condition.summary.guideline' : 'condition.summary.guidelines')} →
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {drugMatches.length > 0 && (
         <div className="mt-4 space-y-2">

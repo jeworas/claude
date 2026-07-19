@@ -1,7 +1,14 @@
 import MiniSearch from 'minisearch';
-import type { Guideline } from './types';
-import { guidelines, getGuideline, getSociety, conditionsForGuideline } from './data';
-import { normalize, resolveConditions, type ThesaurusMatch } from './thesaurus';
+import type { Condition, Guideline } from './types';
+import {
+  guidelines,
+  getGuideline,
+  getSociety,
+  conditionsForGuideline,
+  currentGuidelinesForCondition,
+  countryOf,
+} from './data';
+import { normalize, resolveConditions, type ThesaurusMatch, type MatchSource } from './thesaurus';
 
 /**
  * Two-layer retrieval:
@@ -121,6 +128,39 @@ export function search(query: string): SearchResult[] {
     // Tie-break: newer guidelines first.
     return b.guideline.year - a.guideline.year;
   });
+}
+
+export interface ConditionResult {
+  condition: Condition;
+  /** The original term that matched (e.g. "WZJG"), for a "matched via" hint. */
+  matchedTerm: string;
+  matchSource: MatchSource;
+  guidelineCount: number;
+  regionCount: number;
+}
+
+/**
+ * Conditions a query resolves to via the bilingual thesaurus — surfaced at the
+ * top of search so the primary clinical entity (the condition itself) is the
+ * first result, ahead of the medicines and individual guidelines it fans out to.
+ * Only conditions with at least one current guideline are returned.
+ */
+export function matchedConditions(query: string): ConditionResult[] {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const out: ConditionResult[] = [];
+  for (const m of resolveConditions(trimmed)) {
+    const gs = currentGuidelinesForCondition(m.condition.id);
+    if (gs.length === 0) continue;
+    out.push({
+      condition: m.condition,
+      matchedTerm: m.matchedTerm,
+      matchSource: m.matchSource,
+      guidelineCount: gs.length,
+      regionCount: new Set(gs.map((g) => countryOf(g))).size,
+    });
+  }
+  return out.slice(0, 5);
 }
 
 /** Autocomplete suggestions from the free-text index. */

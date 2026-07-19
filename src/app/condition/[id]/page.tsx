@@ -84,12 +84,8 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
         <T k="condition.summary.tail" />
       </p>
 
-      {/* Cross-region comparison + revision history */}
-      <RegionComparison conditionId={condition.id} />
-      <RevisionTimeline conditionId={condition.id} />
-
-      {/* Current guidelines grouped by region */}
-      <section className="mt-8">
+      {/* Current guidelines grouped by region — the primary content, right below the summary */}
+      <section className="mt-6">
         <h2 className="text-lg font-semibold text-slate-900"><T k="condition.byregion.title" /></h2>
         <div className={`mt-4 grid grid-cols-1 gap-6 ${gridCols}`}>
           {presentColumns.map(({ country, flag }) => {
@@ -110,6 +106,13 @@ export default async function ConditionPage({ params }: { params: Promise<{ id: 
           })}
         </div>
       </section>
+
+      {/* Revision history (renders nothing when there are no superseded editions) */}
+      <RevisionTimeline conditionId={condition.id} />
+
+      {/* Cross-region comparison — large, so collapsed by default and kept last
+          as an optional deep-dive. */}
+      <RegionComparison conditionId={condition.id} collapsible />
     </div>
   );
 }

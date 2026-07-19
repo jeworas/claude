@@ -49,22 +49,45 @@ export default async function DrugPage({ params }: { params: Promise<{ slug: str
         </p>
       </header>
 
-      <div className="mt-6 space-y-5">
+      <div className="mt-6 space-y-3">
         {drug.conditions.map(({ condition, guidelines }) => (
-          <section key={condition.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex flex-wrap items-baseline gap-x-2">
-              <h2 className="text-lg font-semibold text-slate-900">
-                <Link href={`/condition/${condition.id}`} className="hover:text-teal-700">
-                  {condition.nameEn}
-                </Link>
-              </h2>
+          <details key={condition.id} className="group rounded-xl border border-slate-200 bg-white shadow-sm">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3">
+              <svg
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-90"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M7 5l6 5-6 5" />
+              </svg>
+              <span className="font-semibold text-slate-900">{condition.nameEn}</span>
               <span className="text-sm italic text-slate-500">{condition.namePl}</span>
-              <span className="ml-auto text-xs capitalize text-slate-400">
-                {condition.specialty.replace(/-/g, ' ')}
+              <span className="ml-auto flex items-center gap-2">
+                <span className="hidden text-xs capitalize text-slate-400 sm:inline">
+                  {condition.specialty.replace(/-/g, ' ')}
+                </span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                  {guidelines.length}{' '}
+                  <T k={guidelines.length === 1 ? 'drug.guideline.one' : 'drug.guideline.many'} />
+                </span>
               </span>
-            </div>
+            </summary>
 
-            <div className="mt-3 divide-y divide-slate-100">
+            <div className="border-t border-slate-100 px-4 pb-4">
+              <div className="flex justify-end py-2">
+                <Link
+                  href={`/condition/${condition.id}`}
+                  className="text-xs font-medium text-teal-700 hover:text-teal-900"
+                >
+                  <T k="drug.viewcondition" /> →
+                </Link>
+              </div>
+              <div className="divide-y divide-slate-100">
               {guidelines.map((u) => {
                 const society = getSociety(u.guideline.societyId);
                 return (
@@ -115,8 +138,9 @@ export default async function DrugPage({ params }: { params: Promise<{ slug: str
                   </div>
                 );
               })}
+              </div>
             </div>
-          </section>
+          </details>
         ))}
       </div>
 

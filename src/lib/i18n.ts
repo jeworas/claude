@@ -54,6 +54,8 @@ const en: Dict = {
   'search.medicine': 'Medicine',
   'search.medicine.used': 'recommended for',
   'search.medicine.cta': 'see all uses',
+  'search.condition': 'Condition',
+  'search.condition.cta': 'open condition',
   'lang.toggle.aria': 'Switch language',
   'a11y.skip': 'Skip to content',
 
@@ -154,6 +156,7 @@ const en: Dict = {
   'condition.compare.subtitle.consensus': '= the same drug is recommended in another region (consensus);',
   'condition.compare.subtitle.specific': '= region-specific. Polish and English drug names are matched across languages.',
   'condition.compare.therapyline': 'Therapy line',
+  'condition.compare.expand': 'tap to expand the side-by-side matrix',
   'condition.timeline.title': 'How the guidance evolved',
   'condition.timeline.subtitle':
     'Successive editions from each society. The most recent is current; earlier editions are superseded but kept for reference.',
@@ -288,6 +291,8 @@ const pl: Dict = {
   'search.medicine': 'Lek',
   'search.medicine.used': 'zalecany w',
   'search.medicine.cta': 'zobacz wszystkie zastosowania',
+  'search.condition': 'Choroba',
+  'search.condition.cta': 'otwórz chorobę',
   'lang.toggle.aria': 'Zmień język',
   'a11y.skip': 'Przejdź do treści',
 
@@ -388,6 +393,7 @@ const pl: Dict = {
   'condition.compare.subtitle.consensus': '= ten sam lek jest zalecany w innym regionie (konsensus);',
   'condition.compare.subtitle.specific': '= charakterystyczny dla regionu. Polskie i angielskie nazwy leków są dopasowywane między językami.',
   'condition.compare.therapyline': 'Linia leczenia',
+  'condition.compare.expand': 'rozwiń tabelę porównawczą',
   'condition.timeline.title': 'Jak zmieniały się wytyczne',
   'condition.timeline.subtitle':
     'Kolejne edycje każdego towarzystwa. Najnowsza jest aktualna; wcześniejsze zostały zastąpione, ale zachowane dla referencji.',
