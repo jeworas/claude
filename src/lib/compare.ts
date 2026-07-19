@@ -118,6 +118,7 @@ const DRUG_SYNONYMS: Record<string, string> = {
   corticosteroids: 'corticosteroid',
   glucocorticoids: 'corticosteroid',
   glucocorticosteroids: 'corticosteroid',
+  imatynib: 'imatinib',
   statyna: 'statin',
   statyny: 'statin',
   statins: 'statin',

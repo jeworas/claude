@@ -1489,5 +1489,67 @@ export const conditions: Condition[] = [
       "L20"
     ],
     "specialty": "dermatology"
+  },
+  {
+    "id": "cirrhosis",
+    "nameEn": "Cirrhosis",
+    "namePl": "Marskość wątroby",
+    "synonymsEn": [
+      "liver cirrhosis",
+      "hepatic cirrhosis",
+      "decompensated cirrhosis",
+      "chronic liver disease"
+    ],
+    "synonymsPl": [
+      "marskość wątroby",
+      "niewyrównana marskość wątroby"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "K74",
+      "K70.3"
+    ],
+    "specialty": "hepatology"
+  },
+  {
+    "id": "biliary-strictures",
+    "nameEn": "Biliary strictures",
+    "namePl": "Zwężenia dróg żółciowych",
+    "synonymsEn": [
+      "bile duct stricture",
+      "biliary obstruction",
+      "biliary stenosis"
+    ],
+    "synonymsPl": [
+      "zwężenie przewodu żółciowego",
+      "niedrożność dróg żółciowych"
+    ],
+    "abbreviations": [],
+    "icd10": [
+      "K83.1"
+    ],
+    "specialty": "gastroenterology"
+  },
+  {
+    "id": "gi-subepithelial-lesions",
+    "nameEn": "Gastrointestinal subepithelial lesions",
+    "namePl": "Zmiany podnabłonkowe przewodu pokarmowego",
+    "synonymsEn": [
+      "submucosal tumor",
+      "subepithelial tumor",
+      "gastrointestinal stromal tumor"
+    ],
+    "synonymsPl": [
+      "guz podśluzówkowy",
+      "zmiana podnabłonkowa"
+    ],
+    "abbreviations": [
+      "SEL",
+      "GIST"
+    ],
+    "icd10": [
+      "D13.9"
+    ],
+    "specialty": "gastroenterology"
   }
 ];

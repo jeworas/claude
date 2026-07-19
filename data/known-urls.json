@@ -428,6 +428,42 @@
       "pdfUrl": null
     },
     {
+      "id": "acg-perioperative-cirrhosis-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Perioperative Risk Assessment and Management in Patients With Cirrhosis",
+      "titleLocal": null,
+      "url": "https://doi.org/10.14309/ajg.0000000000003616",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-malnutrition-liver-disease-2025",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Malnutrition and Nutritional Recommendations in Liver Disease",
+      "titleLocal": null,
+      "url": "https://doi.org/10.14309/ajg.0000000000003379",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-biliary-strictures-2023",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Biliary Strictures",
+      "titleLocal": null,
+      "url": "https://doi.org/10.14309/ajg.0000000000002190",
+      "pdfUrl": null
+    },
+    {
+      "id": "acg-gi-subepithelial-lesions-2022",
+      "societyId": "acg",
+      "country": "US",
+      "title": "ACG Clinical Guideline: Diagnosis and Management of Gastrointestinal Subepithelial Lesions",
+      "titleLocal": null,
+      "url": "https://doi.org/10.14309/ajg.0000000000002100",
+      "pdfUrl": null
+    },
+    {
       "id": "aga-ulcerative-colitis-2024",
       "societyId": "aga",
       "country": "US",

@@ -1849,5 +1849,134 @@ export const acgGuidelines: Guideline[] = [
     ],
     "lastVerified": "2026-07-18",
     "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "acg-perioperative-cirrhosis-2025",
+    "societyId": "acg",
+    "conditionIds": ["cirrhosis"],
+    "title": "ACG Clinical Guideline: Perioperative Risk Assessment and Management in Patients With Cirrhosis",
+    "language": "en",
+    "specialty": "hepatology",
+    "year": 2025,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.14309/ajg.0000000000003616",
+    "citation": "American College of Gastroenterology. ACG Clinical Guideline: Perioperative Risk Assessment and Management in Patients With Cirrhosis. Am J Gastroenterol. 2025. doi:10.14309/ajg.0000000000003616. Identified via PubMed.",
+    "summary": "ACG guidance on assessing and managing surgical risk in patients with cirrhosis, who face substantially higher perioperative morbidity and mortality. It recommends individualized risk stratification with cirrhosis-specific calculators, structured preoperative optimization, and a multidisciplinary approach across the pre-, intra- and postoperative period, with special caution in decompensated disease.",
+    "keyRecommendations": [
+      {
+        "topic": "Risk stratification",
+        "text": "Estimate perioperative risk with validated cirrhosis-specific tools (e.g. the VOCAL-Penn score) rather than generic calculators, integrating liver-disease severity, non-hepatic comorbidities and the specific surgery.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Preoperative optimization",
+        "text": "Before elective surgery, optimize nutrition, manage portal hypertension, correct clinically significant haemostatic abnormalities, and address frailty and sarcopenia.",
+        "lineOfTherapy": "supportive"
+      },
+      {
+        "topic": "Decompensated disease",
+        "text": "In decompensated cirrhosis, defer elective surgery where possible and involve a multidisciplinary team; transjugular intrahepatic portosystemic shunt (TIPS) may be considered before selected operations.",
+        "lineOfTherapy": "escalation"
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "acg-malnutrition-liver-disease-2025",
+    "societyId": "acg",
+    "conditionIds": ["cirrhosis"],
+    "title": "ACG Clinical Guideline: Malnutrition and Nutritional Recommendations in Liver Disease",
+    "language": "en",
+    "specialty": "hepatology",
+    "year": 2025,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.14309/ajg.0000000000003379",
+    "citation": "American College of Gastroenterology. ACG Clinical Guideline: Malnutrition and Nutritional Recommendations in Liver Disease. Am J Gastroenterol. 2025. doi:10.14309/ajg.0000000000003379. Identified via PubMed.",
+    "summary": "ACG guidance on recognizing and treating malnutrition in liver disease — a common driver of frailty and sarcopenia that worsens mortality and pre- and post-transplant outcomes. It recommends routine nutritional assessment in cirrhosis and alcohol-associated hepatitis, a specific meal pattern, adequate protein, and correction of micronutrient deficiencies.",
+    "keyRecommendations": [
+      {
+        "topic": "Assessment",
+        "text": "Assess all patients with cirrhosis or alcohol-associated hepatitis for malnutrition, frailty and sarcopenia, which independently worsen mortality and transplant outcomes.",
+        "lineOfTherapy": "screening"
+      },
+      {
+        "topic": "Dietary pattern and protein",
+        "text": "Advise small frequent meals with a late-evening (bedtime) snack to shorten overnight fasting, and adequate protein intake — protein restriction is not recommended.",
+        "lineOfTherapy": "supportive"
+      },
+      {
+        "topic": "Micronutrients",
+        "text": "Evaluate for and replace micronutrient deficiencies (for example zinc), which are common in advanced liver disease.",
+        "lineOfTherapy": "supportive"
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "acg-biliary-strictures-2023",
+    "societyId": "acg",
+    "conditionIds": ["biliary-strictures"],
+    "title": "ACG Clinical Guideline: Diagnosis and Management of Biliary Strictures",
+    "language": "en",
+    "specialty": "gastroenterology",
+    "year": 2023,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.14309/ajg.0000000000002190",
+    "citation": "American College of Gastroenterology. ACG Clinical Guideline: Diagnosis and Management of Biliary Strictures. Am J Gastroenterol. 2023. doi:10.14309/ajg.0000000000002190. Identified via PubMed.",
+    "summary": "ACG guidance on biliary strictures, where the central tasks are confirming or excluding malignancy and re-establishing bile flow. The diagnostic and drainage approach differs by anatomic location (extrahepatic vs perihilar), with endoscopic ultrasound-guided tissue acquisition central to extrahepatic disease and perihilar strictures remaining diagnostically challenging.",
+    "keyRecommendations": [
+      {
+        "topic": "Malignancy suspicion",
+        "text": "Maintain a high index of suspicion for malignancy in any biliary stricture; the goals of care are a tissue diagnosis and restoration of bile flow to the duodenum.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Tissue diagnosis",
+        "text": "For extrahepatic strictures, endoscopic ultrasound-guided tissue acquisition is the accurate diagnostic mainstay; perihilar strictures often require ERCP with brush cytology, biopsy or cholangioscopy.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Drainage",
+        "text": "Re-establish biliary drainage endoscopically (ERCP with stenting); the approach and safety differ between extrahepatic and perihilar locations.",
+        "lineOfTherapy": "first-line"
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "acg-gi-subepithelial-lesions-2022",
+    "societyId": "acg",
+    "conditionIds": ["gi-subepithelial-lesions"],
+    "title": "ACG Clinical Guideline: Diagnosis and Management of Gastrointestinal Subepithelial Lesions",
+    "language": "en",
+    "specialty": "gastroenterology",
+    "year": 2022,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.14309/ajg.0000000000002100",
+    "citation": "American College of Gastroenterology. ACG Clinical Guideline: Diagnosis and Management of Gastrointestinal Subepithelial Lesions. Am J Gastroenterol. 2022. doi:10.14309/ajg.0000000000002100. Identified via PubMed.",
+    "summary": "ACG guidance on gastrointestinal subepithelial lesions (SEL) — a mix of benign and potentially malignant tumours, cysts and extrinsic compressions, usually found incidentally at endoscopy or imaging. Endoscopic ultrasound with tissue acquisition is central to characterizing solid lesions and separating benign entities from gastrointestinal stromal tumours that need resection.",
+    "keyRecommendations": [
+      {
+        "topic": "Characterization",
+        "text": "Use endoscopic ultrasound with tissue acquisition (EUS fine-needle biopsy, or fine-needle aspiration with rapid on-site evaluation) to characterize solid, non-lipomatous subepithelial lesions.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Risk stratification",
+        "text": "Many subepithelial lesions are benign incidental findings; stratify risk by EUS features (size, layer of origin, echotexture) to decide between surveillance and intervention.",
+        "lineOfTherapy": "diagnosis"
+      },
+      {
+        "topic": "Gastrointestinal stromal tumours",
+        "text": "Resect gastrointestinal stromal tumours according to size and risk; imatinib is used for high-risk, unresectable or metastatic disease under specialist oncology care.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["imatinib"]
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
   }
 ];

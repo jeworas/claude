@@ -378,6 +378,29 @@ check(
   })(),
 );
 
+console.log('\nGastroenterology audit vs PubMed — newly-filled ACG gaps');
+check('cirrhosis condition exists (hepatology)', getCondition('cirrhosis')?.specialty === 'hepatology');
+check('biliary-strictures condition exists (gastroenterology)', getCondition('biliary-strictures')?.specialty === 'gastroenterology');
+check('gi-subepithelial-lesions condition exists (gastroenterology)', getCondition('gi-subepithelial-lesions')?.specialty === 'gastroenterology');
+check(
+  'ACG perioperative-cirrhosis guideline is searchable',
+  search('cirrhosis surgery').some((r) => r.guideline.id === 'acg-perioperative-cirrhosis-2025') ||
+    search('perioperative cirrhosis').some((r) => r.guideline.id === 'acg-perioperative-cirrhosis-2025'),
+);
+check(
+  'cirrhosis now gathers two ACG guidelines (perioperative + malnutrition)',
+  currentGuidelinesForCondition('cirrhosis').filter((g) => g.societyId === 'acg').length >= 2,
+);
+check(
+  '“biliary strictures” finds the ACG guideline',
+  search('biliary strictures').some((r) => r.guideline.id === 'acg-biliary-strictures-2023'),
+);
+check(
+  '“GIST” resolves to subepithelial lesions and imatinib is cross-referenced',
+  search('GIST').some((r) => r.guideline.id === 'acg-gi-subepithelial-lesions-2022') &&
+    (drugsForQuery('imatinib')[0]?.conditions ?? []).some((c) => c.condition.id === 'gi-subepithelial-lesions'),
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);
