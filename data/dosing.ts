@@ -23,6 +23,12 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Arexvy (RSVPreF3, GSK)', indication: 'RSV prevention in adults', regimen: 'Single 0.5 mL intramuscular dose' },
     { drug: 'Abrysvo (bivalent prefusion-F, Pfizer)', indication: 'RSV prevention in adults', regimen: 'Single 0.5 mL intramuscular dose' },
   ],
+  'ptderm-atopic-dermatitis-2020': [
+    { drug: 'Tacrolimus (topical)', indication: 'Topical anti-inflammatory / proactive maintenance', regimen: '0.03% (children) or 0.1% (adults) ointment twice daily to affected skin; step down to twice-weekly maintenance' },
+    { drug: 'Pimecrolimus (topical)', indication: 'Mild-to-moderate AD, sensitive sites', regimen: '1% cream twice daily' },
+    { drug: 'Cyclosporine', indication: 'Severe AD, systemic therapy', regimen: '2.5–5 mg/kg/day orally in two divided doses, with blood-pressure and renal monitoring' },
+    { drug: 'Dupilumab', indication: 'Moderate-to-severe AD, age ≥12, topical-refractory', regimen: 'Adults: 600 mg SC loading dose, then 300 mg SC every 2 weeks' },
+  ],
   'acg-h-pylori-2024': [
     { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy', regimen: 'Standard dose orally twice daily (e.g. omeprazole 20 mg BID) for 14 days' },
     { drug: 'Bismuth subsalicylate', indication: 'Bismuth quadruple therapy', regimen: '300–524 mg orally four times daily for 14 days' },

@@ -236,4 +236,60 @@ export const polishOtherGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'ptderm-atopic-dermatitis-2020',
+    societyId: 'ptderm',
+    conditionIds: ['atopic-dermatitis'],
+    title:
+      'Atopic Dermatitis — Interdisciplinary Diagnostic and Therapeutic Recommendations of the Polish Dermatological Society (with the Polish Societies of Allergology, Paediatrics and Family Medicine)',
+    titleLocal:
+      'Atopowe zapalenie skóry — interdyscyplinarne rekomendacje diagnostyczno-terapeutyczne Polskiego Towarzystwa Dermatologicznego, Polskiego Towarzystwa Alergologicznego, Polskiego Towarzystwa Pediatrycznego i Polskiego Towarzystwa Medycyny Rodzinnej',
+    language: 'pl',
+    specialty: 'dermatology',
+    year: 2020,
+    status: 'current',
+    sourceUrl: 'https://doi.org/10.5114/ada.2020.93423',
+    citation:
+      'Nowicki RJ, Trzeciak M, Wilkowska A, et al. Atopic dermatitis: interdisciplinary diagnostic and therapeutic recommendations of the Polish Dermatological Society, Polish Society of Allergology, Polish Pediatric Society and Polish Society of Family Medicine. Adv Dermatol Allergol (Postępy Dermatologii i Alergologii). 2020 — Part I doi:10.5114/ada.2020.93423, Part II doi:10.5114/ada.2020.94829; biologics update doi:10.5114/ada.2020.100496. Identified via PubMed.',
+    summary:
+      'Interdisciplinary Polish recommendations on atopic dermatitis (AZS), a chronic relapsing pruritic dermatosis of children and adults. Management is stepwise: liberal, tailored emollients to restore the epidermal barrier as the foundation; topical corticosteroids and topical calcineurin inhibitors (tacrolimus, pimecrolimus) for inflammation, including proactive maintenance; phototherapy for moderate disease; and systemic therapy — cyclosporine first, and the biologic dupilumab for moderate-to-severe disease from age 12 — when topical treatment fails. Unproven modalities (acupuncture, bioresonance, homeopathy, Chinese herbs) are explicitly not recommended.',
+    keyRecommendations: [
+      {
+        topic: 'Emollients / epidermal barrier (leczenie podstawowe)',
+        text: 'Tailored emollients are the foundation of both treatment and prophylaxis, applied liberally and continuously to restore epidermal barrier function and reduce flares.',
+        lineOfTherapy: 'first-line',
+        drugs: ['emolienty'],
+      },
+      {
+        topic: 'Topical anti-inflammatory therapy (leczenie miejscowe)',
+        text: 'Topical corticosteroids treat flares; topical calcineurin inhibitors (tacrolimus, pimecrolimus) are preferred for sensitive sites and for proactive twice-weekly maintenance to prolong remission.',
+        lineOfTherapy: 'first-line',
+        drugs: ['glikokortykosteroidy', 'takrolimus', 'pimekrolimus'],
+      },
+      {
+        topic: 'Phototherapy (fototerapia)',
+        text: 'Phototherapy (narrowband UVB or UVA1) is an option for moderate atopic dermatitis inadequately controlled by topical therapy.',
+        lineOfTherapy: 'second-line',
+      },
+      {
+        topic: 'Systemic treatment (leczenie ogólne)',
+        text: 'For severe atopic dermatitis unresponsive to topical therapy, cyclosporine is the main systemic immunosuppressant; systemic corticosteroids only for short-term control of acute exacerbations. Multi-specialist care is often required.',
+        lineOfTherapy: 'escalation',
+        drugs: ['cyklosporyna', 'glikokortykosteroidy'],
+      },
+      {
+        topic: 'Biologic therapy (leczenie biologiczne)',
+        text: 'Dupilumab is recommended for moderate-to-severe atopic dermatitis in patients aged 12 and older who do not respond to topical treatment.',
+        lineOfTherapy: 'escalation',
+        drugs: ['dupilumab'],
+      },
+      {
+        topic: 'Not recommended (leczenie niezalecane)',
+        text: 'Acupuncture, acupressure, bioresonance, homeopathy, and Chinese herbs are not recommended for atopic dermatitis.',
+        lineOfTherapy: 'supportive',
+      },
+    ],
+    lastVerified: '2026-07-19',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];

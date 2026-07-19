@@ -107,6 +107,13 @@ const DRUG_SYNONYMS: Record<string, string> = {
   'agalzydaza alfa': 'agalsidase alfa',
   'agalzydaza beta': 'agalsidase beta',
   'wodoroweglan sodu': 'sodium bicarbonate',
+  // Dermatology agents from the PTDerm atopic dermatitis recommendations.
+  takrolimus: 'tacrolimus',
+  pimekrolimus: 'pimecrolimus',
+  emolient: 'emollient',
+  emolienty: 'emollient',
+  glikokortykosteroidy: 'corticosteroid',
+  glikokortykosteroid: 'corticosteroid',
   statyna: 'statin',
   statyny: 'statin',
   statins: 'statin',

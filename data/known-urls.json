@@ -82,6 +82,11 @@
       "indexUrl": "https://rheumatology.org/clinical-practice-guidelines"
     },
     {
+      "societyId": "ptderm",
+      "abbreviation": "PTD (derm.)",
+      "indexUrl": "https://ptderm.pl/"
+    },
+    {
       "societyId": "aua",
       "abbreviation": "AUA",
       "indexUrl": "https://www.auanet.org/guidelines-and-quality/guidelines"
@@ -676,6 +681,15 @@
       "title": "Expert Recommendations of the Polish Society of Nephrology and the Polish Society of Vaccinology on RSV Vaccination in Patients with Chronic Kidney Disease",
       "titleLocal": "Zalecenia Ekspertów Polskiego Towarzystwa Nefrologicznego i Polskiego Towarzystwa Wakcynologii dotyczące szczepień przeciwko RSV pacjentów z przewlekłą chorobą nerek",
       "url": "https://doi.org/10.5603/rdatf.108124",
+      "pdfUrl": null
+    },
+    {
+      "id": "ptderm-atopic-dermatitis-2020",
+      "societyId": "ptderm",
+      "country": "PL",
+      "title": "Atopic Dermatitis — Interdisciplinary Diagnostic and Therapeutic Recommendations of the Polish Dermatological Society (with the Polish Societies of Allergology, Paediatrics and Family Medicine)",
+      "titleLocal": "Atopowe zapalenie skóry — interdyscyplinarne rekomendacje diagnostyczno-terapeutyczne Polskiego Towarzystwa Dermatologicznego, Polskiego Towarzystwa Alergologicznego, Polskiego Towarzystwa Pediatrycznego i Polskiego Towarzystwa Medycyny Rodzinnej",
+      "url": "https://doi.org/10.5114/ada.2020.93423",
       "pdfUrl": null
     },
     {

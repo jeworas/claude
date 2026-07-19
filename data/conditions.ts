@@ -1467,5 +1467,27 @@ export const conditions: Condition[] = [
       "Z91.81"
     ],
     "specialty": "primary-care"
+  },
+  {
+    "id": "atopic-dermatitis",
+    "nameEn": "Atopic dermatitis",
+    "namePl": "Atopowe zapalenie skóry",
+    "synonymsEn": [
+      "atopic eczema",
+      "eczema",
+      "atopic dermatitis"
+    ],
+    "synonymsPl": [
+      "wyprysk atopowy",
+      "egzema atopowa"
+    ],
+    "abbreviations": [
+      "AD",
+      "AZS"
+    ],
+    "icd10": [
+      "L20"
+    ],
+    "specialty": "dermatology"
   }
 ];

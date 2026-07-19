@@ -322,6 +322,36 @@ check(
   search('falls prevention').some((r) => r.guideline.id === 'uspstf-falls-prevention-2024'),
 );
 
+console.log('\nCross-specialty ingestion (PTDerm dermatology — PubMed-verified)');
+check('atopic dermatitis condition exists (dermatology)', getCondition('atopic-dermatitis')?.specialty === 'dermatology');
+check(
+  'ptderm now has an ingested current guideline',
+  guidelines.some((g) => g.societyId === 'ptderm' && g.status === 'current'),
+);
+check(
+  'English “atopic dermatitis” finds the PTDerm guideline',
+  search('atopic dermatitis').some((r) => r.guideline.id === 'ptderm-atopic-dermatitis-2020'),
+);
+check(
+  'Polish “atopowe zapalenie skóry” finds the PTDerm guideline',
+  search('atopowe zapalenie skóry').some((r) => r.guideline.id === 'ptderm-atopic-dermatitis-2020'),
+);
+check(
+  'Polish abbreviation “AZS” resolves to atopic dermatitis',
+  search('AZS').some((r) => r.guideline.id === 'ptderm-atopic-dermatitis-2020'),
+);
+check(
+  '“dupilumab” is cross-referenced to atopic dermatitis with dosing',
+  (() => {
+    const d = drugsForQuery('dupilumab')[0];
+    return !!d && d.conditions.some((c) => c.condition.id === 'atopic-dermatitis' && c.guidelines.some((u) => u.doses.length > 0));
+  })(),
+);
+check(
+  'Polish “takrolimus” collapses to the same medicine as “tacrolimus”',
+  !!drugsForQuery('tacrolimus')[0] && drugsForQuery('takrolimus')[0]?.slug === drugsForQuery('tacrolimus')[0]?.slug,
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);
