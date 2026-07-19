@@ -218,6 +218,8 @@ const en: Dict = {
   'coverage.row.total': 'All specialties',
   'coverage.note':
     'Counts reflect current (non-superseded) guidelines in this demo dataset. “Aging” counts current guidelines older than 5 years — a prompt to check the source for a newer edition. Select a specialty to browse its conditions.',
+  'coverage.recent.title': 'Recently published',
+  'coverage.recent.subtitle': 'The newest current guidelines in the atlas, most recent first.',
   'coverage.aging.title': 'Due for review',
   'coverage.aging.subtitle':
     'Current guidelines more than 5 years old, oldest first — each is a prompt to check the source for a newer edition.',
@@ -450,6 +452,8 @@ const pl: Dict = {
   'coverage.row.total': 'Wszystkie specjalności',
   'coverage.note':
     'Liczby odzwierciedlają aktualne (niezastąpione) wytyczne w tym demonstracyjnym zbiorze danych. „Starzejące się” to aktualne wytyczne starsze niż 5 lat — sygnał, aby sprawdzić u źródła nowsze wydanie. Wybierz specjalność, aby przeglądać jej choroby.',
+  'coverage.recent.title': 'Ostatnio opublikowane',
+  'coverage.recent.subtitle': 'Najnowsze aktualne wytyczne w atlasie, od najnowszych.',
   'coverage.aging.title': 'Do przeglądu',
   'coverage.aging.subtitle':
     'Aktualne wytyczne starsze niż 5 lat, od najstarszych — każda to sygnał, aby sprawdzić u źródła nowsze wydanie.',

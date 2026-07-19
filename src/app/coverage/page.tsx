@@ -17,6 +17,7 @@ export const metadata: Metadata = { title: 'Coverage — GuidelineAtlas' };
 const REGIONS: Country[] = ['US', 'EU', 'UK', 'PL', 'INT'];
 const NOW = 2026;
 const AGING_LIST_LIMIT = 15;
+const RECENT_LIST_LIMIT = 12;
 
 /** Light teal heat tint scaled by cell count — kept pale so text stays legible. */
 function tint(count: number): string {
@@ -139,6 +140,41 @@ export default function CoveragePage() {
       </div>
 
       <p className="mt-3 text-xs text-slate-400"><T k="coverage.note" /></p>
+
+      {/* Recently published — newest current guidelines, the other end of the
+          freshness scale from the aging worklist below. */}
+      {(() => {
+        const recent = current.slice().sort((a, b) => b.year - a.year).slice(0, RECENT_LIST_LIMIT);
+        if (recent.length === 0) return null;
+        return (
+          <section className="mt-10">
+            <h2 className="text-lg font-semibold text-slate-900"><T k="coverage.recent.title" /></h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-500"><T k="coverage.recent.subtitle" /></p>
+            <ul className="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+              {recent.map((g) => {
+                const society = getSociety(g.societyId);
+                return (
+                  <li key={g.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium tabular-nums text-emerald-800">
+                      {g.year}
+                    </span>
+                    <Link
+                      href={`/guideline/${g.id}`}
+                      className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800 hover:text-teal-700"
+                      title={g.title}
+                    >
+                      {g.title}
+                    </Link>
+                    <span className="hidden shrink-0 text-xs text-slate-400 sm:inline">
+                      {society?.abbreviation ?? g.societyId}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })()}
 
       {/* Aging worklist — the "Aging" column made actionable: the oldest current
           guidelines, oldest first, each a prompt to re-check the source. */}
