@@ -82,6 +82,11 @@
       "indexUrl": "https://rheumatology.org/clinical-practice-guidelines"
     },
     {
+      "societyId": "eadv",
+      "abbreviation": "EADV",
+      "indexUrl": "https://www.eadv.org/guidelines/"
+    },
+    {
       "societyId": "ptderm",
       "abbreviation": "PTD (derm.)",
       "indexUrl": "https://ptderm.pl/"
@@ -960,6 +965,15 @@
       "title": "ERA Educational Review: Chronic Kidney Disease-Associated Pruritus (CKD-aP)",
       "titleLocal": null,
       "url": "https://www.era-online.org/guidelines/",
+      "pdfUrl": null
+    },
+    {
+      "id": "eadv-euroguiderm-atopic-eczema",
+      "societyId": "eadv",
+      "country": "EU",
+      "title": "EuroGuiDerm Guideline on Atopic Eczema (living guideline)",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1111/jdv.20639",
       "pdfUrl": null
     },
     {

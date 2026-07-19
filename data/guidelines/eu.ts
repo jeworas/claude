@@ -930,5 +930,56 @@ export const euGuidelines: Guideline[] = [
     ],
     "lastVerified": "2026-07-18",
     "dataProvenance": "hand-curated-demo"
+  },
+  {
+    "id": "eadv-euroguiderm-atopic-eczema",
+    "societyId": "eadv",
+    "conditionIds": ["atopic-dermatitis"],
+    "title": "EuroGuiDerm Guideline on Atopic Eczema (living guideline)",
+    "language": "en",
+    "specialty": "dermatology",
+    "year": 2025,
+    "status": "current",
+    "sourceUrl": "https://doi.org/10.1111/jdv.20639",
+    "citation": "Wollenberg A, Kinberger M, Arents B, et al. European Guideline (EuroGuiDerm) on atopic eczema — base guideline 2022, living systemic-therapy update 2025. J Eur Acad Dermatol Venereol. doi:10.1111/jdv.20639. EADV / European Dermatology Forum EuroGuiDerm programme. Identified via PubMed.",
+    "summary": "The EADV EuroGuiDerm living guideline on atopic eczema (atopic dermatitis), developed with the European Dermatology Forum. Beyond emollients and topical anti-inflammatory therapy, it guides escalation to systemic treatment for moderate-to-severe disease inadequately controlled by topicals, with drug-by-drug recommendations: biologics (dupilumab, tralokinumab, lebrikizumab, nemolizumab), JAK inhibitors (abrocitinib, baricitinib, upadacitinib) and conventional immunosuppressants (ciclosporin, azathioprine, methotrexate, mycophenolate mofetil), plus tailored guidance for paediatric, adolescent, pregnant and breastfeeding patients. The systemic-therapy chapter is living, last updated in 2025.",
+    "keyRecommendations": [
+      {
+        "topic": "Basic and topical therapy",
+        "text": "Emollients underpin every stage; topical corticosteroids and topical calcineurin inhibitors control inflammation, including proactive maintenance, with phototherapy an option for more extensive disease.",
+        "lineOfTherapy": "first-line",
+        "drugs": ["emollients", "corticosteroids", "tacrolimus", "pimecrolimus"]
+      },
+      {
+        "topic": "When to start systemic therapy",
+        "text": "Patients with moderate-to-severe atopic eczema not adequately controlled by, or unsuitable for, topical therapy qualify for systemic treatment.",
+        "lineOfTherapy": "escalation"
+      },
+      {
+        "topic": "Biologics",
+        "text": "Dupilumab and tralokinumab — and the newer lebrikizumab and nemolizumab — are recommended biologic options for moderate-to-severe atopic eczema, with favourable long-term safety.",
+        "lineOfTherapy": "escalation",
+        "drugs": ["dupilumab", "tralokinumab", "lebrikizumab", "nemolizumab"]
+      },
+      {
+        "topic": "JAK inhibitors",
+        "text": "Oral Janus kinase inhibitors — abrocitinib, baricitinib and upadacitinib — are recommended for moderate-to-severe disease, with pre-treatment screening and risk-based monitoring (age, cardiovascular and thrombotic risk).",
+        "lineOfTherapy": "escalation",
+        "drugs": ["abrocitinib", "baricitinib", "upadacitinib"]
+      },
+      {
+        "topic": "Conventional immunosuppressants",
+        "text": "Ciclosporin is the preferred conventional systemic agent; azathioprine, methotrexate and mycophenolate mofetil are alternatives. Systemic glucocorticoids should be limited to short-term crisis control.",
+        "lineOfTherapy": "escalation",
+        "drugs": ["ciclosporin", "azathioprine", "methotrexate", "mycophenolate mofetil", "glucocorticoids"]
+      },
+      {
+        "topic": "Special populations",
+        "text": "Specific recommendations are given for children, adolescents, and pregnant or breastfeeding patients, in whom drug choice and monitoring differ.",
+        "lineOfTherapy": "supportive"
+      }
+    ],
+    "lastVerified": "2026-07-19",
+    "dataProvenance": "hand-curated-demo"
   }
 ];

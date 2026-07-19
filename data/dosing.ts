@@ -29,6 +29,14 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Cyclosporine', indication: 'Severe AD, systemic therapy', regimen: '2.5–5 mg/kg/day orally in two divided doses, with blood-pressure and renal monitoring' },
     { drug: 'Dupilumab', indication: 'Moderate-to-severe AD, age ≥12, topical-refractory', regimen: 'Adults: 600 mg SC loading dose, then 300 mg SC every 2 weeks' },
   ],
+  'eadv-euroguiderm-atopic-eczema': [
+    { drug: 'Dupilumab', indication: 'Moderate-to-severe AD, biologic', regimen: 'Adults: 600 mg SC loading dose, then 300 mg SC every 2 weeks' },
+    { drug: 'Tralokinumab', indication: 'Moderate-to-severe AD, biologic', regimen: 'Adults: 600 mg SC loading dose, then 300 mg SC every 2 weeks' },
+    { drug: 'Upadacitinib', indication: 'Moderate-to-severe AD, JAK inhibitor', regimen: '15 mg orally once daily, increased to 30 mg once daily if needed' },
+    { drug: 'Abrocitinib', indication: 'Moderate-to-severe AD, JAK inhibitor', regimen: '100–200 mg orally once daily' },
+    { drug: 'Baricitinib', indication: 'Moderate-to-severe AD, JAK inhibitor', regimen: '4 mg orally once daily, stepped down to 2 mg on control' },
+    { drug: 'Ciclosporin', indication: 'Conventional systemic immunosuppressant', regimen: '2.5–5 mg/kg/day orally in two divided doses, with blood-pressure and renal monitoring' },
+  ],
   'acg-h-pylori-2024': [
     { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy', regimen: 'Standard dose orally twice daily (e.g. omeprazole 20 mg BID) for 14 days' },
     { drug: 'Bismuth subsalicylate', indication: 'Bismuth quadruple therapy', regimen: '300–524 mg orally four times daily for 14 days' },

@@ -13,7 +13,7 @@ import { societies } from '../data/societies';
 import { conditions } from '../data/conditions';
 import { guidelines } from '../data/guidelines';
 import { societiesSchema, conditionsSchema, guidelinesSchema } from '../src/lib/schema';
-import { countryOf, lineagesForCondition, getDosing, getCondition } from '../src/lib/data';
+import { countryOf, lineagesForCondition, getDosing, getCondition, currentGuidelinesForCondition } from '../src/lib/data';
 import { search } from '../src/lib/search';
 import { buildComparison } from '../src/lib/compare';
 import { answerFor } from '../src/lib/answer';
@@ -350,6 +350,32 @@ check(
 check(
   'Polish “takrolimus” collapses to the same medicine as “tacrolimus”',
   !!drugsForQuery('tacrolimus')[0] && drugsForQuery('takrolimus')[0]?.slug === drugsForQuery('tacrolimus')[0]?.slug,
+);
+check(
+  'EADV now has an ingested current guideline (EU dermatology)',
+  guidelines.some((g) => g.societyId === 'eadv' && g.status === 'current'),
+);
+check(
+  'English “atopic eczema” finds the EADV EuroGuiDerm guideline',
+  search('atopic eczema').some((r) => r.guideline.id === 'eadv-euroguiderm-atopic-eczema'),
+);
+check(
+  'atopic dermatitis now compares across regions (EU + PL)',
+  (() => {
+    const regions = new Set(currentGuidelinesForCondition('atopic-dermatitis').map((g) => countryOf(g)));
+    return regions.has('EU') && regions.has('PL');
+  })(),
+);
+check(
+  '“dupilumab” is cross-referenced to atopic dermatitis (recommended in both regions)',
+  (drugsForQuery('dupilumab')[0]?.conditions ?? []).some((c) => c.condition.id === 'atopic-dermatitis'),
+);
+check(
+  '“upadacitinib” now spans dermatology and gastroenterology (cross-specialty)',
+  (() => {
+    const specs = new Set((drugsForQuery('upadacitinib')[0]?.conditions ?? []).map((c) => c.condition.specialty));
+    return specs.has('dermatology') && specs.has('gastroenterology');
+  })(),
 );
 
 console.log('');
