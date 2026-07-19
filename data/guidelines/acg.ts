@@ -19,7 +19,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2025/06000/acg_clinical_guideline_update__ulcerative_colitis.13.aspx",
-    "citation": "Rubin DT, Ananthakrishnan AN, Siegel CA, Barnes EL, Long MD. Am J Gastroenterol. 2025;120(6):1187-1224.",
+    "citation": "Rubin DT, Ananthakrishnan AN, Siegel CA, Barnes EL, Long MD. Am J Gastroenterol. 2025;120(6):1187-1224. doi:10.14309/ajg.0000000000003463 (verified via PubMed).",
     "summary": "The 2025 ACG update guides diagnosis, monitoring and treatment of adult ulcerative colitis using a treat-to-target approach aiming for symptomatic and endoscopic remission. Oral and rectal 5-aminosalicylates remain first-line for mild-to-moderate disease, while moderate-to-severe disease is treated with advanced therapies (biologics and small molecules), and the guideline suggests advanced therapy need not wait for failure of conventional therapy. It also addresses acute severe UC and surgical considerations.",
     "keyRecommendations": [
       {
@@ -85,7 +85,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2025/06000/acg_clinical_guideline__management_of_crohn_s.14.aspx",
-    "citation": "Lichtenstein GR, Loftus EV, Afzali A, et al. Am J Gastroenterol. 2025;120(6):1225-1264.",
+    "citation": "Lichtenstein GR, Loftus EV, Afzali A, et al. Am J Gastroenterol. 2025;120(6):1225-1264. doi:10.14309/ajg.0000000000003465 (verified via PubMed).",
     "summary": "The 2025 ACG Crohn's disease update expands the advanced-therapy armamentarium and endorses early effective therapy with a treat-to-target strategy (clinical plus endoscopic remission). Anti-TNF agents, vedolizumab, ustekinumab, IL-23 inhibitors (risankizumab, guselkumab, mirikizumab) and the JAK inhibitor upadacitinib are options for moderate-to-severe disease. Thiopurines are suggested for maintenance but not induction, and combination anti-TNF plus immunomodulator is favored over monotherapy.",
     "keyRecommendations": [
       {
@@ -213,7 +213,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2024,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2024/09000/acg_clinical_guideline__treatment_of_helicobacter.13.aspx",
-    "citation": "Chey WD, Howden CW, Moss SF, Morgan DR, Greer KB, Grover S, Shah SC. Am J Gastroenterol. 2024;119(9):1730-1753.",
+    "citation": "Chey WD, Howden CW, Moss SF, Morgan DR, Greer KB, Grover S, Shah SC. Am J Gastroenterol. 2024;119(9):1730-1753. doi:10.14309/ajg.0000000000002968 (verified via PubMed).",
     "summary": "The 2024 ACG guideline overhauls H. pylori treatment, making optimized bismuth quadruple therapy the preferred first-line regimen and advising against empiric clarithromycin- or levofloxacin-based regimens because of rising resistance. Rifabutin triple therapy and vonoprazan-based regimens are alternatives, and every treated patient should have a test of cure.",
     "keyRecommendations": [
       {
@@ -320,7 +320,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2025/01000/acg_clinical_guideline__diagnosis_and_management.16.aspx",
-    "citation": "Dellon ES, et al. Am J Gastroenterol. 2025;120(1):31-59.",
+    "citation": "Dellon ES, et al. Am J Gastroenterol. 2025;120(1):31-59. doi:10.14309/ajg.0000000000003194 (verified via PubMed).",
     "summary": "The updated ACG guideline diagnoses eosinophilic esophagitis by symptoms of esophageal dysfunction plus at least 15 eosinophils/hpf after excluding other causes, no longer requiring a PPI trial to exclude the diagnosis. First-line treatments include PPIs, swallowed topical corticosteroids, dietary elimination, and the biologic dupilumab, with dilation for strictures and maintenance therapy to prevent relapse and fibrostenotic remodeling.",
     "keyRecommendations": [
       {
@@ -373,7 +373,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2023,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2023/01000/american_college_of_gastroenterology_guidelines.17.aspx",
-    "citation": "Rubio-Tapia A, Hill ID, Semrad C, Kelly CP, Lebwohl B. Am J Gastroenterol. 2023;118(1):59-76.",
+    "citation": "Rubio-Tapia A, Hill ID, Semrad C, Kelly CP, Lebwohl B. Am J Gastroenterol. 2023;118(1):59-76. doi:10.14309/ajg.0000000000002111 (verified via PubMed).",
     "summary": "The 2023 ACG update recommends tissue transglutaminase IgA (with total IgA) as first-line serology while on a gluten-containing diet, with confirmatory duodenal biopsy in adults. A biopsy-free diagnosis may be considered in children with very high tTG-IgA plus positive endomysial antibody. Lifelong strict gluten-free diet is the treatment, with mucosal healing as the therapeutic goal.",
     "keyRecommendations": [
       {
@@ -419,7 +419,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2024,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2024/03000/american_college_of_gastroenterology_guidelines_.10.aspx",
-    "citation": "Tenner S, Vege SS, Sheth SG, Sauer B, Yang A, Conwell DL, Yadlapati RH, Gardner TB. Am J Gastroenterol. 2024;119(3):419-437.",
+    "citation": "Tenner S, Vege SS, Sheth SG, Sauer B, Yang A, Conwell DL, Yadlapati RH, Gardner TB. Am J Gastroenterol. 2024;119(3):419-437. doi:10.14309/ajg.0000000000002645 (verified via PubMed).",
     "summary": "The 2024 ACG acute pancreatitis guideline emphasizes moderately aggressive fluid resuscitation with lactated Ringer's, early oral or enteral feeding, and antibiotic stewardship. ERCP is reserved for biliary pancreatitis with cholangitis or persistent obstruction, same-admission cholecystectomy is advised for mild biliary disease, and infected necrosis is managed with a delayed, minimally invasive step-up approach.",
     "keyRecommendations": [
       {
@@ -1018,7 +1018,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2024,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2024/01000/acg_clinical_guideline__alcohol_associated_liver.13.aspx",
-    "citation": "Jophlin LL, Singal AK, Bataller R, Wong RJ, Sauer BG, Terrault NA, Shah VH. Am J Gastroenterol. 2024;119(1):30-54.",
+    "citation": "Jophlin LL, Singal AK, Bataller R, Wong RJ, Sauer BG, Terrault NA, Shah VH. Am J Gastroenterol. 2024;119(1):30-54. doi:10.14309/ajg.0000000000002572 (verified via PubMed).",
     "summary": "The 2024 ACG guideline addresses the full spectrum of alcohol-associated liver disease, stressing screening for alcohol use disorder at every encounter and abstinence as the most effective treatment. Severe alcohol-associated hepatitis is treated with corticosteroids guided by the Lille response, alongside aggressive nutrition, and early liver transplantation is an option for selected non-responders.",
     "keyRecommendations": [
       {
@@ -1119,7 +1119,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2024,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2024/07000/acg_clinical_guideline__focal_liver_lesions.13.aspx",
-    "citation": "Frenette C, Mendiratta-Lala M, Salgia R, Wong RJ, Sauer BG, Pillai A. Am J Gastroenterol. 2024;119(7):1235-1271.",
+    "citation": "Frenette C, Mendiratta-Lala M, Salgia R, Wong RJ, Sauer BG, Pillai A. Am J Gastroenterol. 2024;119(7):1235-1271. doi:10.14309/ajg.0000000000002857 (verified via PubMed).",
     "summary": "The 2024 ACG focal liver lesions guideline recommends multiphasic contrast-enhanced MRI (or CT) to characterize incidental liver lesions. Hemangioma and focal nodular hyperplasia generally need no treatment, hepatocellular adenomas are risk-stratified for resection, and at-risk patients should undergo HCC surveillance with LI-RADS characterization and multidisciplinary evaluation of indeterminate lesions.",
     "keyRecommendations": [
       {
@@ -1213,7 +1213,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2025/07000/acg_clinical_guideline_update__preventive_care_in.15.aspx",
-    "citation": "Farraye FA, Melmed GY, Lichtenstein GR, Barnes EL, Limketkai BN, Caldera F, Kane S. Am J Gastroenterol. 2025;120(7):1435-1461 (pages approximate; verify against source).",
+    "citation": "Farraye FA, Melmed GY, Lichtenstein GR, Barnes EL, Limketkai BN, Caldera F, Kane S. Am J Gastroenterol. 2025;120(7):1435-1461 (pages approximate; verify against source). doi:10.14309/ajg.0000000000003541 (verified via PubMed).",
     "summary": "The 2025 ACG update on preventive care in IBD emphasizes vaccinating patients (ideally before starting immunosuppression), screening for skin and cervical cancer, and monitoring bone health and mental health. Inactivated vaccines including recombinant zoster vaccine are encouraged, live vaccines are avoided during significant immunosuppression, and health maintenance is coordinated across gastroenterology and primary care.",
     "keyRecommendations": [
       {
@@ -1550,7 +1550,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2023,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2023/06000/american_gastroenterological_association_american.13.aspx",
-    "citation": "Chang L, Chey WD, Imdad A, et al. Am J Gastroenterol. 2023;118(6):936-954.",
+    "citation": "Chang L, Chey WD, Imdad A, et al. Am J Gastroenterol. 2023;118(6):936-954. doi:10.14309/ajg.0000000000002227 (verified via PubMed).",
     "summary": "This joint AGA-ACG guideline addresses pharmacologic management of chronic idiopathic constipation with a stepwise approach. It makes strong recommendations for polyethylene glycol, senna, and (newly) magnesium oxide as inexpensive first options, reserving secretagogues and prokinetics such as linaclotide, plecanatide and prucalopride for patients with inadequate response.",
     "keyRecommendations": [
       {
@@ -1663,7 +1663,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2025,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2025/04000/acg_clinical_guideline__diagnosis_and_management.13.aspx",
-    "citation": "Morgan DR, Corral JE, Li D, Montgomery EA, Riquelme A, Kim JJ, Sauer B, Shah SC. Am J Gastroenterol. 2025;120(4):709-737.",
+    "citation": "Morgan DR, Corral JE, Li D, Montgomery EA, Riquelme A, Kim JJ, Sauer B, Shah SC. Am J Gastroenterol. 2025;120(4):709-737. doi:10.14309/ajg.0000000000003350 (verified via PubMed).",
     "summary": "This first ACG guideline on gastric premalignant conditions addresses atrophic gastritis, gastric intestinal metaplasia, dysplasia and certain gastric polyps that raise gastric cancer risk. It calls for high-quality, image-enhanced endoscopy with systematic biopsy mapping, risk-stratified surveillance (generally every 3 years for high-risk patients), H. pylori eradication, and endoscopic resection of dysplasia or early cancer at expert centers.",
     "keyRecommendations": [
       {
@@ -1708,7 +1708,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2026,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2026/07000/acg_clinical_guideline__colonic_diverticulitis.13.aspx",
-    "citation": "Peery AF, et al. Am J Gastroenterol. 2026;121(7):1549-1561.",
+    "citation": "Peery AF, et al. Am J Gastroenterol. 2026;121(7):1549-1561. doi:10.14309/ajg.0000000000004047 (verified via PubMed).",
     "summary": "This ACG guideline gives evidence-based, largely outpatient recommendations for colonic diverticulitis. CT confirms the diagnosis, antibiotics are used selectively (not routinely) in mild uncomplicated disease in immunocompetent patients, colonoscopy is performed after resolution in defined circumstances, and elective surgery decisions are individualized rather than based solely on the number of episodes.",
     "keyRecommendations": [
       {
@@ -1753,7 +1753,7 @@ export const acgGuidelines: Guideline[] = [
     "year": 2026,
     "status": "current",
     "sourceUrl": "https://journals.lww.com/ajg/fulltext/2026/03000/acg_clinical_guideline__hepatic_encephalopathy.12.aspx",
-    "citation": "Bajaj JS, Jakab SS, Jesudian AB, et al. Am J Gastroenterol. 2026;121(3):588-618.",
+    "citation": "Bajaj JS, Jakab SS, Jesudian AB, et al. Am J Gastroenterol. 2026;121(3):588-618. doi:10.14309/ajg.0000000000003899 (verified via PubMed).",
     "summary": "This ACG guideline provides recommendations for diagnosing, treating and preventing hepatic encephalopathy in cirrhosis. Lactulose titrated to 2-3 soft stools per day is first-line, rifaximin is added for acute overt HE and for secondary prophylaxis, precipitants are identified and treated, and adequate protein intake plus peri-TIPS rifaximin prophylaxis are emphasized.",
     "keyRecommendations": [
       {
