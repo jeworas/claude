@@ -5,6 +5,7 @@ import { ptgeGuidelines } from './ptg-e';
 import { polishOtherGuidelines } from './polish-other';
 import { usNonGiGuidelines } from './us-non-gi';
 import { euGuidelines } from './eu';
+import { ukGuidelines } from './uk';
 import { internationalGuidelines } from './international';
 import { historicalGuidelines } from './historical';
 
@@ -20,6 +21,7 @@ export const guidelines: Guideline[] = [
   ...polishOtherGuidelines,
   ...usNonGiGuidelines,
   ...euGuidelines,
+  ...ukGuidelines,
   ...internationalGuidelines,
   ...historicalGuidelines,
 ];

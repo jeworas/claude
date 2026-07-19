@@ -12,9 +12,19 @@
       "indexUrl": "https://gastro.org/clinical-guidance/"
     },
     {
+      "societyId": "aasld",
+      "abbreviation": "AASLD",
+      "indexUrl": "https://www.aasld.org/practice-guidelines"
+    },
+    {
       "societyId": "ptg-e",
       "abbreviation": "PTG-E",
       "indexUrl": "https://ptg-e.org.pl/wytyczne/"
+    },
+    {
+      "societyId": "bsg",
+      "abbreviation": "BSG",
+      "indexUrl": "https://www.bsg.org.uk/clinical-resources/"
     },
     {
       "societyId": "ecco",
@@ -815,6 +825,24 @@
       "pdfUrl": null
     },
     {
+      "id": "aasld-masld-mash-2025",
+      "societyId": "aasld",
+      "country": "US",
+      "title": "AASLD Practice Guidance on MASLD/MASH — 2025 Semaglutide Update",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1097/HEP.0000000000001608",
+      "pdfUrl": null
+    },
+    {
+      "id": "aasld-hepatitis-b-2025",
+      "societyId": "aasld",
+      "country": "US",
+      "title": "AASLD-IDSA Practice Guideline on Treatment of Chronic Hepatitis B",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1097/HEP.0000000000001549",
+      "pdfUrl": null
+    },
+    {
       "id": "ecco-uc-medical-2022",
       "societyId": "ecco",
       "country": "EU",
@@ -1010,6 +1038,24 @@
       "title": "EuroGuiDerm Guideline on Atopic Eczema (living guideline)",
       "titleLocal": null,
       "url": "https://doi.org/10.1111/jdv.20639",
+      "pdfUrl": null
+    },
+    {
+      "id": "bsg-ibd-adults-2025",
+      "societyId": "bsg",
+      "country": "UK",
+      "title": "British Society of Gastroenterology Guidelines on Inflammatory Bowel Disease in Adults (2025)",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1136/gutjnl-2024-334395",
+      "pdfUrl": null
+    },
+    {
+      "id": "bsg-coeliac-2026",
+      "societyId": "bsg",
+      "country": "UK",
+      "title": "British Society of Gastroenterology Guidelines on the Diagnosis and Management of Adult Coeliac Disease (2026)",
+      "titleLocal": null,
+      "url": "https://doi.org/10.1136/gutjnl-2025-337747",
       "pdfUrl": null
     },
     {

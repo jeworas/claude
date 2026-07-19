@@ -1551,5 +1551,28 @@ export const conditions: Condition[] = [
       "D13.9"
     ],
     "specialty": "gastroenterology"
+  },
+  {
+    "id": "chronic-hepatitis-b",
+    "nameEn": "Chronic hepatitis B",
+    "namePl": "Przewlekłe wirusowe zapalenie wątroby typu B",
+    "synonymsEn": [
+      "hepatitis B",
+      "HBV infection",
+      "chronic HBV"
+    ],
+    "synonymsPl": [
+      "wirusowe zapalenie wątroby typu B",
+      "zakażenie HBV",
+      "WZW B"
+    ],
+    "abbreviations": [
+      "HBV",
+      "CHB"
+    ],
+    "icd10": [
+      "B18.1"
+    ],
+    "specialty": "hepatology"
   }
 ];

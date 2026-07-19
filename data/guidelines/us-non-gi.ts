@@ -384,4 +384,81 @@ export const usNonGiGuidelines: Guideline[] = [
     lastVerified: '2026-07-18',
     dataProvenance: 'hand-curated-demo',
   },
+  {
+    id: 'aasld-masld-mash-2025',
+    societyId: 'aasld',
+    conditionIds: ['nafld-masld'],
+    title: 'AASLD Practice Guidance on MASLD/MASH — 2025 Semaglutide Update',
+    language: 'en',
+    specialty: 'hepatology',
+    year: 2025,
+    status: 'current',
+    sourceUrl: 'https://doi.org/10.1097/HEP.0000000000001608',
+    citation:
+      'Bansal MB, Patton H, Morgan TR, et al. Semaglutide therapy for metabolic dysfunction-associated steatohepatitis: November 2025 updates to AASLD Practice Guidance. Hepatology. 2025;83(5):1326-1340. doi:10.1097/HEP.0000000000001608. Updates the 2023 AASLD MASLD Practice Guidance. Identified via PubMed.',
+    summary:
+      'AASLD guidance on metabolic dysfunction-associated steatotic liver disease (MASLD, formerly NAFLD) and steatohepatitis (MASH), updated in November 2025 to incorporate semaglutide. Lifestyle modification remains the cornerstone; non-invasive tests stage fibrosis in place of routine biopsy; and semaglutide (following FDA approval of the Wegovy formulation) is an option for MASH with moderate-to-advanced (F2-F3) fibrosis, as is resmetirom for the same population.',
+    keyRecommendations: [
+      {
+        topic: 'Non-invasive staging',
+        text: 'Stage fibrosis with non-invasive tests (VCTE, MRE or ELF) rather than routine liver biopsy; defined thresholds identify F2-F3 fibrosis and help exclude cirrhosis.',
+        lineOfTherapy: 'diagnosis',
+      },
+      {
+        topic: 'Lifestyle',
+        text: 'Weight loss and lifestyle modification remain the cornerstone of MASLD/MASH management and underpin any pharmacotherapy.',
+        lineOfTherapy: 'first-line',
+      },
+      {
+        topic: 'Semaglutide for MASH (F2-F3)',
+        text: 'Semaglutide 2.4 mg weekly is an option for confirmed MASH with stage 2-3 fibrosis (not MASH cirrhosis), based on the phase 3 ESSENCE trial showing MASH resolution and fibrosis improvement; monitor for gastrointestinal and other adverse effects.',
+        evidenceGrade: 'FDA accelerated approval (Aug 2025)',
+        lineOfTherapy: 'escalation',
+        drugs: ['semaglutide'],
+      },
+      {
+        topic: 'Resmetirom',
+        text: 'Resmetirom, a thyroid hormone receptor-β agonist, is a further option for non-cirrhotic MASH with significant fibrosis; its combination with semaglutide has not been studied.',
+        lineOfTherapy: 'escalation',
+        drugs: ['resmetirom'],
+      },
+    ],
+    lastVerified: '2026-07-19',
+    dataProvenance: 'hand-curated-demo',
+  },
+  {
+    id: 'aasld-hepatitis-b-2025',
+    societyId: 'aasld',
+    conditionIds: ['chronic-hepatitis-b'],
+    title: 'AASLD-IDSA Practice Guideline on Treatment of Chronic Hepatitis B',
+    language: 'en',
+    specialty: 'hepatology',
+    year: 2025,
+    status: 'current',
+    sourceUrl: 'https://doi.org/10.1097/HEP.0000000000001549',
+    citation:
+      'Ghany MG, Pan CQ, Lok AS, et al. AASLD-IDSA Practice Guideline on treatment of chronic hepatitis B. Hepatology. 2025;83(4):974-997. doi:10.1097/HEP.0000000000001549. Identified via PubMed.',
+    summary:
+      'GRADE-based AASLD/IDSA guidance on chronic hepatitis B, spanning prevention of transmission (mother-to-infant and horizontal), surveillance for hepatocellular carcinoma, and antiviral treatment decisions — including the immune-tolerant and indeterminate phases and criteria for withdrawing therapy.',
+    keyRecommendations: [
+      {
+        topic: 'Prevention of transmission',
+        text: 'Prevent mother-to-infant transmission with maternal antiviral therapy in high-viral-load pregnancy plus infant immunoprophylaxis, and reduce horizontal transmission through vaccination of susceptible contacts.',
+        lineOfTherapy: 'prevention',
+      },
+      {
+        topic: 'HCC surveillance',
+        text: 'Provide hepatocellular carcinoma surveillance for at-risk HBsAg-positive persons, including after HBsAg loss and in those co-infected with HCV, HDV or HIV.',
+        lineOfTherapy: 'screening',
+      },
+      {
+        topic: 'Antiviral therapy',
+        text: 'Treat eligible patients with a high-barrier nucleos(t)ide analogue — tenofovir or entecavir; the guideline addresses treating the immune-tolerant and indeterminate phases and criteria for finite-therapy withdrawal.',
+        lineOfTherapy: 'first-line',
+        drugs: ['tenofovir', 'entecavir'],
+      },
+    ],
+    lastVerified: '2026-07-19',
+    dataProvenance: 'hand-curated-demo',
+  },
 ];

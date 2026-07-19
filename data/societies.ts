@@ -62,6 +62,17 @@ export const societies: Society[] = [
       'National Polish gastroenterology society; publishes wytyczne/rekomendacje, frequently together with the national consultant in gastroenterology.',
   },
   {
+    id: 'bsg',
+    name: 'British Society of Gastroenterology',
+    abbreviation: 'BSG',
+    country: 'UK',
+    specialties: ['gastroenterology', 'hepatology'],
+    homepage: 'https://www.bsg.org.uk',
+    guidelinesIndexUrl: 'https://www.bsg.org.uk/clinical-resources/',
+    description:
+      'The UK professional body for gastroenterology and hepatology; publishes BSG guidelines in Gut across luminal GI, IBD and liver disease.',
+  },
+  {
     id: 'ecco',
     name: "European Crohn's and Colitis Organisation",
     abbreviation: 'ECCO',

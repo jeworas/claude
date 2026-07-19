@@ -37,6 +37,14 @@ export const dosingByGuideline: Record<string, DoseEntry[]> = {
     { drug: 'Baricitinib', indication: 'Moderate-to-severe AD, JAK inhibitor', regimen: '4 mg orally once daily, stepped down to 2 mg on control' },
     { drug: 'Ciclosporin', indication: 'Conventional systemic immunosuppressant', regimen: '2.5–5 mg/kg/day orally in two divided doses, with blood-pressure and renal monitoring' },
   ],
+  'aasld-masld-mash-2025': [
+    { drug: 'Semaglutide', indication: 'MASH with F2–F3 fibrosis', regimen: '2.4 mg subcutaneously once weekly (dose-escalated over ~16–20 weeks)' },
+    { drug: 'Resmetirom', indication: 'Non-cirrhotic MASH with significant fibrosis', regimen: '80 mg (<100 kg) or 100 mg (≥100 kg) orally once daily' },
+  ],
+  'aasld-hepatitis-b-2025': [
+    { drug: 'Tenofovir', indication: 'Chronic hepatitis B, first-line', regimen: 'Tenofovir disoproxil 300 mg, or tenofovir alafenamide 25 mg, orally once daily' },
+    { drug: 'Entecavir', indication: 'Chronic hepatitis B, first-line', regimen: '0.5 mg orally once daily (1 mg if lamivudine-experienced)' },
+  ],
   'acg-h-pylori-2024': [
     { drug: 'Proton pump inhibitor', indication: 'Bismuth quadruple therapy', regimen: 'Standard dose orally twice daily (e.g. omeprazole 20 mg BID) for 14 days' },
     { drug: 'Bismuth subsalicylate', indication: 'Bismuth quadruple therapy', regimen: '300–524 mg orally four times daily for 14 days' },

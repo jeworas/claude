@@ -401,6 +401,48 @@ check(
     (drugsForQuery('imatinib')[0]?.conditions ?? []).some((c) => c.condition.id === 'gi-subepithelial-lesions'),
 );
 
+console.log('\nPubMed-assisted ingestion (BSG — cracks the UK column)');
+check('BSG has an ingested current guideline (UK gastroenterology)', guidelines.some((g) => g.societyId === 'bsg' && g.status === 'current'));
+check(
+  'BSG IBD guideline is searchable',
+  search('inflammatory bowel disease').some((r) => r.guideline.id === 'bsg-ibd-adults-2025'),
+);
+check(
+  'ulcerative colitis now compares across FOUR regions (US, EU, PL, UK)',
+  (() => {
+    const regions = new Set(currentGuidelinesForCondition('ulcerative-colitis').map((g) => countryOf(g)));
+    return (['US', 'EU', 'PL', 'UK'] as const).every((r) => regions.has(r));
+  })(),
+);
+check(
+  'celiac disease now includes a UK (BSG) guideline',
+  currentGuidelinesForCondition('celiac-disease').some((g) => countryOf(g) === 'UK'),
+);
+
+console.log('\nPubMed-assisted ingestion (AASLD — US hepatology opened)');
+check('AASLD now has ingested current guidelines', guidelines.filter((g) => g.societyId === 'aasld' && g.status === 'current').length >= 2);
+check(
+  'MASLD/MASH guidance is searchable',
+  search('MASH').some((r) => r.guideline.id === 'aasld-masld-mash-2025') ||
+    search('fatty liver').some((r) => r.guideline.id === 'aasld-masld-mash-2025'),
+);
+check(
+  'semaglutide now spans diabetology and hepatology (cross-specialty)',
+  (() => {
+    const specs = new Set((drugsForQuery('semaglutide')[0]?.conditions ?? []).map((c) => c.condition.specialty));
+    return specs.has('diabetology') && specs.has('hepatology');
+  })(),
+);
+check('chronic hepatitis B condition exists (hepatology)', getCondition('chronic-hepatitis-b')?.specialty === 'hepatology');
+check(
+  '“hepatitis B” finds the AASLD guideline and tenofovir is cross-referenced with dosing',
+  search('hepatitis B').some((r) => r.guideline.id === 'aasld-hepatitis-b-2025') &&
+    (() => {
+      const d = drugsForQuery('tenofovir')[0];
+      return !!d && d.conditions.some((c) => c.guidelines.some((u) => u.doses.length > 0));
+    })(),
+);
+
 console.log('');
 if (failures > 0) {
   console.error(`✗ ${failures} check(s) failed.\n`);
