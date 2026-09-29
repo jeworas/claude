@@ -259,16 +259,25 @@ export class Board {
       group.add(mesh);
 
       // highlight (flat copy of shape)
-      const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
       const hgeo = new THREE.ShapeGeometry(shape, 6);
       hgeo.rotateX(-Math.PI / 2);
       const hl = new THREE.Mesh(hgeo, hlMat);
       hl.position.y = TILE_TOP + 0.02;
       hl.renderOrder = 5;
-      group.add(hl);
+      // glowing rim, slightly larger than the tile, visible in the gaps around it
+      const rgeo = new THREE.ShapeGeometry(shape, 6);
+      rgeo.translate(-P.x, P.z, 0); rgeo.scale(1.07, 1.07, 1); rgeo.translate(P.x, -P.z, 0);
+      rgeo.rotateX(-Math.PI / 2);
+      const rim = new THREE.Mesh(rgeo, hlMat);
+      rim.position.y = TILE_TOP - 0.12;
+      rim.renderOrder = 4;
+      const hlg = new THREE.Group();
+      hlg.add(hl, rim);
 
       const inr = minEdgeDist(poly, P.x, P.z);
-      const node = this.register(d, group, new THREE.Vector3(P.x, TILE_TOP, P.z), inr, [capMat], hl, hlMat);
+      const node = this.register(d, group, new THREE.Vector3(P.x, TILE_TOP, P.z), inr, [capMat], hlg, hlMat);
+      group.add(hlg);
       this.pickables.push(mesh);
       this.decorate(group, poly, P, terrain, inr, decorRnd, d.id);
       // tile name shown a bit above the centre pieces
@@ -307,7 +316,7 @@ export class Board {
         b.castShadow = true; b.receiveShadow = true;
         group.add(b);
       }
-      const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+      const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
       const hl = new THREE.Mesh(new THREE.RingGeometry(r + 0.05, r + 0.6, 48), hlMat);
       hl.rotation.x = -Math.PI / 2;
       hl.position.set(P.x, TILE_TOP + 0.03, P.z);
@@ -408,7 +417,7 @@ export class Board {
     }
     this.pickables.push(pad);
 
-    const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+    const hlMat = new THREE.MeshBasicMaterial({ color: 0x55e0ff, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
     const hlg = new THREE.Group();
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.35, 32), hlMat);
     ring.rotation.x = -Math.PI / 2; ring.position.set(P.x, ROAD_Y + 0.09, P.z); ring.renderOrder = 5;
@@ -461,7 +470,7 @@ export class Board {
       const hs: HL = selected.has(id) ? 'selected' : legal.has(id) ? 'legal' : 'none';
       n.hlState = hs;
       n.hl.visible = hs !== 'none';
-      n.hlMat.color.set(hs === 'selected' ? 0xffd23a : 0x55e0ff);
+      n.hlMat.color.set(hs === 'selected' ? 0xffd23a : 0x33d6ff);
     }
     this.hlNodes = Object.values(this.nodes).filter((n) => n.hlState !== 'none');
   }
@@ -542,8 +551,8 @@ export class Board {
   }
 
   private pulse(t: number) {
-    const a = 0.28 + 0.24 * Math.sin(t * 4);
-    for (const n of this.hlNodes) n.hlMat.opacity = n.hlState === 'selected' ? 0.5 : a;
+    const a = 0.34 + 0.2 * Math.sin(t * 4);
+    for (const n of this.hlNodes) n.hlMat.opacity = n.hlState === 'selected' ? 0.55 : a;
   }
 
   spaceAt(obj: THREE.Object3D): string | null {

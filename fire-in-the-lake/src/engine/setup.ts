@@ -7,6 +7,7 @@ import { SCENARIOS } from '../data/scenarios';
 import { CARDS } from '../data/cards';
 import { SPACE_IDS } from '../data/map';
 import { POOL_OF } from '../core/pieces';
+import { computeEcon } from './coup';
 import './sequence';
 
 function zeroPools(): Record<PoolKind, number> {
@@ -89,6 +90,7 @@ export function newGame(scenarioId: string, humans: Faction[], seed: number = Da
   log(g, `New game: ${sc.name}. Humans: ${humans.length ? humans.join(', ') : 'none'}.`);
 
   push(g, 'game', {});
+  g.econ = computeEcon(g);
   clearUndo(g);
   return g;
 }
