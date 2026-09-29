@@ -14,6 +14,7 @@ export interface HudHandlers {
   onSpeed(v: number): void;
   onFF(on: boolean): void;
   onResetView(): void;
+  onHelp(): void;
 }
 
 const FNAME: Record<Faction, string> = { US: 'United States', ARVN: 'ARVN', NVA: 'North Vietnam', VC: 'Viet Cong' };
@@ -36,6 +37,17 @@ export class Hud {
   private lastBusy = false;
   private lastThinking: Faction | null = null;
   private overShown = false;
+  private cache = new Map<string, string>();
+  private curCard: number | null = null;
+  private seenActed: Faction[] = [];
+  private prevActed: Faction[] = [];
+
+  private setHtml(key: string, el: HTMLElement, html: string): boolean {
+    if (this.cache.get(key) === html) return false;
+    this.cache.set(key, html);
+    el.innerHTML = html;
+    return true;
+  }
 
   constructor(private root: HTMLElement, private h: HudHandlers) {
     root.innerHTML = `
@@ -46,6 +58,7 @@ export class Hud {
           <label class="speed" title="Bot speed">Speed <input id="speed" type="range" min="0" max="100" value="60" /></label>
           <button id="ff" class="btn small" title="Fast forward AI turns">&#9193; Fast</button>
           <button id="resetview" class="btn small" title="Reset camera">&#8982; View</button>
+          <button id="help-btn" class="btn small" title="Rules help (?)">?</button>
           <button id="save" class="btn small">Save</button>
           <button id="load" class="btn small">Load</button>
           <button id="newgame" class="btn small">New</button>
@@ -67,13 +80,15 @@ export class Hud {
           <div id="actions"></div>
         </div>
       </div>
+      <div id="banner" class="hidden"></div>
       <div id="gameover" class="hidden"></div>`;
-    for (const id of ['scen', 'status', 'factions', 'tracks', 'pools', 'cards', 'effects', 'log', 'prompt', 'actions', 'gameover', 'speed', 'ff']) {
+    for (const id of ['scen', 'status', 'factions', 'tracks', 'pools', 'cards', 'effects', 'log', 'prompt', 'actions', 'gameover', 'speed', 'ff', 'banner']) {
       this.el[id] = root.querySelector('#' + id) as HTMLElement;
     }
     (this.el.speed as HTMLInputElement).oninput = () => h.onSpeed(+(this.el.speed as HTMLInputElement).value);
     this.el.ff.onclick = () => { const on = !this.el.ff.classList.contains('on'); this.el.ff.classList.toggle('on', on); h.onFF(on); };
     root.querySelector<HTMLElement>('#resetview')!.onclick = h.onResetView;
+    root.querySelector<HTMLElement>('#help-btn')!.onclick = h.onHelp;
     root.querySelector<HTMLElement>('#save')!.onclick = h.onSave;
     root.querySelector<HTMLElement>('#load')!.onclick = h.onLoad;
     root.querySelector<HTMLElement>('#newgame')!.onclick = h.onNewGame;
@@ -103,15 +118,18 @@ export class Hud {
     this.renderEffects(g);
     this.renderLog(g);
     this.renderPrompt(g, view, busy, thinking);
+    this.renderBanner(g, busy, thinking);
     this.renderOver(g);
   }
 
   private renderStatus(g: Game) {
     const coupsLeft = g.deck.filter((id) => CARD[id]?.coup).length + (g.current && CARD[g.current]?.coup ? 1 : 0) + (g.next && CARD[g.next]?.coup ? 1 : 0);
-    this.el.status.innerHTML = `<span>Deck <b>${g.deck.length}</b></span><span>Coups left <b>${coupsLeft}</b></span><span>Coups played <b>${g.coup_count}</b></span>${g.leader ? `<span>Leader <b>${esc(CARD[g.leader]?.title ?? String(g.leader))}</b></span>` : ''}`;
+    this.setHtml('status', this.el.status, `<span>Deck <b>${g.deck.length}</b></span><span>Coups left <b>${coupsLeft}</b></span><span>Coups played <b>${g.coup_count}</b></span>${g.leader ? `<span>Leader <b>${esc(CARD[g.leader]?.title ?? String(g.leader))}</b></span>` : ''}`);
   }
 
   private renderFactions(g: Game, view: View) {
+    if (g.current !== this.curCard) { this.prevActed = this.seenActed.slice(); this.curCard = g.current; }
+    this.seenActed = g.acted.slice();
     const out: string[] = [];
     for (const f of FACTIONS) {
       const score = victoryScore(g, f), thr = VICTORY_THRESHOLD[f];
@@ -122,22 +140,26 @@ export class Hud {
       const elig = g.eligible[f];
       const acted = g.acted.includes(f);
       const badge = view.active === f ? '<span class="tag act">ACTING</span>' : acted ? '<span class="tag done">ACTED</span>' : elig ? '<span class="tag ok">ELIGIBLE</span>' : '<span class="tag no">INELIGIBLE</span>';
+      let reason = '';
+      if (!elig) reason = this.prevActed.includes(f) ? 'Acted on the previous card' : 'Made ineligible by an Event or Coup';
+      else if (g.next_ineligible.includes(f)) reason = 'Will be ineligible next card (Event)';
+      else if (g.first_faction && !acted && view.active !== f) reason = '';
       out.push(`<div class="fpanel ${f} ${view.active === f ? 'active' : ''} ${elig ? '' : 'inelig'}" style="--fc:${FACTION_CSS[f]}">
         <div class="frow"><b class="fname">${FNAME[f]}</b><span class="who ${human ? 'human' : 'ai'}">${human ? 'HUMAN' : 'AI'}</span>${res}</div>
         <div class="frow"><div class="vbar"><i style="width:${pct}%"></i><u style="left:${thrPct}%"></u></div><span class="vnum ${score > thr ? 'win' : ''}">${score}<small>/${thr}</small></span></div>
-        <div class="frow">${badge}</div>
+        <div class="frow" title="${esc(reason)}">${badge}${reason ? `<span class="ireason">${esc(reason)}</span>` : ''}</div>
       </div>`);
     }
-    this.el.factions.innerHTML = out.join('');
+    this.setHtml('factions', this.el.factions, out.join(''));
   }
 
   private renderTracks(g: Game) {
     const pips = Array.from({ length: 5 }, (_, i) => `<i class="${i <= g.trail ? 'on' : ''}"></i>`).join('');
-    this.el.tracks.innerHTML = `
+    this.setHtml('tracks', this.el.tracks, `
       <div><span>Aid</span><b>${g.aid}</b></div>
       <div><span>Patronage</span><b>${g.patronage}</b></div>
       <div><span>Econ</span><b>${g.econ}</b></div>
-      <div><span>Trail</span><span class="pips">${pips}</span></div>`;
+      <div><span>Trail</span><span class="pips">${pips}</span></div>`);
   }
 
   private renderPools(g: Game) {
@@ -147,7 +169,7 @@ export class Hud {
       const chips = POOL_KINDS.filter((k) => POOL_FACTION(k) === f).map((k) => `<span class="chip" title="${f} ${POOL_LABEL[k]}"><small>${POOL_LABEL[k]}</small><b>${pool[k] ?? 0}</b></span>`).join('');
       return `<div class="prow" style="--fc:${FACTION_CSS[f]}"><em>${f}</em>${chips}</div>`;
     }).join('');
-    this.el.pools.innerHTML = `<div class="tabs">${tabs.map(([n, k]) => `<button data-t="${k}" class="${k === this.poolTab ? 'on' : ''}">${n}</button>`).join('')}</div>${rows}`;
+    if (!this.setHtml('pools', this.el.pools, `<div class="tabs">${tabs.map(([n, k]) => `<button data-t="${k}" class="${k === this.poolTab ? 'on' : ''}">${n}</button>`).join('')}</div>${rows}`)) return;
     this.el.pools.querySelectorAll<HTMLElement>('button[data-t]').forEach((b) => (b.onclick = () => { this.poolTab = b.dataset.t as any; if (this.lastGame) this.renderPools(this.lastGame); }));
   }
 
@@ -171,15 +193,15 @@ export class Hud {
       html += '</div>';
     } else html += '<div class="card cur empty">No card in play</div>';
     if (nxt) html += `<div class="card nxt"><span class="lbl">NEXT</span><span class="cid">#${nxt.id}</span><b>${esc(nxt.title)}</b><div class="order">${this.orderChips(nxt.id)}</div></div>`;
-    this.el.cards.innerHTML = html;
+    this.setHtml('cards', this.el.cards, html);
   }
 
   private renderEffects(g: Game) {
     const caps = Object.entries(g.capabilities).map(([id, side]) => `<span class="eff cap ${side}" title="${esc(CARD[+id]?.[side as 'shaded'] ?? '')}">${esc(CARD[+id]?.title ?? id)} <small>${side === 'shaded' ? '&#9790;' : '&#9728;'}</small></span>`);
     const mom = g.momentum.map((id) => `<span class="eff mom" title="${esc(CARD[id]?.unshaded ?? '')}">${esc(CARD[id]?.title ?? String(id))}</span>`);
-    this.el.effects.innerHTML = caps.length || mom.length
+    this.setHtml('effects', this.el.effects, caps.length || mom.length
       ? `${caps.length ? `<div class="ptitle">Capabilities</div><div class="effs">${caps.join('')}</div>` : ''}${mom.length ? `<div class="ptitle">Momentum</div><div class="effs">${mom.join('')}</div>` : ''}`
-      : '';
+      : '');
     this.el.effects.style.display = caps.length || mom.length ? '' : 'none';
   }
 
@@ -219,6 +241,7 @@ export class Hud {
       const b = document.createElement('button');
       b.className = 'btn act ' + a.verb;
       b.textContent = a.label;
+      b.title = a.label;
       b.onclick = () => this.h.onAction(a.verb, a.arg);
       A.appendChild(b);
     }
@@ -231,6 +254,31 @@ export class Hud {
       A.prepend(hint);
     }
     this.addUndo(A, view);
+  }
+
+  private renderBanner(g: Game, busy: boolean, thinking: Faction | null) {
+    const b = this.el.banner;
+    const bot = busy && thinking && !g.over;
+    b.classList.toggle('hidden', !bot);
+    if (!bot) return;
+    let last = '';
+    for (let i = g.log.length - 1; i >= 0; i--) { if (!/^-{2,}/.test(g.log[i])) { last = g.log[i]; break; } }
+    const GER: [RegExp, string][] = [[/Rally|Rallies/i, 'rallying'], [/March/i, 'marching'], [/Attack/i, 'attacking'], [/Terror/i, 'terrorizing'],
+      [/Train/i, 'training'], [/Patrol/i, 'patrolling'], [/Sweep/i, 'sweeping'], [/Assault/i, 'assaulting'], [/Govern/i, 'governing'],
+      [/Transport/i, 'transporting'], [/Raid/i, 'raiding'], [/Tax/i, 'taxing'], [/Subvert/i, 'subverting'], [/Infiltrat/i, 'infiltrating'],
+      [/Bombard/i, 'bombarding'], [/Ambush/i, 'ambushing'], [/Advise/i, 'advising'], [/Air Lift/i, 'air lifting'], [/Air Strike/i, 'striking from the air'],
+      [/Event/i, 'playing an event'], [/pass/i, 'passing']];
+    const own = new RegExp('^' + thinking + '\b');
+    let verb = 'is thinking';
+    for (let i = g.log.length - 1; i >= Math.max(0, g.log.length - 12); i--) {
+      const l = g.log[i];
+      if (!own.test(l)) continue;
+      const hit = GER.find(([re]) => re.test(l));
+      if (hit) { verb = 'is ' + hit[1]; break; }
+    }
+    const col = FACTION_CSS[thinking!];
+    b.style.setProperty('--fc', col);
+    this.setHtml('banner', b, `<span style="color:${col}">${thinking}</span> ${verb}&hellip;<small>${esc(last)}</small>`);
   }
 
   private addUndo(A: HTMLElement, view: View) {

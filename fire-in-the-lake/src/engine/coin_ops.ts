@@ -124,6 +124,13 @@ function finish(g: Game, a: any): void {
 
 function name(id: string): string { return space(id).name; }
 
+// Progress / cost line for space-selection prompts.
+function selNote(g: Game, a: any, mx: number, cost: number): string {
+  const c = cost > 0 ? `cost ${cost} each, ARVN Resources ${g.resources.ARVN}` : 'no cost';
+  const m = mx === Infinity ? '' : ` of max ${mx}`;
+  return `${a.sel.length} selected${m}, ${c}. Click highlighted spaces, then Done`;
+}
+
 // ---- generic sequential resolver: for each selected space, apply `hits` hits (auto if one choice)
 
 interface Resolver {
@@ -148,7 +155,7 @@ function runResolver(g: Game, a: any, r: Resolver): void {
 
 function resolverPrompt(g: Game, a: any, p: any, r: Resolver, label: string): void {
   const sp = a.sel[a.i];
-  p.text(`${label}: ${a.hits} left in ${name(sp)}. Choose a piece.`);
+  p.text(`${label}: ${a.hits} hit(s) left in ${name(sp)}. Click an enemy piece to target it.`);
   for (const k of r.kinds(g, sp)) p.piece(sp, k, `${PIECE_NAME[k]} in ${name(sp)}`);
   p.select([sp]);
 }
@@ -272,14 +279,14 @@ registerState('op_assault', {
     if (a.phase === 'select') {
       const cands = assaultCandidates(g, a).filter((id) => canSpend(g, a.faction, assaultCost(a)));
       const mx = assaultMax(g, a);
-      p.text(`${a.faction} Assault: select spaces (${a.sel.length}/${mx === Infinity ? '-' : mx}).`);
+      p.text(`${a.faction} Assault: select spaces (${selNote(g, a, mx, assaultCost(a))}).`);
       if (a.sel.length < mx) for (const id of cands) p.space(id, `${name(id)} (${assaultHits(g, a.faction, id)} hits)`);
       p.select(a.sel);
-      if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, 'Done');
+      if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, a.sel.length ? 'Done selecting spaces' : 'Done (nothing to do)');
     } else if (a.phase === 'arvn') {
       p.text('US Assault: add an ARVN Assault in one of these spaces for 3 ARVN Resources?');
       for (const id of arvnAddCandidates(g, a)) p.space(id, `ARVN Assault in ${name(id)}`);
-      p.action('done', undefined, 'No');
+      p.action('done', undefined, 'No, skip this');
     } else {
       resolverPrompt(g, a, p, assaultResolver(a), `${a.faction} Assault`);
     }
@@ -404,10 +411,10 @@ registerState('op_sweep', {
   prompt(g, a, p) {
     if (a.phase === 'select') {
       const cands = sweepCandidates(g, a).filter(() => canSpend(g, a.faction, sweepCost(a)));
-      p.text(`${a.faction} Sweep: select spaces (${a.sel.length}/${maxSel(a) === Infinity ? '-' : maxSel(a)}).`);
-      if (a.sel.length < maxSel(a)) for (const id of cands) p.space(id);
+      p.text(`${a.faction} Sweep: select Provinces/Cities with Underground guerrillas (${selNote(g, a, maxSel(a), sweepCost(a))}).`);
+      if (a.sel.length < maxSel(a)) for (const id of cands) p.space(id, name(id));
       p.select(a.sel);
-      if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, 'Done');
+      if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, a.sel.length ? 'Done selecting spaces' : 'Done (nothing to do)');
     } else if (a.phase === 'move') {
       const dest = a.sel[a.mi];
       p.text(`Sweep into ${name(dest)}: move Troops from adjacent spaces (optional).`);
@@ -416,7 +423,7 @@ registerState('op_sweep', {
         p.action('move_all', `${s.sp}:${s.kind}`, `Move all ${PIECE_NAME[s.kind]} from ${name(s.sp)}`, { space: s.sp, piece: s.kind });
       }
       p.select([dest]);
-      p.action('next', undefined, 'Next space');
+      p.action('next', undefined, 'Done moving; go to the next space');
     } else {
       resolverPrompt(g, a, p, curSweep(a), `${a.faction} Sweep`);
     }
@@ -528,10 +535,10 @@ registerState('op_patrol', {
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
-      p.text(`${a.faction} Patrol: select LoCs (${a.sel.length}/${maxSel(a) === Infinity ? '-' : maxSel(a)}).`);
-      if (a.sel.length < maxSel(a)) for (const id of patrolCandidates(g, a)) p.space(id);
+      p.text(`${a.faction} Patrol: select LoCs (${selNote(g, a, maxSel(a), a.paid ? 0 : (a.free || a.faction === 'US' ? 0 : 3))}; the cost is paid once)`);
+      if (a.sel.length < maxSel(a)) for (const id of patrolCandidates(g, a)) p.space(id, name(id));
       p.select(a.sel);
-      if (a.sel.length > 0) p.action('done', undefined, 'Done');
+      if (a.sel.length > 0) p.action('done', undefined, a.sel.length ? 'Done selecting spaces' : 'Done (nothing to do)');
     } else if (a.phase === 'move') {
       const dest = a.sel[a.mi];
       p.text(`Patrol ${name(dest)}: move cubes along LoCs (optional).`);
@@ -540,7 +547,7 @@ registerState('op_patrol', {
         p.action('move_all', `${s.sp}:${s.kind}`, `Move all ${PIECE_NAME[s.kind]} from ${name(s.sp)}`, { space: s.sp, piece: s.kind });
       }
       p.select([dest]);
-      p.action('next', undefined, 'Next LoC');
+      p.action('next', undefined, 'Done moving; go to the next LoC');
     } else if (a.phase === 'resolve') {
       resolverPrompt(g, a, p, patrolResolver(), `${a.faction} Patrol activation`);
     } else {
@@ -659,12 +666,12 @@ registerState('op_train', {
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
-      p.text(`${a.faction} Train: select Cities/Provinces (${a.sel.length}/${maxSel(a) === Infinity ? '-' : maxSel(a)}).`);
+      p.text(`${a.faction} Train: select Cities/Provinces (${selNote(g, a, maxSel(a), trainSelectCost(a))}).`);
       if (a.sel.length < maxSel(a)) {
-        for (const id of trainCandidates(g, a)) if (canSpend(g, a.faction, trainSelectCost(a))) p.space(id);
+        for (const id of trainCandidates(g, a)) if (canSpend(g, a.faction, trainSelectCost(a))) p.space(id, name(id));
       }
       p.select(a.sel);
-      if (a.sel.length > 0) p.action('done', undefined, 'Done selecting');
+      if (a.sel.length > 0) p.action('done', undefined, 'Done selecting spaces');
     } else if (a.phase === 'place') {
       const sp = a.sel[a.i];
       p.text(`Train in ${name(sp)}: place forces (${a.cur.cubes} cubes, ${a.cur.sf} special forces placed).`);
@@ -675,7 +682,7 @@ registerState('op_train', {
         } else p.action(o.verb, o.kind, o.label, { space: sp });
       }
       p.select([sp]);
-      p.action('next', undefined, 'Done with this space');
+      p.action('next', undefined, 'Done placing here; go on');
     } else {
       p.text(`${a.faction} Pacification: choose a Train space with COIN Control (${a.steps}/${pacifyMaxSteps(g)} steps).`);
       if (a.pac == null) {
@@ -689,7 +696,7 @@ registerState('op_train', {
         }
         p.select([a.pac]);
       }
-      p.action('done', undefined, 'Done');
+      p.action('done', undefined, 'Done (finish this activity)');
     }
   },
   act(g, a, verb, arg) {
@@ -757,10 +764,10 @@ registerState('sa_advise', {
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
-      p.text(`US Advise: select up to ${maxSel(a, 2)} spaces with ARVN forces (${a.sel.length} selected).`);
-      if (a.sel.length < maxSel(a, 2)) for (const id of advCandidates(g, a)) p.space(id);
+      p.text(`US Advise: select up to ${maxSel(a, 2)} spaces with ARVN forces (${a.sel.length} selected; click highlighted spaces, then Done).`);
+      if (a.sel.length < maxSel(a, 2)) for (const id of advCandidates(g, a)) p.space(id, name(id));
       p.select(a.sel);
-      if (a.sel.length > 0) p.action('done', undefined, 'Done selecting');
+      if (a.sel.length > 0) p.action('done', undefined, 'Done selecting spaces');
     } else {
       const sp = a.sel[a.i];
       p.text(`Advise in ${name(sp)}: order a free ARVN Sweep or Assault.`);
@@ -813,9 +820,9 @@ registerState('sa_air_lift', {
   prompt(g, a, p) {
     const lim = airLimit(g, a, 4);
     if (a.phase === 'select') {
-      p.text(`US Air Lift: select up to ${lim} spaces (${a.sel.length} selected).`);
+      p.text(`US Air Lift: select up to ${lim} spaces (${a.sel.length} selected; click highlighted spaces, then Done).`);
       if (a.sel.length < lim) {
-        for (const id of SPACE_IDS) if (!isLoc(id) && allowed(a, id) && !a.sel.includes(id)) p.space(id);
+        for (const id of SPACE_IDS) if (!isLoc(id) && allowed(a, id) && !a.sel.includes(id)) p.space(id, name(id));
       }
       p.select(a.sel);
       p.action('done', undefined, a.sel.length ? 'Done selecting' : 'Cancel');
@@ -829,11 +836,11 @@ registerState('sa_air_lift', {
         }
       }
       p.select(a.sel);
-      p.action('done', undefined, 'Done');
+      p.action('done', undefined, 'Done (finish this activity)');
     } else {
       const { sp, kind } = parsePiece(a.src);
       p.text(`Move ${PIECE_NAME[kind]} from ${name(sp)} to which selected space?`);
-      for (const d of a.sel) if (d !== sp) p.space(d);
+      for (const d of a.sel) if (d !== sp) p.space(d, name(d));
       p.action('cancel', undefined, 'Choose another piece');
     }
   },
@@ -915,8 +922,8 @@ registerState('sa_air_strike', {
   prompt(g, a, p) {
     const lim = strikeMaxSpaces(g, a);
     if (a.phase === 'select') {
-      p.text(`US Air Strike: select up to ${lim} spaces; up to 6 Active enemy pieces are removed in total (${a.sel.length} selected).`);
-      if (a.sel.length < lim) for (const id of strikeCandidates(g, a)) p.space(id);
+      p.text(`US Air Strike: select up to ${lim} spaces; up to 6 Active enemy pieces are removed in total (${a.sel.length} selected; click highlighted spaces, then Done).`);
+      if (a.sel.length < lim) for (const id of strikeCandidates(g, a)) p.space(id, name(id));
       p.select(a.sel);
       if (a.sel.length > 0) p.action('done', undefined, 'Strike');
     } else if (a.phase === 'resolve') {
@@ -929,7 +936,7 @@ registerState('sa_air_strike', {
       const need = capability(g, 4) === 'shaded';
       p.text(`Air Strike: degrade the Trail${two ? ' by up to 2' : ' by 1'}${need ? ' (needs a die roll of 4-6)' : ''}?`);
       p.action('degrade', undefined, 'Degrade the Trail');
-      p.action('done', undefined, 'No');
+      p.action('done', undefined, 'No, skip this');
     }
   },
   act(g, a, verb, arg) {
@@ -998,10 +1005,10 @@ registerState('sa_govern', {
       return;
     }
     const lim = governMax(g, a);
-    p.text(`ARVN Govern: select up to ${lim} COIN-controlled spaces with ARVN cubes (${a.sel.length}).`);
-    if (a.sel.length < lim) for (const id of governCandidates(g, a)) p.space(id);
+    p.text(`ARVN Govern: select up to ${lim} COIN-controlled spaces with ARVN cubes (${a.sel.length} selected; click highlighted spaces, then Done).`);
+    if (a.sel.length < lim) for (const id of governCandidates(g, a)) p.space(id, name(id));
     p.select(a.sel);
-    if (a.sel.length > 0) p.action('done', undefined, 'Done');
+    if (a.sel.length > 0) p.action('done', undefined, 'Done (finish this activity)');
   },
   act(g, a, verb, arg) {
     if (a.pending) {
@@ -1058,24 +1065,24 @@ registerState('sa_transport', {
   prompt(g, a, p) {
     if (a.phase === 'cav') {
       p.text('Armored Cavalry: free ARVN Assault in one Transport destination?');
-      for (const d of a.dests) if (assaultHits(g, 'ARVN', d) > 0 && assaultTargets(g, d).length > 0) p.space(d);
-      p.action('done', undefined, 'No');
+      for (const d of a.dests) if (assaultHits(g, 'ARVN', d) > 0 && assaultTargets(g, d).length > 0) p.space(d, name(d));
+      p.action('done', undefined, 'No, skip this');
       return;
     }
     if (a.phase === 'origin') {
       p.text('ARVN Transport: choose the origin space (up to 6 Troops/Rangers move along LoCs).');
-      for (const id of transportOrigins(g, a)) p.space(id);
+      for (const id of transportOrigins(g, a)) p.space(id, name(id));
       return;
     }
     const origin = a.sel[0];
     if (a.src == null) {
       p.text(`Transport from ${name(origin)}: choose a piece (${a.n}/6 moved).`);
-      if (a.n < 6) for (const k of TRANSPORT_KINDS) if (count(g, origin, k) > 0) p.piece(origin, k);
+      if (a.n < 6) for (const k of TRANSPORT_KINDS) if (count(g, origin, k) > 0) p.piece(origin, k, `Transport ${PIECE_NAME[k]} from ${name(origin)}`);
       p.select([origin]);
-      p.action('done', undefined, 'Done');
+      p.action('done', undefined, 'Done (finish this activity)');
     } else {
       p.text('Choose the destination.');
-      for (const d of transportDestinations(g, origin)) p.space(d);
+      for (const d of transportDestinations(g, origin)) p.space(d, name(d));
       p.action('cancel', undefined, 'Choose another piece');
     }
   },
@@ -1146,8 +1153,8 @@ registerState('sa_raid', {
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
-      p.text(`ARVN Raid: select up to ${maxSel(a, 2)} spaces with Rangers (${a.sel.length}).`);
-      if (a.sel.length < maxSel(a, 2)) for (const id of raidCandidates(g, a)) p.space(id);
+      p.text(`ARVN Raid: select up to ${maxSel(a, 2)} spaces with Rangers (${a.sel.length} selected; click highlighted spaces, then Done).`);
+      if (a.sel.length < maxSel(a, 2)) for (const id of raidCandidates(g, a)) p.space(id, name(id));
       p.select(a.sel);
       if (a.sel.length > 0) p.action('done', undefined, 'Raid');
     } else resolverPrompt(g, a, p, raidResolver(), 'ARVN Raid');

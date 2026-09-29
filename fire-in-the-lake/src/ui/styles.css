@@ -209,9 +209,6 @@ button { font-family: inherit; }
   .brand small, .status, .speed { display: none; }
 }
 
-#stage:not(.zoomed) .slabel.loc .nm { display: none; }
-#stage:not(.zoomed) .slabel.loc { padding: 1px 3px; }
-#stage:not(.zoomed) .slabel.loc:not(:has(.econ)):not(:has(.terr)) { display: none; }
 .seat { display: flex; flex-direction: column; }
 .toggle { margin-top: auto; }
 
@@ -224,3 +221,24 @@ button { font-family: inherit; }
   .fpanel { padding: 4px 8px; gap: 2px; }
   .cards { max-height: 42%; }
 }
+
+/* help drawer */
+#help { position: absolute; top: 60px; right: 320px; bottom: 8px; width: 340px; z-index: 12; background: rgba(12, 20, 26, .97); border: 1px solid var(--panel-b); border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6); display: flex; flex-direction: column; }
+#help .hh { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--panel-b); font-family: var(--f-head); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+#help .hb { overflow-y: auto; padding: 4px 14px 14px; font-size: 13px; line-height: 1.38; scrollbar-width: thin; }
+#help h4 { font-family: var(--f-head); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: #f0d9a0; margin: 12px 0 4px; font-size: 13px; }
+#help ul { margin: 0; padding-left: 16px; } #help li { margin: 3px 0; }
+#help table { border-collapse: collapse; width: 100%; } #help td, #help th { padding: 4px 6px; vertical-align: top; border-top: 1px solid rgba(255,255,255,.08); text-align: left; }
+#help th { font-family: var(--f-head); width: 44px; } #help th.US { color: var(--US); } #help th.ARVN { color: var(--ARVN); } #help th.NVA { color: var(--NVA); } #help th.VC { color: var(--VC); }
+#help small { color: var(--dim); }
+.leg { display: flex; flex-direction: column; gap: 3px; } .leg span { display: flex; align-items: center; gap: 8px; }
+.leg i { display: inline-block; width: 16px; height: 16px; background: #8a9; border-radius: 2px; flex: none; }
+.leg i.tall { width: 10px; height: 18px; border-radius: 5px; margin: 0 3px; background: #56605a; } .leg i.short { width: 14px; height: 8px; border-radius: 4px; border: 2px solid #fff; background: #bcd; margin: 4px 1px; box-sizing: content-box; height: 6px; }
+.leg i.hex { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); } .leg i.flat { height: 10px; margin: 3px 0; width: 20px; margin-right: -2px; }
+.leg i.tun { border-radius: 50%; background: transparent; border: 3px solid #e0a020; box-sizing: border-box; }
+.leg.colors { flex-direction: row; margin-top: 6px; gap: 6px; } .leg.colors span { background: var(--c); color: #111; padding: 1px 10px; border-radius: 3px; font-family: var(--f-head); font-size: 12px; }
+.btn.act { max-width: 460px; text-align: left; white-space: normal; line-height: 1.25; }
+#banner { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); z-index: 6; pointer-events: none; padding: 6px 18px; border-radius: 20px; background: rgba(12,20,26,.9); border: 1px solid var(--fc, #888); font-family: var(--f-head); letter-spacing: .05em; font-size: 15px; box-shadow: 0 4px 16px rgba(0,0,0,.5); transition: opacity .2s; max-width: 46vw; text-align: center; }
+#banner small { display: block; font-family: var(--f-body); font-size: 12px; color: var(--dim); letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ireason { font-size: 10.5px; color: #d99; }
+@media (max-width: 1100px) { #help { right: 270px; } }

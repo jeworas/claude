@@ -66,7 +66,7 @@ defCard(42, 'NVA Resources -6.', 'NVA Resources +6. Place up to 2 NVA Troops in 
 }));
 
 defCard(43, 'Aid +9.', 'NVA and VC Resources +3 each. Aid -3.', () => ({
-  u: [aid(9)],
+  u: [aid(6)],
   s: [resources('NVA', 3), resources('VC', 3), aid(-3)],
 }));
 
@@ -78,8 +78,8 @@ defCard(44, 'Free US Sweep then Assault in Pleiku-Darlac.', 'NVA places 3 Troops
 defCard(45, 'Capability: NVA Attack removes fewer pieces (PT-76 neutralised).', 'Capability: PT-76 - NVA Troop Attack removes 2 more COIN pieces.', () => ({ u: [cap()], s: [cap()] }));
 
 defCard(46, 'Remove up to 3 NVA Troops in Laos/Cambodia.', 'Momentum (until Coup): Trail improvement is free. Trail +1.', () => ({
-  u: [removeUp([...NVA_TROOPS], 3, { where: W.lc })],
-  s: [mom(), trail(1)],
+  u: [mom(), removeUp([...NVA_TROOPS], 3, { where: W.lc })],
+  s: [trail(1), resources('NVA', 3)],
 }));
 
 defCard(47, 'Remove up to 3 NVA Troops in South Vietnam.', 'Place up to 3 NVA Troops and 2 NVA Guerrillas in South Vietnam.', () => ({
@@ -99,7 +99,7 @@ defCard(49, 'NVA Resources -6.', 'NVA Resources +6. Place up to 3 NVA Troops in 
 
 defCard(50, 'Remove up to 2 NVA/VC Bases (only if no Guerrillas remain in the space).', 'NVA and VC Resources +4 each.', () => ({
   u: [removeUp([...FACTION_PIECES.NVA.filter((k) => k.includes('base') || k.includes('tunnel')), 'vc_base', 'vc_tunnel'], 2)],
-  s: [resources('NVA', 4), resources('VC', 4)],
+  s: [resources('NVA', 3), resources('VC', 3)],
 }));
 
 defCard(51, 'NVA Resources -6.', 'NVA Resources +6. Place up to 3 NVA Troops in Laos.', () => ({
@@ -149,7 +149,7 @@ defCard(59, 'Free US Sweep then Assault in Pleiku-Darlac.', 'Place up to 3 NVA T
 
 defCard(60, 'Shift 1 space one level toward Support.', 'Shift up to 3 spaces one level toward Opposition. Aid -3.', () => ({
   u: [shift(1, 1, { where: W.sv })],
-  s: [shift(3, -1, { where: W.sv }), aid(-3)],
+  s: [shift(2, -1, { where: W.sv }), aid(-3)],
 }));
 
 void [COIN_KINDS, INS_KINDS, GUER_KINDS, count, flip, insBase, mom, patronage, pick, run, stayEligible, RANGERS, VC_K, VC_G, NVA_K, NVA_TROOPS, usDest, ids, laosIds, highlandProvs, IRREG, US_TROOPS, cap, poolMove, trail, resources, shift, aid];

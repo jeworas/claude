@@ -43,7 +43,7 @@ defCard(65, 'Place up to 3 ARVN Police in South Vietnam Cities/Provinces.', 'Rem
 
 defCard(66, 'Aid +6. Shift up to 2 spaces one level toward Support.', 'Aid -6. Shift up to 2 spaces one level toward Opposition.', () => ({
   u: [aid(6), shift(2, 1, { where: W.sv })],
-  s: [aid(-6), shift(2, -1, { where: W.sv })],
+  s: [aid(-6), shift(1, -1, { where: W.sv })],
 }));
 
 defCard(67, 'Place up to 3 US Troops in coastal South Vietnam, then a free US Sweep in up to 2 spaces.', 'Remove up to 2 US Troops from coastal spaces.', () => ({
@@ -110,7 +110,7 @@ defCard(79, 'Aid +6. Patronage -3.', 'Patronage +6. Aid -3.', () => ({ u: [aid(6
 
 defCard(80, 'Aid +6. Shift up to 2 spaces one level toward Support.', 'Aid -6. Shift up to 2 spaces one level toward Opposition.', () => ({
   u: [aid(6), shift(2, 1, { where: W.sv })],
-  s: [aid(-6), shift(2, -1, { where: W.sv })],
+  s: [aid(-6), shift(1, -1, { where: W.sv })],
 }));
 
 defCard(81, 'Place up to 3 Irregulars in Highland spaces.', 'Remove up to 3 Irregulars from the map.', () => ({
@@ -119,13 +119,13 @@ defCard(81, 'Place up to 3 Irregulars in Highland spaces.', 'Remove up to 3 Irre
 }));
 
 defCard(82, 'Aid +9.', 'Shift up to 2 spaces one level toward Opposition.', () => ({
-  u: [aid(9)],
+  u: [aid(6)],
   s: [shift(2, -1, { where: W.sv })],
 }));
 
 defCard(83, 'Shift up to 3 spaces one level toward Support.', 'Shift up to 3 spaces one level toward Opposition.', () => ({
-  u: [shift(3, 1, { where: W.sv })],
-  s: [shift(3, -1, { where: W.sv })],
+  u: [shift(2, 1, { where: W.sv })],
+  s: [shift(2, -1, { where: W.sv })],
 }));
 
 defCard(84, 'Patronage +5. Place up to 3 ARVN Troops in Cities.', 'Patronage -5.', () => ({

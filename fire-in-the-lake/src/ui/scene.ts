@@ -23,6 +23,7 @@ export class Stage {
   private sea!: THREE.Mesh;
   private seaTex!: THREE.CanvasTexture;
   private zoomed = false;
+  safe = { l: 0, r: 0, t: 0, b: 0 };
 
   constructor(el: HTMLElement) {
     this.el = el;
@@ -116,6 +117,56 @@ export class Stage {
     this.labels.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.applySafe();
+  }
+
+  /** Shift the projection so the map centres in the area not covered by HUD panels. */
+  applySafe() {
+    const w = this.el.clientWidth || window.innerWidth, h = this.el.clientHeight || window.innerHeight;
+    const { l, r, t, b } = this.safe;
+    if (!l && !r && !t && !b) { this.camera.clearViewOffset(); return; }
+    this.camera.setViewOffset(w, h, (r - l) / 2, (b - t) / 2, w, h);
+  }
+
+  /** Frame the given world points inside the safe area, keeping the viewing direction. */
+  fit(points: THREE.Vector3[], dir: THREE.Vector3, animate = false) {
+    const W = this.el.clientWidth || window.innerWidth, H = this.el.clientHeight || window.innerHeight;
+    const { l, r, t, b } = this.safe;
+    const limX = ((W - l - r) / W) * 0.97, limY = ((H - t - b) / H) * 0.97;
+    const cam = this.camera.clone();
+    cam.clearViewOffset();
+    cam.aspect = W / H; cam.updateProjectionMatrix();
+    const target = new THREE.Vector3();
+    for (const p of points) target.add(p);
+    target.divideScalar(points.length);
+    const v = new THREE.Vector3();
+    const extents = (dist: number) => {
+      cam.position.copy(target).addScaledVector(dir, dist);
+      cam.lookAt(target); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
+      let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+      for (const p of points) { v.copy(p).project(cam); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+      return { x0, x1, y0, y1 };
+    };
+    let dist = 60;
+    for (let it = 0; it < 3; it++) {
+      let lo = 15, hi = 300;
+      for (let k = 0; k < 24; k++) {
+        const mid = (lo + hi) / 2, e = extents(mid);
+        if ((e.x1 - e.x0) / 2 <= limX && (e.y1 - e.y0) / 2 <= limY) hi = mid; else lo = mid;
+      }
+      dist = hi;
+      const e = extents(dist);
+      // recentre: move target so the projected extents are centred
+      const ray = new THREE.Raycaster();
+      ray.setFromCamera(new THREE.Vector2((e.x0 + e.x1) / 2, (e.y0 + e.y1) / 2), cam);
+      const hit = new THREE.Vector3();
+      if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit)) target.copy(hit);
+    }
+    const pos = target.clone().addScaledVector(dir, dist);
+    if (animate) {
+      const p0 = this.camera.position.clone(), t0 = this.controls.target.clone();
+      this.tween(0.8, (k) => { const e = k * k * (3 - 2 * k); this.camera.position.lerpVectors(p0, pos, e); this.controls.target.lerpVectors(t0, target, e); });
+    } else { this.camera.position.copy(pos); this.controls.target.copy(target); }
   }
 
   addTicker(fn: Ticker) { this.tickers.add(fn); }

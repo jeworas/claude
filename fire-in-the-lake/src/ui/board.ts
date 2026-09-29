@@ -34,6 +34,11 @@ export interface SpaceNode {
   markers: THREE.Group;
   markerSig: string;
   labelEl: HTMLElement;
+  label: THREE.Object3D;
+  cands: THREE.Vector3[];
+  prio: number;
+  labelHtml: string;
+  flashT: number;
   hover: boolean;
 }
 
@@ -204,8 +209,13 @@ function textTexture(text: string, bg: string, fg = '#fff'): THREE.CanvasTexture
   return t;
 }
 
+// Display-only warp so the long thin map reads as Vietnam's S-curve.
+export function warpX(x: number, y: number): number {
+  const t = y / 140;
+  return x + 13 * Math.sin(Math.PI * 1.75 * t - 0.55) + (t - 0.5) * 6;
+}
 export function worldPos(d: { x: number; y: number }, y = 0): THREE.Vector3 {
-  return new THREE.Vector3((d.x - 50) * SCALE, y, (d.y - 70) * SCALE);
+  return new THREE.Vector3((warpX(d.x, d.y) - 50) * SCALE, y, (d.y - 70) * SCALE);
 }
 
 // ---------------------------------------------------------------- Board
@@ -215,11 +225,13 @@ export class Board {
   pickables: THREE.Object3D[] = [];
   bounds = new THREE.Box3();
   private hlNodes: SpaceNode[] = [];
+  private frame = 0;
+  private pos = new THREE.Vector3();
 
   constructor(private stage: Stage, private defs: SpaceDef[]) {
     stage.scene.add(this.root);
     this.build();
-    stage.addTicker((_dt, t) => this.pulse(t));
+    stage.addTicker((dt, t) => { this.pulse(t); this.flashTick(dt); if ((this.frame++ % 6) === 0) this.layoutLabels(); });
   }
 
   private build() {
@@ -235,7 +247,7 @@ export class Board {
       const P = sites[i];
       const dists = sites.map((s, j) => (j === i ? 1e9 : Math.hypot(s.x - P.x, s.z - P.z))).sort((a, b) => a - b);
       const near = (dists[0] + dists[1] + (dists[2] ?? dists[1])) / 3;
-      const R = Math.max(4.4, Math.min(9.5, near * 0.66));
+      const R = Math.max(4.4, Math.min(9.5, near * 0.6));
       let poly = circlePoly(P.x, P.z, R, 40);
       const gap = 0.3;
       sites.forEach((Q, j) => {
@@ -439,11 +451,19 @@ export class Board {
     const label = new CSS2DObject(el);
     const yOff = d.type === 'city' ? 1.3 : d.type === 'loc' ? 0.6 : 0.7;
     const zOff = d.type === 'loc' ? 1.5 : d.type === 'city' ? 2.6 : -(r * 0.8) - 0.3;
-    if (d.type === 'city') { label.position.set(center.x + r + 0.35, center.y + 0.3, center.z); label.center.set(0, 0.5); }
-    else { label.position.set(center.x, center.y + yOff - 1.0, center.z + zOff); label.center.set(0.5, 0); }
+    let cands: THREE.Vector3[];
+    if (d.type === 'city') {
+      cands = [new THREE.Vector3(center.x + r + 0.35, center.y + 0.3, center.z), new THREE.Vector3(center.x - r - 0.35, center.y + 0.3, center.z)];
+      label.center.set(0, 0.5);
+    } else {
+      cands = [new THREE.Vector3(center.x, center.y + yOff - 1.0, center.z + zOff), new THREE.Vector3(center.x, center.y + yOff - 1.0, center.z - zOff + (d.type === 'loc' ? 0.4 : 2.2))];
+      label.center.set(0.5, 0);
+    }
+    label.position.copy(cands[0]);
     group.add(label);
     this.root.add(group);
-    const node: SpaceNode = { def: d, group, center, r, capMats, hl, hlMat, hlState: 'none', markers, markerSig: '', labelEl: el, hover: false };
+    const node: SpaceNode = { def: d, group, center, r, capMats, hl, hlMat, hlState: 'none', markers, markerSig: '', labelEl: el, label, cands, labelHtml: '', flashT: 0, hover: false,
+      prio: d.type === 'city' ? 5 + d.pop * 0.3 : d.type === 'province' ? (d.pop > 0 ? 3 + d.pop * 0.3 : 2) : d.econ > 0 ? 0.6 : 0.2 };
     hlMat.opacity = 0;
     hl.visible = false;
     this.nodes[d.id] = node;
@@ -466,7 +486,8 @@ export class Board {
       const pop = d.type !== 'loc' && d.pop > 0 ? `<span class="pop">${d.pop}</span>` : '';
       const eco = d.type === 'loc' && d.econ > 0 ? `<span class="econ">${d.econ}</span>` : '';
       const terr = st.terror > 0 ? `<span class="terr">${d.type === 'loc' ? '⚠' : '☠'}${d.type === 'loc' ? '' : st.terror}</span>` : '';
-      n.labelEl.innerHTML = `${pop}${eco}<span class="nm">${d.name}</span>${sup}${terr}`;
+      const html = `${pop}${eco}<span class="nm">${d.name}</span>${sup}${terr}`;
+      if (html !== n.labelHtml) { n.labelHtml = html; n.labelEl.innerHTML = html; }
       const hs: HL = selected.has(id) ? 'selected' : legal.has(id) ? 'legal' : 'none';
       n.hlState = hs;
       n.hl.visible = hs !== 'none';
@@ -479,7 +500,12 @@ export class Board {
     const g = n.markers;
     while (g.children.length) {
       const c = g.children.pop()!;
-      c.traverse((o) => { const m = o as THREE.Mesh; if (m.geometry) m.geometry.dispose(); });
+      c.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.geometry) m.geometry.dispose();
+        const mt = m.material as THREE.MeshStandardMaterial | THREE.MeshStandardMaterial[] | undefined;
+        for (const x of Array.isArray(mt) ? mt : mt ? [mt] : []) { x.map?.dispose(); x.dispose(); }
+      });
     }
     const d = n.def;
     const top = n.center.y;
@@ -539,7 +565,73 @@ export class Board {
     this.stage.tween(0.35, (k) => g.scale.setScalar(0.01 + 0.99 * (1 - Math.pow(1 - k, 3))));
   }
 
+  /** Briefly flash spaces (bot just acted there). */
+  flash(ids: string[]) {
+    for (const id of ids) { const n = this.nodes[id]; if (n) n.flashT = 1.8; }
+  }
+
+  private flashTick(dt: number) {
+    for (const id in this.nodes) {
+      const n = this.nodes[id];
+      if (n.flashT <= 0) continue;
+      n.flashT -= dt;
+      if (n.flashT > 0) {
+        n.hl.visible = true;
+        n.hlMat.color.set(0xffa834);
+        n.hlMat.opacity = Math.min(0.7, n.flashT / 1.8 * 0.9);
+      } else {
+        n.hl.visible = n.hlState !== 'none';
+        n.hlMat.color.set(n.hlState === 'selected' ? 0xffd23a : 0x33d6ff);
+      }
+    }
+  }
+
+  private hoverId: string | null = null;
+
+  /** Greedy label collision avoidance: highest priority first, try alternate anchors, else hide. */
+  private layoutLabels() {
+    const cam = this.stage.camera;
+    const W = this.stage.el.clientWidth, H = this.stage.el.clientHeight;
+    const dist = cam.position.distanceTo(this.stage.controls.target);
+    const showLoc = dist < 46;
+    const showMinor = dist < 78;
+    const order = Object.values(this.nodes).map((n) => {
+      const forced = n.hlState !== 'none' || n.flashT > 0 || n.def.id === this.hoverId;
+      return { n, p: n.prio + (forced ? 20 : 0), forced };
+    }).sort((a, b) => b.p - a.p);
+    const placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
+    for (const { n, forced } of order) {
+      const d = n.def;
+      let allowed = true;
+      if (!forced) {
+        if (d.type === 'loc' && (!showLoc && !(d.econ > 0 && dist < 58))) allowed = false;
+        if (d.type === 'province' && d.pop === 0 && !showMinor) allowed = false;
+      }
+      let ok = false;
+      if (allowed) {
+        const len = d.name.length * (d.type === 'city' ? 7.4 : d.type === 'loc' ? 5.2 : 6.2) + (d.type === 'loc' ? 34 : 50);
+        const w = Math.min(len, 260), h = d.type === 'city' ? 22 : 18;
+        for (let i = 0; i < n.cands.length && !ok; i++) {
+          this.pos.copy(n.cands[i]).project(cam);
+          if (this.pos.z > 1 || this.pos.z < -1) continue;
+          const sx = (this.pos.x + 1) / 2 * W, sy = (1 - this.pos.y) / 2 * H;
+          const r = d.type === 'city' ? { x0: i === 0 ? sx : sx - w, x1: i === 0 ? sx + w : sx, y0: sy - h / 2, y1: sy + h / 2 }
+            : { x0: sx - w / 2, x1: sx + w / 2, y0: sy - h, y1: sy };
+          if (!forced && placed.some((q) => r.x0 < q.x1 + 2 && r.x1 > q.x0 - 2 && r.y0 < q.y1 + 1 && r.y1 > q.y0 - 1)) continue;
+          placed.push(r);
+          if (i !== n.cands.length && !n.label.position.equals(n.cands[i])) {
+            n.label.position.copy(n.cands[i]);
+            if (d.type === 'city') (n.label as CSS2DObject).center.set(i === 0 ? 0 : 1, 0.5);
+          }
+          ok = true;
+        }
+      }
+      n.label.visible = ok;
+    }
+  }
+
   setHover(id: string | null) {
+    this.hoverId = id;
     for (const k in this.nodes) {
       const n = this.nodes[k];
       const h = k === id;

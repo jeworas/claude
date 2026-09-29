@@ -571,10 +571,11 @@ registerState('op_terror', {
     pay(g, f, terrorCost(id), a);
     if (gU(g, id, f) > 0) flip(g, id, GK[f].u, GK[f].a, 1);
     const st = g.spaces[id];
-    if (st.terror === 0) st.terror = 1;
-    if (s.type !== 'loc' && canHaveSupport(id)) {
-      if (f === 'VC') shiftSupport(g, id, -1);
-      else if (st.support > 0) shiftSupport(g, id, -1);
+    const fresh = st.terror === 0;
+    if (fresh) st.terror = 1;
+    // The shift only happens with a newly placed marker: re-Terrorizing a marked space does nothing more.
+    if (fresh && s.type !== 'loc' && canHaveSupport(id)) {
+      if (st.support > 0) shiftSupport(g, id, -1); // Terror never creates Opposition (that is Agitation's job)
     }
     log(g, `${f} Terror in ${s.name}${s.type === 'loc' ? ' (Sabotage)' : ''}.`);
     spaceDone(g, a, id, terrorCands);

@@ -8,6 +8,7 @@ import { PieceLayer } from './ui/pieces';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { StartScreen } from './ui/start';
+import { HelpDrawer } from './ui/help';
 import { mockApi, type EngineApi } from './ui/mock';
 import type { BotAction } from './ai/bot';
 import * as THREE from 'three';
@@ -50,6 +51,7 @@ const stage = new Stage(document.getElementById('stage')!);
 const board = new Board(stage, SPACES);
 const pieces = new PieceLayer(stage, board);
 
+const help = new HelpDrawer();
 const hud = new Hud(document.getElementById('hud')!, {
   onAction: (v, a) => act(v, a),
   onUndo: () => undo(),
@@ -59,6 +61,7 @@ const hud = new Hud(document.getElementById('hud')!, {
   onSpeed: (v) => { speed = v; stage.speed = fast ? 5 : 0.8 + v / 40; },
   onFF: (on) => { fast = on; stage.speed = on ? 5 : 0.8 + speed / 40; },
   onResetView: () => resetCamera(true),
+  onHelp: () => help.toggle(),
 });
 hud.show(false);
 
@@ -75,26 +78,28 @@ const input = new Input(stage, board, pieces, {
   act: (v, a) => act(v, a),
 });
 
-function resetCamera(animate = false) {
-  const b = board.bounds;
-  const c = b.getCenter(new THREE.Vector3());
-  const size = b.getSize(new THREE.Vector3());
-  const aspect = stage.camera.aspect;
-  const vfov = (stage.camera.fov * Math.PI) / 180;
-  const fitH = size.z * 0.5 / Math.tan(vfov / 2);
-  const fitW = (size.x * 0.55) / (Math.tan(vfov / 2) * aspect);
-  const dist = Math.max(fitH, fitW) * 1.16;
-  const target = new THREE.Vector3(c.x - 3, 0, c.z + 6);
-  const pos = new THREE.Vector3(target.x, dist * 0.86, target.z + dist * 0.52);
-  if (animate) {
-    const p0 = stage.camera.position.clone(), t0 = stage.controls.target.clone();
-    stage.tween(0.8, (k) => {
-      const e = k * k * (3 - 2 * k);
-      stage.camera.position.lerpVectors(p0, pos, e);
-      stage.controls.target.lerpVectors(t0, target, e);
-    });
-  } else { stage.camera.position.copy(pos); stage.controls.target.copy(target); }
+function updateSafeArea() {
+  const q = (sel: string) => document.querySelector(sel) as HTMLElement | null;
+  const vis = (e: HTMLElement | null) => !!e && getComputedStyle(e).display !== 'none' && getComputedStyle(document.getElementById('hud')!).display !== 'none';
+  const left = q('#hud .left'), right = q('#hud .right');
+  const hudOn = getComputedStyle(document.getElementById('hud')!).display !== 'none';
+  stage.safe = {
+    l: hudOn && vis(left) ? left!.offsetWidth + 14 : 0,
+    r: hudOn && vis(right) ? right!.offsetWidth + 14 : 0,
+    t: hudOn ? 58 : 0,
+    b: hudOn ? 100 : 0,
+  };
+  stage.applySafe();
 }
+
+function resetCamera(animate = false) {
+  updateSafeArea();
+  const b = board.bounds;
+  const pts: THREE.Vector3[] = [];
+  for (const x of [b.min.x, b.max.x]) for (const y of [0, 1]) for (const z of [b.min.z, b.max.z]) pts.push(new THREE.Vector3(x, y, z));
+  stage.fit(pts, new THREE.Vector3(0, 0.84, 0.54).normalize(), animate);
+}
+window.addEventListener('resize', () => { updateSafeArea(); });
 
 // ------------------------------------------------------------------ rendering
 function render() {
@@ -113,8 +118,27 @@ function render() {
   }
   const selected = new Set(view.selected ?? []);
   board.update(g, legal, selected);
+  if (g.log.length < lastLogLen) lastLogLen = g.log.length;
+  if (busy && g.log.length > lastLogLen) board.flash(spacesMentioned(g.log.slice(Math.max(lastLogLen, g.log.length - 30))));
+  lastLogLen = g.log.length;
   pieces.update(g, pieceKeys);
   hud.update(g, view, busy, thinking);
+}
+
+let lastLogLen = 0;
+let lastRender = 0;
+const NAMES = SPACES.map((d) => [d.name, d.id] as const).sort((a, b) => b[0].length - a[0].length);
+function spacesMentioned(lines: string[]): string[] {
+  const out = new Set<string>();
+  for (let l of lines) {
+    for (const [name, id] of NAMES) if (l.includes(name)) { out.add(id); l = l.split(name).join('#'); }
+  }
+  return [...out];
+}
+/** In Fast mode, rendering is throttled so the engine can run flat out. */
+function renderThrottled() {
+  const now = performance.now();
+  if (!fast || now - lastRender > 110) { lastRender = now; render(); }
 }
 
 function fail(e: unknown) {
@@ -178,7 +202,9 @@ function begin(gm: Game) {
   busy = false; thinking = null;
   startScreen.hide();
   hud.show(true);
+  updateSafeArea();
   pieces.reset();
+  lastLogLen = gm.log.length;
   render();
   resetCamera(false);
   saveLocal();
@@ -238,7 +264,7 @@ async function runBots() {
   busy = true;
   while (token === botToken && isBot()) {
     thinking = api.currentFaction(gm);
-    render();
+    renderThrottled();
     await sleep(delayMs() + (fast ? 0 : 60));
     if (token !== botToken) return;
     const a = pickBotAction(gm);

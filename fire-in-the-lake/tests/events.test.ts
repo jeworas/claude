@@ -5,6 +5,7 @@ import { doAction, getView, log, push, random, top } from '../src/core/framework
 import { SPACE_IDS } from '../src/data/map';
 import { POOL_OF } from '../src/core/pieces';
 import { CARD } from '../src/data/cards';
+import '../src/engine';
 import { IMPL, TEXT, eventPlayable, pivotalPreconditionMet } from '../src/engine/events';
 
 // A hand-built, well-populated game so that every event has something to act on.
@@ -89,25 +90,26 @@ describe('pivotal events', () => {
   }
 });
 
-describe('events (newGame)', () => {
-  it('plays every event in a real game', async () => {
-    let newGame: any;
-    try {
-      newGame = (await import('../src/engine')).newGame;
-    } catch {
-      return; // engine not complete yet
-    }
-    if (!newGame) return;
-    for (let card = 1; card <= 120; card++) {
-      for (const shaded of [false, true]) {
-        let g: Game;
-        try { g = newGame('full', [], card * 2 + (shaded ? 1 : 0)); } catch { return; }
-        // run on top of whatever the game stack is
-        log(g, 'test');
-        play(g, card, shaded);
+describe('events (newGame, real op/SA states)', () => {
+  for (const scen of ['full', 'medium', 'short']) {
+    it(`plays every event in ${scen}`, async () => {
+      const { newGame } = await import('../src/engine');
+      const bad: string[] = [];
+      for (let card = 1; card <= 124; card++) {
+        for (const shaded of card > 120 ? [false] : [false, true]) {
+          const g: Game = newGame(scen, [], card * 2 + (shaded ? 1 : 0));
+          const base = g.stack.length;
+          try {
+            const steps = play(g, card, shaded, card > 120);
+            if (steps >= 500 && g.stack.length > base) bad.push(`${card}${shaded ? 's' : 'u'} stuck`);
+          } catch (e: any) {
+            bad.push(`${card}${shaded ? 's' : 'u'}: ${e.message}`);
+          }
+        }
       }
-    }
-  });
+      expect(bad).toEqual([]);
+    });
+  }
 });
 
 describe('markers and playability', () => {

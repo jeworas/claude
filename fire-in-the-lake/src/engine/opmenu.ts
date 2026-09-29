@@ -72,8 +72,8 @@ registerState('op_menu', {
     if (a.sa && !a.used_sa) {
       for (const s of SA_STATES[f]) if (saAllowed(g, s)) p.action('sa', s, `Special Activity: ${STATE_LABEL[s]}`);
     }
-    if (a.used_op || a.attempts > 0) p.action('done', undefined, 'Done');
-    else if (!OP_STATES[f].some((s) => opAllowed(g, f, s))) p.action('done', undefined, 'Done (no Operation available)');
+    if (a.used_op || a.attempts > 0) p.action('done', undefined, 'Finish (end this action)');
+    else if (!OP_STATES[f].some((s) => opAllowed(g, f, s))) p.action('done', undefined, 'Finish (no Operation is available)');
   },
   act(g, a, verb, arg) {
     if (verb === 'done') {

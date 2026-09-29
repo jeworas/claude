@@ -10,6 +10,10 @@
 // All state must be JSON-serializable (it is cloned for undo and save games).
 
 import type { ActionOption, Faction, Frame, Game, PieceKind, View } from './types';
+import { MAP } from '../data/map';
+import { PIECE_NAME } from './pieces';
+
+const spaceName = (id: string): string => MAP[id]?.name ?? id;
 
 export interface Prompt {
   text(s: string): void;
@@ -142,9 +146,9 @@ export function getView(g: Game): View {
     action: (verb, arg, label, extra) => {
       actions.push({ verb, arg, label: label ?? (arg !== undefined ? `${verb} ${arg}` : verb), ...extra });
     },
-    space: (id, label) => { actions.push({ verb: 'space', arg: id, label: label ?? id, space: id }); },
+    space: (id, label) => { actions.push({ verb: 'space', arg: id, label: label ?? spaceName(id), space: id }); },
     piece: (space, kind, label) => {
-      actions.push({ verb: 'piece', arg: `${space}:${kind}`, label: label ?? `${kind} in ${space}`, space, piece: kind });
+      actions.push({ verb: 'piece', arg: `${space}:${kind}`, label: label ?? `${PIECE_NAME[kind] ?? kind} in ${spaceName(space)}`, space, piece: kind });
     },
     select: (ids) => { view.selected = ids; },
   };

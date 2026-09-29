@@ -31,7 +31,7 @@ defCard(2, 'Aid +6. Place up to 3 Irregulars in Provinces.', 'Aid -6. Shift up t
 }));
 
 defCard(3, 'NVA Resources -9.', 'NVA Resources +6. Trail +1.', () => ({
-  u: [resources('NVA', -9)],
+  u: [resources('NVA', -6)],
   s: [resources('NVA', 6), trail(1)],
 }));
 
@@ -63,7 +63,7 @@ defCard(9, 'Up to 4 US Troops from Casualties to Available.', 'Up to 3 US Troops
 
 defCard(10, 'Momentum (until Coup): the Trail may not be improved.', 'Momentum (until Coup): NVA Rally is stronger. NVA Resources +6.', () => ({
   u: [mom()],
-  s: [mom(), resources('NVA', 6)],
+  s: [resources('NVA', 6)],
 }));
 
 defCard(11, 'Capability: US Assault more effective.', 'Capability: US Assault less effective.', () => ({ u: [cap()], s: [cap()] }));
@@ -79,12 +79,12 @@ defCard(14, 'Capability: Assault bonus in Lowland.', 'Capability: NVA/VC Ambush 
 
 defCard(15, 'Momentum (until Coup): US Casualties return to Available.', 'Momentum (until Coup): no Medevac. Remove up to 3 US Troops from the map to Casualties.', () => ({
   u: [mom()],
-  s: [mom(), removeUp([...US_TROOPS], 3, { dest: usDest })],
+  s: [removeUp([...US_TROOPS], 3, { dest: usDest })],
 }));
 
 defCard(16, 'Momentum (until Coup): Pacification is cheaper.', 'Momentum (until Coup): Pacification limited. Aid -6.', () => ({
   u: [mom()],
-  s: [mom(), aid(-6)],
+  s: [aid(-6)],
 }));
 
 defCard(17, 'Momentum (until Coup): insurgent Marches are hindered.', 'Place up to 3 Guerrillas in COIN-controlled spaces (Bases stay).', () => ({
@@ -146,7 +146,7 @@ defCard(26, 'Remove up to 3 Guerrillas in or adjacent to Laos/Cambodia.', 'Remov
 
 defCard(27, 'Remove up to 3 VC pieces in Cities/Provinces of South Vietnam.', 'Shift up to 2 spaces one level toward Opposition.', () => ({
   u: [removeUp(VC_K, 3, { where: W.and(W.sv, W.notLoc) })],
-  s: [shift(2, -1, { where: W.sv })],
+  s: [shift(1, -1, { where: W.sv })],
 }));
 
 defCard(28, 'Capability: Sweep/Assault bonus.', 'Capability: Sweep penalty.', () => ({ u: [cap()], s: [cap()] }));

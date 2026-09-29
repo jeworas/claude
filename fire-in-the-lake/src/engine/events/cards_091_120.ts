@@ -98,7 +98,7 @@ defCard(106, 'Free US Sweep then Assault in Tay Ninh / An Loc.', 'Place up to 3 
 
 defCard(107, 'Patronage +3. Shift up to 1 space one level toward Support.', 'Shift up to 2 spaces one level toward Opposition. Patronage -3.', () => ({
   u: [patronage(3), shift(1, 1, { where: W.sv })],
-  s: [shift(2, -1, { where: W.sv }), patronage(-3)],
+  s: [shift(1, -1, { where: W.sv }), patronage(-3)],
 }));
 
 defCard(108, 'Up to 3 US Troops from Out of Play to Available.', 'Up to 3 US Troops from Available to Out of Play.', () => ({
@@ -123,7 +123,7 @@ defCard(111, 'Remove up to 3 Guerrillas from Jungle spaces.', 'Place up to 3 Gue
 
 defCard(112, 'Place up to 2 ARVN Police in a Province and shift it one level toward Support.', 'Remove up to 2 Police; shift up to 2 spaces toward Opposition.', () => ({
   u: [placeIn('arvn_police', 2, { where: W.and(W.sv, W.prov) }), shift(1, 1, { where: W.prov })],
-  s: [removeUp(['arvn_police'], 2), shift(2, -1, { where: W.sv })],
+  s: [removeUp(['arvn_police'], 2), shift(1, -1, { where: W.sv })],
 }));
 
 defCard(113, 'Place up to 4 ARVN Police in South Vietnam Cities/Provinces.', 'Remove up to 4 ARVN Police.', () => ({
@@ -133,7 +133,7 @@ defCard(113, 'Place up to 4 ARVN Police in South Vietnam Cities/Provinces.', 'Re
 
 defCard(114, 'Shift up to 2 spaces one level toward Support.', 'Shift up to 3 spaces one level toward Opposition.', () => ({
   u: [shift(2, 1, { where: W.sv })],
-  s: [shift(3, -1, { where: W.sv })],
+  s: [shift(2, -1, { where: W.sv })],
 }));
 
 defCard(115, 'Momentum (until Coup): no NVA/VC Rally or March in Provinces without adjacent friendly pieces (Typhoon Kate).', 'NVA Resources +3.', () => ({
@@ -150,17 +150,17 @@ defCard(117, 'Patronage +5. Place up to 2 ARVN Rangers.', 'Patronage -5.', () =>
 
 defCard(118, 'NVA Resources -3. Trail -1.', 'NVA and VC Resources +6 each.', () => ({
   u: [resources('NVA', -3), trail(-1)],
-  s: [resources('NVA', 6), resources('VC', 6)],
+  s: [resources('NVA', 3), resources('VC', 3)],
 }));
 
 defCard(119, 'Shift up to 1 space one level toward Support.', 'Shift up to 3 spaces one level toward Opposition. Aid -3.', () => ({
   u: [shift(1, 1, { where: W.sv })],
-  s: [shift(3, -1, { where: W.sv }), aid(-3)],
+  s: [shift(2, -1, { where: W.sv }), aid(-3)],
 }));
 
 defCard(120, 'Shift up to 2 spaces one level toward Support.', 'VC Resources +3. Shift up to 2 spaces one level toward Opposition.', () => ({
   u: [shift(2, 1, { where: W.sv })],
-  s: [resources('VC', 3), shift(2, -1, { where: W.sv })],
+  s: [resources('VC', 3), shift(1, -1, { where: W.sv })],
 }));
 
 void [COIN_KINDS, INS_KINDS, GUER_KINDS, count, flip, insBase, mom, patronage, pick, run, stayEligible, RANGERS, VC_K, VC_G, NVA_K, NVA_TROOPS, usDest, ids, laosIds, highlandProvs, IRREG, US_TROOPS, cap, poolMove, trail, resources, shift, aid];
