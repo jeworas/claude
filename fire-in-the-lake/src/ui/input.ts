@@ -92,9 +92,9 @@ export class Input {
     rows.push(`<div class="tt-h">${d.name}</div><div class="tt-s">${kind}${d.terrain ? ' &middot; ' + cap(d.terrain) : ''} &middot; ${cap(d.country)}${d.coastal ? ' &middot; Coastal' : ''}</div>`);
     const stats: string[] = [];
     if (d.type !== 'loc') stats.push(`Pop <b>${d.pop}</b>`);
-    else stats.push(`Econ <b>${d.econ}</b>`);
-    if (d.type !== 'loc' && d.pop > 0) stats.push(`<b>${SUPPORT_NAME[st.support]}</b>`);
-    if (d.type !== 'loc') stats.push(ctl === 'COIN' ? 'COIN control' : ctl === 'NVA' ? 'NVA control' : 'Uncontrolled');
+    else stats.push(`Econ <b>${d.econ}</b>${st.terror ? ' (Sabotaged)' : ''}`);
+    if (d.type !== 'loc') stats.push(d.pop > 0 ? `<b>${SUPPORT_NAME[st.support]}</b>` : 'No Population: Neutral');
+    if (d.type !== 'loc') stats.push(ctl === 'COIN' ? 'COIN Control' : ctl === 'NVA' ? 'NVA Control' : 'Uncontrolled');
     if (st.terror) stats.push(`${d.type === 'loc' ? 'Sabotage' : 'Terror'} <b>${st.terror}</b>`);
     rows.push(`<div class="tt-r">${stats.join(' &middot; ')}</div>`);
     const pcs = PIECE_KINDS.filter((k) => (st.pieces[k] ?? 0) > 0);

@@ -292,7 +292,7 @@ async function runBots() {
   if (Object.keys(SCENARIOS).length === 0) console.warn('No scenarios');
   startScreen.show();
   // debug hooks
-  (window as any).__fitl = { get g() { return g; }, stage, board, begin, api: () => api };
+  (window as any).__fitl = { get g() { return g; }, stage, board, begin, render, api: () => api };
   const q = new URLSearchParams(location.search);
   if (q.has('auto')) {
     const sc = q.get('auto') || 'short';

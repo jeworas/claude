@@ -10,7 +10,8 @@ export const TILE_TOP = 0.43;
 export const PLAZA_H = 0.36;
 export const ROAD_Y = 0.47;
 
-export const SUPPORT_COLORS: Record<number, number> = { 2: 0x39d353, 1: 0xa6e08a, [-1]: 0xd9a0ee, [-2]: 0xb03ee0 };
+// Support = COIN colours blended (US olive + ARVN yellow); Opposition = insurgent colours blended (NVA red + VC blue).
+export const SUPPORT_COLORS: Record<number, number> = { 2: 0xa8cf2a, 1: 0xd6e58c, [-1]: 0xc39ae0, [-2]: 0x8e3ec9 };
 export const SUPPORT_SHORT: Record<number, string> = { 2: 'AS', 1: 'PS', [-1]: 'PO', [-2]: 'AO' };
 
 const COUNTRY_TINT: Record<string, number> = {
@@ -215,6 +216,19 @@ export function warpX(x: number, y: number): number {
   const t = y / 140;
   return x + 13 * Math.sin(Math.PI * 1.75 * t - 0.55) + (t - 0.5) * 6;
 }
+function coinTexture(): THREE.CanvasTexture {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 128;
+  const g = cv.getContext('2d')!;
+  g.fillStyle = '#6f8f2a'; g.fillRect(0, 0, 64, 128);
+  g.fillStyle = '#e8c62c'; g.fillRect(64, 0, 64, 128);
+  g.fillStyle = '#111'; g.font = 'bold 56px Oswald, Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('C', 64, 68);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 export function worldPos(d: { x: number; y: number }, y = 0): THREE.Vector3 {
   return new THREE.Vector3((warpX(d.x, d.y) - 50) * SCALE, y, (d.y - 70) * SCALE);
 }
@@ -515,9 +529,9 @@ export class Board {
     const items: THREE.Object3D[] = [];
     if (!isLoc && ctl) {
       const isC = ctl === 'COIN';
-      const tex = textTexture(isC ? 'C' : 'N', isC ? '#7a9a2f' : '#b3271f');
+      const tex = isC ? coinTexture() : textTexture('N', '#c02a20');
       const top1 = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5 });
-      const side = new THREE.MeshStandardMaterial({ color: isC ? 0x5d7a22 : 0x8f1f18, roughness: 0.5 });
+      const side = new THREE.MeshStandardMaterial({ color: isC ? 0xa8a02a : 0x8f1f18, roughness: 0.5 });
       const t = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.12, 6), [side, top1, side]);
       t.rotation.y = Math.PI / 6;
       t.castShadow = true;

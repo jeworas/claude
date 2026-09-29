@@ -4,6 +4,7 @@ import { FACTIONS, POOL_KINDS } from '../core/types';
 import { VICTORY_THRESHOLD, victoryScore } from '../core/pieces';
 import { CARD } from '../data/cards';
 import { FACTION_CSS } from './pieces';
+import { cardHtml, orderChips, esc as escH } from './cardview';
 
 export interface HudHandlers {
   onAction(verb: string, arg?: string | number): void;
@@ -58,6 +59,7 @@ export class Hud {
           <label class="speed" title="Bot speed">Speed <input id="speed" type="range" min="0" max="100" value="60" /></label>
           <button id="ff" class="btn small" title="Fast forward AI turns">&#9193; Fast</button>
           <button id="resetview" class="btn small" title="Reset camera">&#8982; View</button>
+          <button id="deck-btn" class="btn small" title="Played cards / deck">Cards</button>
           <button id="help-btn" class="btn small" title="Rules help (?)">?</button>
           <button id="save" class="btn small">Save</button>
           <button id="load" class="btn small">Load</button>
@@ -80,15 +82,17 @@ export class Hud {
           <div id="actions"></div>
         </div>
       </div>
+      <div id="deckv" class="hidden"></div>
       <div id="banner" class="hidden"></div>
       <div id="gameover" class="hidden"></div>`;
-    for (const id of ['scen', 'status', 'factions', 'tracks', 'pools', 'cards', 'effects', 'log', 'prompt', 'actions', 'gameover', 'speed', 'ff', 'banner']) {
+    for (const id of ['scen', 'status', 'factions', 'tracks', 'pools', 'cards', 'effects', 'log', 'prompt', 'actions', 'gameover', 'speed', 'ff', 'banner', 'deckv']) {
       this.el[id] = root.querySelector('#' + id) as HTMLElement;
     }
     (this.el.speed as HTMLInputElement).oninput = () => h.onSpeed(+(this.el.speed as HTMLInputElement).value);
     this.el.ff.onclick = () => { const on = !this.el.ff.classList.contains('on'); this.el.ff.classList.toggle('on', on); h.onFF(on); };
     root.querySelector<HTMLElement>('#resetview')!.onclick = h.onResetView;
     root.querySelector<HTMLElement>('#help-btn')!.onclick = h.onHelp;
+    root.querySelector<HTMLElement>('#deck-btn')!.onclick = () => this.toggleDeck();
     root.querySelector<HTMLElement>('#save')!.onclick = h.onSave;
     root.querySelector<HTMLElement>('#load')!.onclick = h.onLoad;
     root.querySelector<HTMLElement>('#newgame')!.onclick = h.onNewGame;
@@ -115,6 +119,7 @@ export class Hud {
     this.renderTracks(g);
     this.renderPools(g);
     this.renderCards(g);
+    this.renderDeck(g);
     this.renderEffects(g);
     this.renderLog(g);
     this.renderPrompt(g, view, busy, thinking);
@@ -173,27 +178,42 @@ export class Hud {
     this.el.pools.querySelectorAll<HTMLElement>('button[data-t]').forEach((b) => (b.onclick = () => { this.poolTab = b.dataset.t as any; if (this.lastGame) this.renderPools(this.lastGame); }));
   }
 
-  private orderChips(id: number | null): string {
-    const c = id ? CARD[id] : null;
-    if (!c) return '';
-    if (c.coup) return '<span class="coupchip">COUP</span>';
-    return c.order.map((f, i) => `<span class="ochip" style="--fc:${FACTION_CSS[f]}" title="${i + 1}. ${FNAME[f]}">${f === 'ARVN' ? 'AR' : f === 'NVA' ? 'NV' : f}</span>`).join('');
+  private deckSel: number | null = null;
+
+  toggleDeck(on?: boolean) {
+    const open = on ?? this.el.deckv.classList.contains('hidden');
+    this.el.deckv.classList.toggle('hidden', !open);
+    if (open) { this.cache.delete('deck'); if (this.lastGame) this.renderDeck(this.lastGame); }
+  }
+
+  private renderDeck(g: Game) {
+    if (this.el.deckv.classList.contains('hidden')) return;
+    const played = g.discard.slice().reverse();
+    const rows: number[] = [...(g.current ? [g.current] : []), ...(g.next ? [g.next] : []), ...played];
+    if (this.deckSel === null || !rows.includes(this.deckSel)) this.deckSel = g.current ?? rows[0] ?? null;
+    const label = (id: number) => id === g.current ? 'now' : id === g.next ? 'next' : '';
+    const list = rows.map((id) => {
+      const c = CARD[id];
+      return `<div class="drow ${c?.coup ? 'coup' : ''} ${id === this.deckSel ? 'on' : ''}" data-id="${id}"><small>#${id}</small><b>${escH(c?.title ?? String(id))}</b>${label(id) ? `<span class="tag ${label(id) === 'now' ? 'act' : 'done'}">${label(id)}</span>` : ''}</div>`;
+    }).join('');
+    const sel = this.deckSel ? CARD[this.deckSel] : null;
+    const coupsLeft = g.deck.filter((id) => CARD[id]?.coup).length;
+    const html = `<div class="hh"><b>Cards</b><button class="btn small" id="deck-x">&times;</button></div>
+      <div class="dcols"><div class="dlist">${list || '<div class="drow">No cards yet</div>'}</div><div class="ddetail">${sel ? cardHtml(sel) : ''}</div></div>
+      <div class="dinfo">Draw deck: ${g.deck.length} cards (${coupsLeft} Coup) &middot; Played: ${g.discard.length}</div>`;
+    if (!this.setHtml('deck', this.el.deckv, html)) return;
+    this.el.deckv.querySelector<HTMLElement>('#deck-x')!.onclick = () => this.toggleDeck(false);
+    this.el.deckv.querySelectorAll<HTMLElement>('.drow[data-id]').forEach((r) => (r.onclick = () => { this.deckSel = +r.dataset.id!; if (this.lastGame) this.renderDeck(this.lastGame); }));
   }
 
   private renderCards(g: Game) {
     const cur = g.current ? CARD[g.current] : null;
     const nxt = g.next ? CARD[g.next] : null;
-    let html = '';
-    if (cur) {
-      html += `<div class="card cur"><div class="chead"><span class="cid">#${cur.id}</span><b>${esc(cur.title)}</b>${cur.pivotal ? '<span class="tag act">PIVOTAL</span>' : ''}</div><div class="order">${this.orderChips(cur.id)}${cur.capability ? '<span class="tag done">CAPABILITY</span>' : ''}${cur.momentum ? '<span class="tag done">MOMENTUM</span>' : ''}</div>`;
-      if (!cur.coup) {
-        html += `<div class="etext un"><span class="lbl">&#9728; Unshaded</span>${esc(cur.unshaded)}</div>`;
-        if (cur.shaded) html += `<div class="etext sh"><span class="lbl">&#9790; Shaded</span>${esc(cur.shaded)}</div>`;
-      } else html += `<div class="etext un">${esc(cur.unshaded || 'Coup Round: Victory, Resources, Support, Redeploy, Commitment, Reset.')}</div>`;
-      html += '</div>';
-    } else html += '<div class="card cur empty">No card in play</div>';
-    if (nxt) html += `<div class="card nxt"><span class="lbl">NEXT</span><span class="cid">#${nxt.id}</span><b>${esc(nxt.title)}</b><div class="order">${this.orderChips(nxt.id)}</div></div>`;
-    this.setHtml('cards', this.el.cards, html);
+    let html = cur ? cardHtml(cur) : '<div class="card cur empty">No card in play</div>';
+    if (nxt) html += `<div class="card nxt clickable" data-next="1" title="Click to view"><span class="lbl">NEXT</span><span class="cid">#${nxt.id}</span><b>${escH(nxt.title)}</b><div class="order">${orderChips(nxt, true)}</div></div>`;
+    if (this.setHtml('cards', this.el.cards, html)) {
+      this.el.cards.querySelector<HTMLElement>('[data-next]')?.addEventListener('click', () => { this.deckSel = g.next; this.toggleDeck(true); });
+    }
   }
 
   private renderEffects(g: Game) {
