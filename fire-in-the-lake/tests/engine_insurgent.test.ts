@@ -74,32 +74,57 @@ describe('Rally', () => {
     do_(g, 'opt', 'many');
     expect(n(g, 'tay_ninh', 'vc_guer_u')).toBe(3);
   });
-  it('NVA improves the Trail for 2, and Laos is free at Trail 4', () => {
+  it('NVA improves the Trail for 2 Resources (even in a free Rally); Rally is never free in Laos at Trail 4', () => {
     const g = mk();
     push(g, 'op_rally', { faction: 'NVA' });
-    do_(g, 'space', 'central_laos');
-    do_(g, 'opt', 'trail');
+    do_(g, 'trail');
     expect(g.trail).toBe(3);
     expect(g.resources.NVA).toBe(18);
+    const f = mk();
+    push(f, 'op_rally', { faction: 'NVA', free: true });
+    do_(f, 'trail');
+    expect(f.resources.NVA).toBe(18);
     const h = mk();
     h.trail = 4;
     push(h, 'op_rally', { faction: 'NVA' });
+    expect(has(h, 'trail')).toBe(false);
     do_(h, 'space', 'central_laos');
-    expect(has(h, 'opt', 'trail')).toBe(false);
     do_(h, 'opt', 'guer');
-    expect(h.resources.NVA).toBe(20);
+    expect(h.resources.NVA).toBe(19);
   });
-  it('Rolling Thunder momentum blocks Trail improvement', () => {
+  it('SA-2s (shaded) improves the Trail 2 boxes; ADSID costs 6; AAA limits the Rally to 1 space', () => {
     const g = mk();
-    g.momentum = [10];
+    g.capabilities[34] = 'shaded';
     push(g, 'op_rally', { faction: 'NVA' });
-    do_(g, 'space', 'central_laos');
-    expect(has(g, 'opt', 'trail')).toBe(false);
+    do_(g, 'trail');
+    expect(g.trail).toBe(4);
+    const h = mk();
+    h.momentum = [7]; h.tmp.momentum_side = { 7: 'unshaded' };
+    push(h, 'op_rally', { faction: 'NVA' });
+    do_(h, 'trail');
+    expect(h.resources.NVA).toBe(20 - 2 - 6);
+    const k = mk();
+    k.capabilities[31] = 'unshaded';
+    push(k, 'op_rally', { faction: 'NVA' });
+    do_(k, 'trail');
+    do_(k, 'space', 'central_laos');
+    do_(k, 'opt', 'guer');
+    expect(k.stack.length).toBe(0);
+  });
+  it('McNamara Line momentum blocks Trail improvement and Infiltrate', () => {
+    const g = mk();
+    g.momentum = [38];
+    push(g, 'op_rally', { faction: 'NVA' });
+    expect(has(g, 'trail')).toBe(false);
+    g.stack = [];
+    put(g, 'tay_ninh', 'nva_base', 1);
+    push(g, 'sa_infiltrate', {});
+    expect(g.stack.length).toBe(0);
   });
 });
 
 describe('March', () => {
-  it('moves guerrillas and activates them entering a LoC when group + COIN > 3', () => {
+  it('moves guerrillas; LoC destinations are free and activate when group + non-Base COIN > 3', () => {
     const g = mk();
     put(g, 'kien_phong', 'vc_guer_u', 2);
     put(g, 'loc_can_tho_chau_doc', 'arvn_police', 2);
@@ -108,6 +133,18 @@ describe('March', () => {
     do_(g, 'all', 'kien_phong');
     do_(g, 'done');
     expect(n(g, 'loc_can_tho_chau_doc', 'vc_guer_a')).toBe(2);
+    expect(g.resources.VC).toBe(15);
+  });
+  it('a Province destination costs 1; COIN Bases do not count toward activation', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'vc_guer_u', 2);
+    put(g, 'tay_ninh', 'arvn_base', 2);
+    g.spaces.tay_ninh.support = 1;
+    push(g, 'op_march', { faction: 'VC' });
+    do_(g, 'space', 'tay_ninh');
+    do_(g, 'all', 'kien_phong');
+    do_(g, 'done');
+    expect(n(g, 'tay_ninh', 'vc_guer_u')).toBe(2);
     expect(g.resources.VC).toBe(14);
   });
   it('stays underground when the total is 3 or less', () => {
@@ -127,18 +164,36 @@ describe('March', () => {
     push(g, 'op_march', { faction: 'VC' });
     expect(g.stack.length).toBe(0);
   });
-  it('NVA continues through Laos only with a Trail', () => {
+  it('NVA continues through Laos with a Trail, paying for each added destination; not with Trail 0 or a LimOp', () => {
     const g = mk();
     put(g, 'north_vietnam', 'nva_troops', 2);
     push(g, 'op_march', { faction: 'NVA' });
+    do_(g, 'space', 'central_laos');
+    do_(g, 'all', 'north_vietnam');
+    do_(g, 'done');
     expect(has(g, 'space', 'southern_laos')).toBe(true);
-    const h = cloneGame(g);
-    h.trail = 0; h.stack = []; h.resources.NVA = 20;
+    do_(g, 'space', 'southern_laos');
+    do_(g, 'all', 'central_laos');
+    do_(g, 'done');
+    expect(n(g, 'southern_laos', 'nva_troops')).toBe(2);
+    expect(g.resources.NVA).toBe(18);
+    const h = mk();
+    h.trail = 0;
+    put(h, 'north_vietnam', 'nva_troops', 2);
     push(h, 'op_march', { faction: 'NVA' });
+    do_(h, 'space', 'central_laos');
+    do_(h, 'all', 'north_vietnam');
+    do_(h, 'done');
     expect(has(h, 'space', 'southern_laos')).toBe(false);
-    expect(has(h, 'space', 'central_laos')).toBe(true);
+    const k = mk();
+    put(k, 'north_vietnam', 'nva_troops', 2);
+    push(k, 'op_march', { faction: 'NVA', limited: true });
+    do_(k, 'space', 'central_laos');
+    do_(k, 'all', 'north_vietnam');
+    do_(k, 'done');
+    expect(k.stack.length).toBe(0);
   });
-  it('Trail 4 makes Laos march free; pieces moved cannot move twice', () => {
+  it('Trail 4: NVA March into or out of Laos/Cambodia is free; pieces that stop in South Vietnam cannot move twice', () => {
     const g = mk();
     g.trail = 4;
     put(g, 'north_vietnam', 'nva_troops', 2);
@@ -147,7 +202,12 @@ describe('March', () => {
     do_(g, 'all', 'north_vietnam');
     do_(g, 'done');
     expect(g.resources.NVA).toBe(20);
-    expect(has(g, 'space', 'southern_laos')).toBe(false); // the moved troops are locked
+    do_(g, 'space', 'quang_nam');
+    do_(g, 'all', 'central_laos');
+    do_(g, 'done'); // out of Laos: free
+    expect(g.resources.NVA).toBe(20);
+    expect(n(g, 'quang_nam', 'nva_troops')).toBe(2);
+    expect(has(g, 'space', 'quang_tin_quang_ngai')).toBe(false); // the troops are locked in the South
   });
 });
 
@@ -200,28 +260,52 @@ describe('Attack', () => {
     do_(g, 'opt', 'troops');
     expect(n(g, 'kien_phong', 'arvn_troops')).toBe(2);
   });
-  it('Ambush inside op_attack and standalone sa_ambush remove 2 with no roll', () => {
+  it('Ambush (inside op_attack, standalone) removes 1 enemy, activates 1, no roll and no attrition', () => {
     const g = mk();
     put(g, 'kien_phong', 'vc_guer_u', 2);
-    put(g, 'kien_phong', 'arvn_troops', 3);
+    put(g, 'kien_phong', 'us_troops', 3);
     push(g, 'op_attack', { faction: 'VC' });
     do_(g, 'space', 'kien_phong');
     do_(g, 'opt', 'ambush');
-    expect(n(g, 'kien_phong', 'arvn_troops')).toBe(1);
+    expect(n(g, 'kien_phong', 'us_troops')).toBe(2);
+    expect(g.casualties.us_troops).toBe(1);
     expect(n(g, 'kien_phong', 'vc_guer_a')).toBe(1);
-    expect(n(g, 'kien_phong', 'vc_guer_u')).toBe(1);
+    expect(n(g, 'kien_phong', 'vc_guer_u')).toBe(1); // no Attrition
+    expect(g.resources.VC).toBe(14);
     const h = mk();
     put(h, 'kien_phong', 'vc_guer_u', 1);
     put(h, 'kien_phong', 'arvn_troops', 3);
     push(h, 'sa_ambush', { faction: 'VC' });
     do_(h, 'space', 'kien_phong');
     do_(h, 'opt', 'ambush');
-    expect(n(h, 'kien_phong', 'arvn_troops')).toBe(1);
+    expect(n(h, 'kien_phong', 'arvn_troops')).toBe(2);
     expect(h.resources.VC).toBe(15);
   });
-  it('Claymores forbids Ambush', () => {
+  it('an Ambush on a LoC may remove an enemy from an adjacent space; Main Force Bns shaded removes 2', () => {
     const g = mk();
-    g.momentum = [17];
+    put(g, 'loc_can_tho_chau_doc', 'vc_guer_u', 1);
+    put(g, 'kien_phong', 'arvn_troops', 3);
+    g.capabilities[104] = 'shaded';
+    push(g, 'sa_ambush', { faction: 'VC' });
+    do_(g, 'space', 'loc_can_tho_chau_doc');
+    do_(g, 'opt', 'ambush'); // the only enemy is in adjacent Kien Phong
+    expect(n(g, 'kien_phong', 'arvn_troops')).toBe(1);
+  });
+  it('Booby Traps (unshaded) limits Ambush to 1 space', () => {
+    const g = mk();
+    g.capabilities[101] = 'unshaded';
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    put(g, 'tay_ninh', 'vc_guer_u', 1);
+    put(g, 'kien_phong', 'arvn_troops', 2);
+    put(g, 'tay_ninh', 'arvn_troops', 2);
+    push(g, 'sa_ambush', { faction: 'VC' });
+    do_(g, 'space', 'kien_phong');
+    do_(g, 'opt', 'ambush');
+    expect(g.stack.length).toBe(0);
+  });
+  it('Claymores (unshaded momentum) forbids Ambush', () => {
+    const g = mk();
+    g.momentum = [17]; g.tmp.momentum_side = { 17: 'unshaded' };
     put(g, 'kien_phong', 'vc_guer_u', 2);
     put(g, 'kien_phong', 'arvn_troops', 3);
     push(g, 'sa_ambush', { faction: 'VC' });
@@ -255,28 +339,34 @@ describe('Terror', () => {
 });
 
 describe('Special Activities', () => {
-  it('Infiltrate builds up troops by Trail + bases, and takes over VC pieces', () => {
+  it('Infiltrate places Troops up to Trail + Bases, replaces Guerrillas with Troops, or takes over 1 VC piece', () => {
     const g = mk();
     put(g, 'tay_ninh', 'nva_base', 1);
+    put(g, 'tay_ninh', 'nva_guer_u', 2);
     push(g, 'sa_infiltrate', {});
     do_(g, 'space', 'tay_ninh');
     do_(g, 'mode', 'build');
     do_(g, 'place', 'troop');
     do_(g, 'place', 'troop');
-    do_(g, 'place', 'guer');
-    expect(n(g, 'tay_ninh', 'nva_troops')).toBe(2);
+    do_(g, 'place', 'troop');
+    expect(has(g, 'place', 'troop')).toBe(false); // Trail 2 + 1 Base
+    do_(g, 'piece', 'tay_ninh:nva_guer_u');
+    expect(n(g, 'tay_ninh', 'nva_troops')).toBe(4);
     expect(n(g, 'tay_ninh', 'nva_guer_u')).toBe(1);
+    do_(g, 'finish');
     expect(g.stack.length).toBe(0);
     const h = mk();
     put(h, 'tay_ninh', 'nva_base', 1);
+    put(h, 'tay_ninh', 'nva_troops', 3);
     put(h, 'tay_ninh', 'vc_guer_u', 2);
+    h.spaces.tay_ninh.support = -2;
     push(h, 'sa_infiltrate', {});
     do_(h, 'space', 'tay_ninh');
     do_(h, 'mode', 'takeover');
+    expect(h.spaces.tay_ninh.support).toBe(-1);
     do_(h, 'piece', 'tay_ninh:vc_guer_u');
-    do_(h, 'piece', 'tay_ninh:vc_guer_u');
-    expect(n(h, 'tay_ninh', 'nva_guer_u')).toBe(2);
-    expect(n(h, 'tay_ninh', 'vc_guer_u')).toBe(0);
+    expect(n(h, 'tay_ninh', 'nva_guer_u')).toBe(1);
+    expect(n(h, 'tay_ninh', 'vc_guer_u')).toBe(1);
   });
   it('Bombard removes one COIN Troop with 3+ NVA Troops in range', () => {
     const g = mk();
@@ -315,17 +405,16 @@ describe('Special Activities', () => {
     do_(g, 'space', 'loc_can_tho_chau_doc');
     expect(g.resources.VC).toBe(15);
   });
-  it('March can Ambush from the space it entered', () => {
+  it('March can Ambush from the space it entered (1 enemy piece)', () => {
     const g = mk();
     put(g, 'kien_phong', 'vc_guer_u', 2);
     put(g, 'tay_ninh', 'arvn_troops', 3);
-    put(g, 'tay_ninh', 'vc_guer_u', 1);
     push(g, 'op_march', { faction: 'VC', max: 1 });
     do_(g, 'space', 'tay_ninh');
     do_(g, 'all', 'kien_phong');
     do_(g, 'done');
     do_(g, 'opt', 'ambush');
-    expect(n(g, 'tay_ninh', 'arvn_troops')).toBe(1);
+    expect(n(g, 'tay_ninh', 'arvn_troops')).toBe(2);
     expect(g.stack.length).toBe(0);
   });
   it('Tax flips a guerrilla and earns Econ on LoCs, 2 x Pop elsewhere', () => {
@@ -339,7 +428,7 @@ describe('Special Activities', () => {
     expect(g.spaces.kien_phong.support).toBe(1);
     expect(n(g, 'kien_phong', 'vc_guer_a')).toBe(1);
   });
-  it('Subvert removes 2 ARVN cubes or replaces one, lowering Patronage', () => {
+  it('Subvert: remove 2 cubes or replace 1; Patronage -1 per 2 pieces in total (rounded down); no Activation', () => {
     const g = mk();
     put(g, 'kien_phong', 'vc_guer_u', 1);
     put(g, 'kien_phong', 'arvn_troops', 1);
@@ -348,8 +437,8 @@ describe('Special Activities', () => {
     do_(g, 'space', 'kien_phong');
     do_(g, 'mode', 'replace');
     do_(g, 'piece', 'kien_phong:arvn_police');
-    expect(n(g, 'kien_phong', 'vc_guer_a') + n(g, 'kien_phong', 'vc_guer_u')).toBe(2);
-    expect(g.patronage).toBe(14);
+    expect(n(g, 'kien_phong', 'vc_guer_u')).toBe(2);
+    expect(g.patronage).toBe(15); // 1 piece: rounds down to 0 (done ends the SA below)
     const h = mk();
     put(h, 'kien_phong', 'vc_guer_u', 1);
     put(h, 'kien_phong', 'arvn_troops', 1);
@@ -360,6 +449,7 @@ describe('Special Activities', () => {
     do_(h, 'piece', 'kien_phong:arvn_troops'); // the remaining cube is removed automatically
     expect(n(h, 'kien_phong', 'arvn_police')).toBe(1);
     expect(n(h, 'kien_phong', 'arvn_troops')).toBe(0);
+    expect(n(h, 'kien_phong', 'vc_guer_u')).toBe(1);
     expect(h.patronage).toBe(14);
   });
   it('args.spaces restricts selection', () => {
@@ -372,8 +462,8 @@ describe('Special Activities', () => {
   });
 });
 
-describe('Terror balance rules', () => {
-  it('VC Terror shifts toward Opposition, but only when placing a fresh marker', () => {
+describe('Terror rules (3.3.4)', () => {
+  it('VC shifts toward Active Opposition only where it places a fresh marker', () => {
     const g = mk();
     g.spaces.kien_phong.support = 0;
     put(g, 'kien_phong', 'vc_guer_u', 2);
@@ -387,5 +477,19 @@ describe('Terror balance rules', () => {
     push(h, 'op_terror', { faction: 'VC' });
     do_(h, 'space', 'kien_phong');
     expect(h.spaces.kien_phong.support).toBe(2);
+    expect(n(h, 'kien_phong', 'vc_guer_a')).toBe(1); // still Activates
+  });
+  it('Cadres (unshaded) makes Terror remove 2 VC Guerrillas per space', () => {
+    const g = mk();
+    g.capabilities[116] = 'unshaded';
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    push(g, 'op_terror', { faction: 'VC' });
+    expect(g.stack.length).toBe(0);
+    const h = mk();
+    h.capabilities[116] = 'unshaded';
+    put(h, 'kien_phong', 'vc_guer_u', 3);
+    push(h, 'op_terror', { faction: 'VC' });
+    do_(h, 'space', 'kien_phong');
+    expect(n(h, 'kien_phong', 'vc_guer_u') + n(h, 'kien_phong', 'vc_guer_a')).toBe(1);
   });
 });

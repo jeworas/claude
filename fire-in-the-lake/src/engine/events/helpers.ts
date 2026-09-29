@@ -23,11 +23,11 @@
 // next step when they pop. Everything that lives in game state is JSON: helper states refer to behaviour by
 // string key. Keys are minted at module load by defCard()'s R() (`c<card>.<n>`) or regFn().
 import type { Faction, Game, PieceKind, PoolKind } from '../../core/types';
-import { hasState, log, pop, push, registerState, top } from '../../core/framework';
+import { hasState, log, pop, push, registerState, rollDie, top } from '../../core/framework';
 import { MAP, SPACE_IDS } from '../../data/map';
 import { CARD } from '../../data/cards';
 import {
-  BASES, FACTION_OF, FACTION_PIECES, PIECE_NAME, addAid, addPatronage, addResources, count, countBases, countFaction,
+  BASES, FACTION_OF, FACTION_PIECES, PIECE_NAME, POOL_OF, PLACE_AS, flip as flipPiece, addAid, addPatronage, addResources, count, countBases, countFaction,
   isBase, movePool, move as movePiece, place, removeTo, remove as removePiece, shiftSupport as shiftSup, setSupport,
   canHaveSupport,
 } from '../../core/pieces';
@@ -146,12 +146,40 @@ export function stayEligible(g: Game, f: Faction): void {
 export function makeIneligible(g: Game, f: Faction): void {
   ensure(g.next_ineligible, f);
 }
+// Change the Trail by delta (clamped 0-4). Momentum ADSID (7, unshaded) costs NVA 6 Resources at any Trail change.
+export function changeTrail(g: Game, delta: number): number {
+  const before = g.trail;
+  g.trail = Math.max(0, Math.min(4, before + delta));
+  const d = g.trail - before;
+  if (d !== 0) {
+    log(g, `Trail ${d > 0 ? 'improves' : 'degrades'} to ${g.trail}.`);
+    if (g.momentum.includes(7)) { addResources(g, 'NVA', -6); log(g, 'ADSID: NVA Resources -6.'); }
+  }
+  return d;
+}
+export function setTrailTo(g: Game, v: number): number { return changeTrail(g, v - g.trail); }
 export function track(g: Game, what: 'aid' | 'patronage' | 'trail' | 'ARVN' | 'NVA' | 'VC', n: number): void {
   if (what === 'aid') addAid(g, n);
   else if (what === 'patronage') addPatronage(g, n);
-  else if (what === 'trail') g.trail = Math.max(0, Math.min(4, g.trail + n));
+  else if (what === 'trail') changeTrail(g, n);
   else addResources(g, what, n);
 }
+export function momentumSide(g: Game, id: number): 'unshaded' | 'shaded' | undefined {
+  return g.momentum.includes(id) ? g.tmp?.momentum_side?.[id] : undefined;
+}
+// Would placing/moving a piece of this kind into this space violate stacking (1.4.2)?
+export function canHold(g: Game, id: string, k: PieceKind): boolean {
+  const m = MAP[id];
+  if (isBase(k)) return m.type !== 'loc' && countBases(g, id) < 2;
+  if (m.country === 'north_vietnam' && FACTION_OF[k] !== 'NVA' && FACTION_OF[k] !== 'VC') return false;
+  return true;
+}
+export const KINDS_OF_POOL: Record<PoolKind, PieceKind[]> = (() => {
+  const out = {} as Record<PoolKind, PieceKind[]>;
+  for (const k of Object.keys(POOL_OF) as PieceKind[]) (out[POOL_OF[k]] ??= []).push(k);
+  return out;
+})();
+export const isTunnel = (k: PieceKind) => k === 'nva_tunnel' || k === 'vc_tunnel';
 export function effAid(g: Game): number { return g.aid; }
 
 // Pool -> pool shuffles ("Out of Play to Available", ...). Returns number moved.
@@ -162,6 +190,7 @@ export function pools(g: Game, pool: PoolKind, from: 'available' | 'casualties' 
 // Free op / special activity. Silently skips if that state is not registered yet.
 export function freeOp(g: Game, state: string, faction: Faction, extra: any = {}): void {
   if (!hasState(state)) { log(g, `(free ${state} not available)`); return; }
+  if (extra === false || extra === null) return; // nothing legal to do
   push(g, state, { faction, free: true, ...extra });
 }
 
@@ -220,14 +249,14 @@ export interface PickOpts {
   label?: string;
 }
 export function pickSpaces(g: Game, c: { card: number; faction: Faction }, o: PickOpts): void {
-  push(g, 'ev_spaces', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, filter: o.filter ?? ALL, apply: o.apply, data: o.data ?? {}, label: o.label ?? '', chosen: [] });
+  push(g, 'ev_spaces', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, filter: o.filter ?? ALL, apply: o.apply, data: o.data ?? {}, label: o.label ?? '', chosen: [], touched: [] });
 }
 function spacesCands(g: Game, a: any): string[] {
   return SPACE_IDS.filter((id) => !a.chosen.includes(id) && callFn(a.filter, g, a, id));
 }
 function spacesSettle(g: Game, a: any): void {
   if (top(g)?.args !== a) return;
-  if (a.chosen.length >= a.n || spacesCands(g, a).length === 0) pop(g, { spaces: a.chosen });
+  if (a.chosen.length >= a.n || spacesCands(g, a).length === 0) pop(g, { spaces: a.chosen, touched: a.touched });
 }
 registerState('ev_spaces', {
   faction: (g, a) => a.by,
@@ -239,21 +268,24 @@ registerState('ev_spaces', {
     p.action('done', undefined, 'Done');
   },
   act(g, a, verb, arg) {
-    if (verb === 'done') { pop(g, { spaces: a.chosen }); return; }
+    if (verb === 'done') { pop(g, { spaces: a.chosen, touched: a.touched }); return; }
     a.chosen.push(arg as string);
     a.busy = true;
     if (a.apply) callFn(a.apply, g, a, arg as string);
     a.busy = false;
     spacesSettle(g, a);
   },
-  resume(g, a) { if (!a.busy) spacesSettle(g, a); },
+  resume(g, a, result) {
+    for (const id of result?.spaces ?? []) ensure(a.touched, id);
+    if (!a.busy) spacesSettle(g, a);
+  },
 });
 
 // Shift support in up to n spaces (delta > 0 toward Support, < 0 toward Opposition).
-export function shiftSupportIn(g: Game, c: { card: number; faction: Faction }, o: { n: number; delta: number; by?: Faction; label?: string; filter?: string }): void {
-  push(g, 'ev_spaces', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, filter: o.filter ?? 'shift.filter', apply: 'shift.apply', data: { delta: o.delta }, label: o.label ?? (o.delta > 0 ? 'shift toward Support' : 'shift toward Opposition'), chosen: [] });
+export function shiftSupportIn(g: Game, c: { card: number; faction: Faction }, o: { n: number; delta: number; by?: Faction; label?: string; filter?: string; data?: any }): void {
+  push(g, 'ev_spaces', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, filter: o.filter ?? 'shift.filter', apply: 'shift.apply', data: { ...(o.data ?? {}), delta: o.delta }, label: o.label ?? (o.delta > 0 ? 'shift toward Support' : 'shift toward Opposition'), chosen: [], touched: [] });
 }
-regFn('shift.filter', (g, a, id) => canHaveSupport(id) && (a.data.delta > 0 ? g.spaces[id].support < 2 : g.spaces[id].support > -2));
+regFn('shift.filter', (g, a, id) => canHaveSupport(id) && (!a.data.ids || a.data.ids.includes(id)) && (a.data.delta > 0 ? g.spaces[id].support < 2 : g.spaces[id].support > -2));
 regFn('shift.apply', (g, a, id) => {
   shiftSup(g, id, a.data.delta);
   log(g, `Support shifted ${a.data.delta > 0 ? '+' : ''}${a.data.delta} in ${MAP[id].name}.`);
@@ -277,7 +309,8 @@ export function placePieces(g: Game, c: { card: number; faction: Faction }, o: P
 }
 function placeCands(g: Game, a: any): string[] {
   if (a.placed >= a.n || g[a.src as 'available'][a.pool as PoolKind] <= 0) return [];
-  return SPACE_IDS.filter((id) => (!a.per || (a.counts[id] ?? 0) < a.per) && callFn(a.filter, g, a, id));
+  const k = (a.as ?? PLACE_AS[a.pool as PoolKind]) as PieceKind;
+  return SPACE_IDS.filter((id) => (!a.per || (a.counts[id] ?? 0) < a.per) && canHold(g, id, k) && callFn(a.filter, g, a, id));
 }
 function placeSettle(g: Game, a: any): void {
   if (top(g)?.args !== a) return;
@@ -315,22 +348,40 @@ export interface RemoveOpts {
   pfilter?: string;                                 // (g, a, spaceId, kind) => boolean
   dest?: 'std' | 'available' | 'casualties' | 'out_of_play';
   per?: number;                                     // max per space
-  basesFirst?: boolean;                             // allow removing bases while other pieces remain
+  basesLast?: boolean;                              // a Base is only removable once its Faction has no other pieces there
+  basesFirst?: boolean;                             // (ignored; kept for old callers - events have no Bases-last rule)
+  air?: boolean;                                    // Air Strike removal rules (4.2.3)
+  tunnels?: boolean;                                // allow removing Tunneled Bases (only when the card says so)
+  then?: string;                                    // fn key (g, a, {removed, spaces}) run synchronously when finished
   data?: any;
   label?: string;
 }
 export function removePieces(g: Game, c: { card: number; faction: Faction }, o: RemoveOpts): void {
-  push(g, 'ev_remove', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, kinds: o.kinds, filter: o.filter ?? ALL, pfilter: o.pfilter, dest: o.dest ?? 'std', per: o.per ?? 0, basesFirst: !!o.basesFirst, data: o.data ?? {}, label: o.label ?? '', removed: 0, counts: {}, spaces: [] });
+  push(g, 'ev_remove', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, kinds: o.kinds, filter: o.filter ?? ALL, pfilter: o.pfilter, dest: o.dest ?? 'std', per: o.per ?? 0, basesLast: !!o.basesLast, air: !!o.air, tunnels: !!o.tunnels, then: o.then, data: o.data ?? {}, label: o.label ?? '', removed: 0, counts: {}, spaces: [] });
 }
+const AIR_KINDS: PieceKind[] = ['nva_troops', 'nva_guer_a', 'vc_guer_a'];
 function removeCands(g: Game, a: any): [string, PieceKind][] {
   const out: [string, PieceKind][] = [];
   if (a.removed >= a.n) return out;
   for (const id of SPACE_IDS) {
     if (a.per && (a.counts[id] ?? 0) >= a.per) continue;
     if (!callFn(a.filter, g, a, id)) continue;
+    let airPhase: 'troops' | 'guer' | 'base' | null = null;
+    if (a.air) {
+      if (count(g, id, 'nva_troops') > 0) airPhase = 'troops';
+      else if (count(g, id, 'nva_guer_a', 'vc_guer_a') > 0) airPhase = 'guer';
+      else if (count(g, id, 'nva_guer_u', 'vc_guer_u') === 0) airPhase = 'base';
+      else continue;
+    }
     for (const k of a.kinds as PieceKind[]) {
       if (count(g, id, k) <= 0) continue;
-      if (!a.basesFirst && isBase(k)) {
+      if (isTunnel(k) && !a.tunnels) continue;
+      if (a.air) {
+        if (airPhase === 'troops' && k !== 'nva_troops') continue;
+        if (airPhase === 'guer' && k !== 'nva_guer_a' && k !== 'vc_guer_a') continue;
+        if (airPhase === 'base' && !isBase(k)) continue;
+      }
+      if (a.basesLast && isBase(k)) {
         const f = FACTION_OF[k];
         if (FACTION_PIECES[f].some((k2) => !isBase(k2) && count(g, id, k2) > 0)) continue;
       }
@@ -340,9 +391,14 @@ function removeCands(g: Game, a: any): [string, PieceKind][] {
   }
   return out;
 }
+function removeEnd(g: Game, a: any): void {
+  const res = { removed: a.removed, spaces: a.spaces };
+  if (a.then) callFn(a.then, g, a, res);
+  pop(g, res);
+}
 function removeSettle(g: Game, a: any): void {
   if (top(g)?.args !== a) return;
-  if (removeCands(g, a).length === 0) pop(g, { removed: a.removed, spaces: a.spaces });
+  if (removeCands(g, a).length === 0) removeEnd(g, a);
 }
 export function doRemove(g: Game, id: string, k: PieceKind, dest: string = 'std', n = 1): number {
   if (dest === 'std') return removePiece(g, id, k, n);
@@ -357,13 +413,12 @@ registerState('ev_remove', {
     p.action('done', undefined, 'Done');
   },
   act(g, a, verb, arg) {
-    if (verb === 'done') { pop(g, { removed: a.removed, spaces: a.spaces }); return; }
+    if (verb === 'done') { removeEnd(g, a); return; }
     const [id, k] = (arg as string).split(':') as [string, PieceKind];
     const m = doRemove(g, id, k, a.dest);
     a.removed += m;
     a.counts[id] = (a.counts[id] ?? 0) + m;
-    ensure(a.spaces, id);
-    if (m > 0) log(g, `Removed ${PIECE_NAME[k]} from ${MAP[id].name}.`);
+    if (m > 0) { ensure(a.spaces, id); log(g, `Removed ${PIECE_NAME[k]} from ${MAP[id].name}.`); }
     removeSettle(g, a);
   },
   resume(g, a) { removeSettle(g, a); },
@@ -439,11 +494,199 @@ registerState('ev_choose', {
   act(g, a, verb, arg) {
     const frame = top(g)!;
     a.busy = true;
+    a.choice = arg;
     callFn(a.fn, g, a, arg as number);
     a.busy = false;
     if (top(g) === frame) pop(g, { choice: arg });
   },
-  resume(g, a) { if (!a.busy && top(g)?.args === a) pop(g, { choice: -1 }); },
+  resume(g, a) { if (!a.busy && top(g)?.args === a) pop(g, { choice: a.choice ?? -1 }); },
+});
+
+// ------------------------------------------------------------------ helper: transfer pieces (general)
+
+export type Box = 'available' | 'casualties' | 'out_of_play';
+export interface XferRule {
+  pool: PoolKind;
+  from: Box | 'map';
+  to: Box | 'map';
+  kinds?: PieceKind[];        // map source: which piece states (default: every state of the pool; Tunneled Bases excluded unless tunnels)
+  fromWhere?: string;         // fn key (g, a, spaceId) for map sources
+  toWhere?: string;           // fn key (g, a, spaceId) for map destinations
+  toSpace?: string;           // fixed map destination
+  max?: number;               // at most this many pieces through this rule
+  asKind?: PieceKind;         // state a piece takes when it is placed on the map
+  tunnels?: boolean;
+  label?: string;
+}
+export function transferPieces(g: Game, c: { card: number; faction: Faction }, o: { by?: Faction; n: number; rules: XferRule[]; label?: string; data?: any }): void {
+  push(g, 'ev_transfer', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, rules: o.rules, label: o.label ?? '', data: o.data ?? {}, moved: 0, used: o.rules.map(() => 0), sel: null, spaces: [] });
+}
+function xferPlaceKind(rule: XferRule, srcKind?: PieceKind): PieceKind {
+  return srcKind ?? rule.asKind ?? PLACE_AS[rule.pool];
+}
+function xferDests(g: Game, a: any, rule: XferRule, src: string | null, kind?: PieceKind): string[] {
+  const k = xferPlaceKind(rule, kind);
+  if (rule.toSpace) return canHold(g, rule.toSpace, k) && rule.toSpace !== src ? [rule.toSpace] : [];
+  return SPACE_IDS.filter((id) => id !== src && canHold(g, id, k) && callFn(rule.toWhere, g, a, id));
+}
+interface XOpt { ri: number; src: string | null; kind?: PieceKind }
+function xferOpts(g: Game, a: any): XOpt[] {
+  const out: XOpt[] = [];
+  if (a.moved >= a.n) return out;
+  (a.rules as XferRule[]).forEach((rule, ri) => {
+    if (rule.max != null && a.used[ri] >= rule.max) return;
+    if (rule.from === 'map') {
+      for (const id of SPACE_IDS) {
+        if (!callFn(rule.fromWhere, g, a, id)) continue;
+        for (const k of rule.kinds ?? KINDS_OF_POOL[rule.pool]) {
+          if (count(g, id, k) <= 0 || (isTunnel(k) && !rule.tunnels)) continue;
+          if (rule.to === 'map' && xferDests(g, a, rule, id, k).length === 0) continue;
+          out.push({ ri, src: id, kind: k });
+        }
+      }
+    } else {
+      if (g[rule.from][rule.pool] <= 0) return;
+      if (rule.to === 'map' && xferDests(g, a, rule, null).length === 0) return;
+      out.push({ ri, src: null });
+    }
+  });
+  return out;
+}
+const BOX_NAME: Record<string, string> = { available: 'Available', casualties: 'Casualties', out_of_play: 'Out of Play', map: 'the map' };
+function xferLabel(a: any, o: XOpt): string {
+  const r = a.rules[o.ri] as XferRule;
+  if (r.label) return `${r.label}${o.src ? ` (${MAP[o.src].name})` : ''}`;
+  const what = o.kind ? PIECE_NAME[o.kind] : r.pool;
+  return `${what}: ${o.src ? MAP[o.src].name : BOX_NAME[r.from]} -> ${BOX_NAME[r.to]}`;
+}
+function xferSettle(g: Game, a: any): void {
+  if (top(g)?.args !== a) return;
+  if (a.sel) return;
+  if (xferOpts(g, a).length === 0) pop(g, { moved: a.moved, spaces: a.spaces });
+}
+function xferExec(g: Game, a: any, ri: number, src: string | null, kind: PieceKind | undefined, dst: string | null): void {
+  const r = a.rules[ri] as XferRule;
+  let ok = 0;
+  if (r.from === 'map' && r.to === 'map') ok = movePiece(g, src!, dst!, kind!, 1);
+  else if (r.from === 'map') ok = removeTo(g, src!, kind!, 1, r.to as Box);
+  else if (r.to === 'map') {
+    if (r.from !== 'available') movePool(g, r.pool, r.from as Box, 'available', 1);
+    ok = place(g, dst!, r.pool, 1, r.asKind);
+    if (!ok && r.from !== 'available') movePool(g, r.pool, 'available', r.from as Box, 1);
+  } else ok = movePool(g, r.pool, r.from as Box, r.to as Box, 1);
+  if (ok > 0) {
+    a.used[ri]++;
+    a.moved++;
+    if (src) ensure(a.spaces, src);
+    if (dst) ensure(a.spaces, dst);
+    log(g, `${kind ? PIECE_NAME[kind] : r.pool}: ${src ? MAP[src].name : BOX_NAME[r.from]} to ${dst ? MAP[dst].name : BOX_NAME[r.to]}.`);
+  }
+}
+registerState('ev_transfer', {
+  faction: (g, a) => a.by,
+  enter(g, a) { xferSettle(g, a); },
+  prompt(g, a, p) {
+    if (!a.sel) {
+      p.text(`${cardTitle(a.card)}: ${a.label || 'move pieces'} (${a.moved}/${a.n})`);
+      for (const o of xferOpts(g, a)) p.action('mv', `${o.ri}|${o.src ?? ''}|${o.kind ?? ''}`, xferLabel(a, o), { space: o.src ?? undefined, piece: o.kind });
+    } else {
+      p.text(`${cardTitle(a.card)}: choose the destination`);
+      const r = a.rules[a.sel.ri] as XferRule;
+      for (const id of xferDests(g, a, r, a.sel.src, a.sel.kind)) p.space(id, MAP[id].name);
+      p.action('cancel', undefined, 'Cancel');
+    }
+    p.action('done', undefined, 'Done');
+  },
+  act(g, a, verb, arg) {
+    if (verb === 'done') { pop(g, { moved: a.moved, spaces: a.spaces }); return; }
+    if (verb === 'cancel') { a.sel = null; return; }
+    if (verb === 'mv') {
+      const [ris, src, kind] = String(arg).split('|');
+      const ri = Number(ris);
+      const r = a.rules[ri] as XferRule;
+      const sk = (kind || undefined) as PieceKind | undefined;
+      if (r.to !== 'map') { xferExec(g, a, ri, src || null, sk, null); xferSettle(g, a); return; }
+      const dests = xferDests(g, a, r, src || null, sk);
+      if (dests.length === 1) { xferExec(g, a, ri, src || null, sk, dests[0]); xferSettle(g, a); return; }
+      a.sel = { ri, src: src || null, kind: sk };
+      return;
+    }
+    const sel = a.sel;
+    a.sel = null;
+    xferExec(g, a, sel.ri, sel.src, sel.kind, arg as string);
+    xferSettle(g, a);
+  },
+});
+
+// ------------------------------------------------------------------ helper: flip pieces
+
+export type FlipMode = 'underground' | 'active' | 'tunnel' | 'untunnel';
+export const FLIP_KINDS: Record<FlipMode, [PieceKind, PieceKind][]> = {
+  underground: [['nva_guer_a', 'nva_guer_u'], ['vc_guer_a', 'vc_guer_u'], ['us_irreg_a', 'us_irreg_u'], ['arvn_ranger_a', 'arvn_ranger_u']],
+  active: [['nva_guer_u', 'nva_guer_a'], ['vc_guer_u', 'vc_guer_a'], ['us_irreg_u', 'us_irreg_a'], ['arvn_ranger_u', 'arvn_ranger_a']],
+  tunnel: [['nva_base', 'nva_tunnel'], ['vc_base', 'vc_tunnel']],
+  untunnel: [['nva_tunnel', 'nva_base'], ['vc_tunnel', 'vc_base']],
+};
+export function flipAll(g: Game, id: string, mode: FlipMode, only?: PieceKind[]): number {
+  let n = 0;
+  for (const [f, t] of FLIP_KINDS[mode]) if (!only || only.includes(f)) n += flipPiece(g, id, f, t, count(g, id, f));
+  return n;
+}
+export function flipPieces(g: Game, c: { card: number; faction: Faction }, o: { by?: Faction; n: number; mode: FlipMode; kinds?: PieceKind[]; filter?: string; data?: any; label?: string }): void {
+  push(g, 'ev_flip', { card: c.card, faction: c.faction, by: o.by ?? c.faction, n: o.n, mode: o.mode, kinds: o.kinds ?? null, filter: o.filter ?? ALL, data: o.data ?? {}, label: o.label ?? '', flipped: 0 });
+}
+function flipCands(g: Game, a: any): [string, PieceKind, PieceKind][] {
+  const out: [string, PieceKind, PieceKind][] = [];
+  if (a.flipped >= a.n) return out;
+  for (const id of SPACE_IDS) {
+    if (!callFn(a.filter, g, a, id)) continue;
+    for (const [f, t] of FLIP_KINDS[a.mode as FlipMode]) {
+      if (a.kinds && !a.kinds.includes(f)) continue;
+      if (count(g, id, f) > 0) out.push([id, f, t]);
+    }
+  }
+  return out;
+}
+registerState('ev_flip', {
+  faction: (g, a) => a.by,
+  enter(g, a) { if (flipCands(g, a).length === 0) pop(g, { flipped: 0 }); },
+  prompt(g, a, p) {
+    p.text(`${cardTitle(a.card)}: ${a.label || `flip pieces to ${a.mode}`} (${a.flipped}/${a.n})`);
+    for (const [id, f] of flipCands(g, a)) p.piece(id, f, `${PIECE_NAME[f]} in ${MAP[id].name}`);
+    p.action('done', undefined, 'Done');
+  },
+  act(g, a, verb, arg) {
+    if (verb === 'done') { pop(g, { flipped: a.flipped }); return; }
+    const [id, f] = (arg as string).split(':') as [string, PieceKind];
+    const t = FLIP_KINDS[a.mode as FlipMode].find(([x]) => x === f)![1];
+    a.flipped += flipPiece(g, id, f, t, 1);
+    if (a.flipped >= a.n || flipCands(g, a).length === 0) pop(g, { flipped: a.flipped });
+  },
+});
+
+// ------------------------------------------------------------------ helper: run a fn once per item, in order
+
+export function eachOf(g: Game, c: { card: number; faction: Faction }, o: { items: string[]; fn: string; by?: Faction; data?: any }): void {
+  push(g, 'ev_each', { card: c.card, faction: c.faction, by: o.by ?? c.faction, items: o.items, fn: o.fn, data: o.data ?? {}, i: 0 });
+}
+function eachAdvance(g: Game, a: any): void {
+  a.busy = true;
+  try {
+    while (top(g)?.args === a) {
+      if (a.i >= a.items.length) { a.busy = false; pop(g, { done: true }); return; }
+      const item = a.items[a.i++];
+      callFn(a.fn, g, a, item);
+    }
+  } finally {
+    a.busy = false;
+  }
+}
+registerState('ev_each', {
+  faction: (g, a) => a.by,
+  enter(g, a) { eachAdvance(g, a); },
+  prompt(g, a, p) { p.text(`${cardTitle(a.card)}: continue`); p.action('done', undefined, 'Continue'); },
+  act(g, a) { eachAdvance(g, a); },
+  resume(g, a) { if (!a.busy) eachAdvance(g, a); },
 });
 
 // ------------------------------------------------------------------ pieces convenience for steps
@@ -451,4 +694,4 @@ registerState('ev_choose', {
 export function placeN(g: Game, id: string, pool: PoolKind, n: number, as?: PieceKind): number {
   return place(g, id, pool, n, as);
 }
-export { BASES, countBases, countFaction, movePiece, place, removeTo, removePiece, setSupport, shiftSup, count, isBase, FACTION_PIECES, log };
+export { rollDie, BASES, countBases, countFaction, movePiece, place, removeTo, removePiece, setSupport, shiftSup, count, isBase, FACTION_PIECES, log };

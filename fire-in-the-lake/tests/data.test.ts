@@ -5,7 +5,6 @@ import { SCENARIOS } from '../src/data/scenarios';
 import { PIECE_TOTALS } from '../src/core/types';
 import type { PoolKind, PieceKind } from '../src/core/types';
 import { POOL_OF, totalSupport, coinControlledPop, totalOpposition, countOnMap, nvaControlledPop } from '../src/core/pieces';
-import { newGame } from '../src/engine';
 
 describe('map', () => {
   it('has 8 cities and 17 LoCs, unique ids', () => {
@@ -123,7 +122,15 @@ describe('scenario starting scores (rulebook checkpoints)', () => {
   };
   for (const [id, w] of Object.entries(want)) {
     it(id, () => {
-      const g = newGame(id, [], 1);
+      // Build the starting position straight from the scenario data (independent of engine setup).
+      const sc = SCENARIOS[id];
+      const g: any = { spaces: {}, patronage: sc.patronage, available: {} };
+      for (const sp of SPACE_IDS) g.spaces[sp] = { pieces: { ...(sc.pieces[sp] ?? {}) }, support: sc.support[sp] ?? 0, terror: 0 };
+      const used: Record<string, number> = {};
+      for (const pcs of Object.values(sc.pieces)) for (const [k, n] of Object.entries(pcs)) used[POOL_OF[k as PieceKind]] = (used[POOL_OF[k as PieceKind]] ?? 0) + (n ?? 0);
+      for (const pool of Object.keys(PIECE_TOTALS) as PoolKind[]) {
+        g.available[pool] = PIECE_TOTALS[pool] - (used[pool] ?? 0) - (sc.casualties[pool] ?? 0) - (sc.out_of_play[pool] ?? 0);
+      }
       const sa = totalSupport(g) + g.available.us_troops + g.available.us_base;
       const cp = coinControlledPop(g) + g.patronage;
       const ob = totalOpposition(g) + countOnMap(g, 'vc_base', 'vc_tunnel');

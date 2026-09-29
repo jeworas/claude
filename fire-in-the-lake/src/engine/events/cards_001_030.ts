@@ -1,164 +1,266 @@
-// Events 1-30, in the canonical Fire in the Lake deck order (titles in src/data/cards.ts).
-// Effects are reconstructed from memory of the printed cards; numbers/wording are approximations.
-// Capabilities only record the marker. Momentum is recorded in g.momentum (side in g.tmp.momentum_side).
-import { COIN_KINDS, INS_KINDS, GUER_KINDS, defCard } from './helpers';
-import { FACTION_PIECES, count, flip } from '../../core/pieces';
+// Events 1-30, implemented from the official playbook text (reference/playbook.txt) and rules section 5.
+// Notes on how "instructions to the ops code" are passed: free Ops/SAs are pushed with the usual
+// {faction, free:true, spaces?, max?} plus these documented extras: ignoreMonsoon (Sweep/March may occur in Monsoon),
+// ignoreTunnel (Assault removes Tunneled Bases as if untunneled), into (Air Lift destination space).
+// Capabilities/momentum only record the marker (and, for Top Gun / Wild Weasels / Peace Talks, the cross-card effects).
+import { INS_KINDS, defCard, track, changeTrail, setTrailTo, removePieces, K, log, rollDie, flipAll, countIn } from './helpers';
+import { FACTION_PIECES, count, remove, removeTo, place, setSupport, shiftSupport } from '../../core/pieces';
 import { MAP, SPACE_IDS } from '../../data/map';
-import { aid, cap, freeOp, insBase, insGuer, mom, patronage, pick, placeIn, poolMove, removeUp, resources, run, shift, stayEligible, trail } from './dsl';
+import { anyOf, cap, chooseFaction, flipUp, freeOp, makeIneligible, mom, patronage, pick, placeIn, poolMove, removeUp, resources, run, selectInto, shift, stayEligible, trail, xfer, aid } from './dsl';
 import * as W from './wh';
 
-const US_TROOPS = ['us_troops'] as const;
+const US_POOLS = ['us_troops', 'us_base', 'us_irreg'] as const;
+const NVA_POOLS = ['nva_troops', 'nva_guer', 'nva_base'] as const;
 const IRREG = ['us_irreg_u', 'us_irreg_a'] as const;
-const RANGERS = ['arvn_ranger_u', 'arvn_ranger_a'] as const;
-const VC_K = FACTION_PIECES.VC;
-const VC_G = ['vc_guer_u', 'vc_guer_a'] as const;
-const NVA_K = FACTION_PIECES.NVA;
-const NVA_TROOPS = ['nva_troops'] as const;
-const usDest = 'casualties' as const;
-const ids = (...x: string[]) => x;
-const laosIds = ['central_laos', 'southern_laos'];
-const highlandProvs = () => SPACE_IDS.filter((id) => MAP[id].type === 'province' && MAP[id].terrain === 'highland' && MAP[id].country === 'south_vietnam');
+const VC_KINDS = FACTION_PIECES.VC;
+const MEK3 = ['loc_can_tho_chau_doc', 'loc_can_tho_bac_lieu', 'loc_can_tho_long_phu'];
+const lowlandsTouchingMekong = () => SPACE_IDS.filter((id) => MAP[id].terrain === 'lowland' && MAP[id].adjacent.some((a) => MEK3.includes(a)));
 
-defCard(1, 'Free US Air Strike. Then move up to 3 US Troops from Casualties to Available.',
-  'Aid -6. Remove up to 3 US Troops from the map to Out of Play.', () => ({
-    u: [freeOp('sa_air_strike', { faction: 'US' }), poolMove('us_troops', 'casualties', 'available', 3)],
-    s: [aid(-6), removeUp([...US_TROOPS], 3, { dest: 'out_of_play' })],
-  }));
-
-defCard(2, 'Aid +6. Place up to 3 US Irregulars in Provinces, in any distribution.', 'Aid -6. Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [aid(6), placeIn('us_irreg', 3, { where: W.prov })],
-  s: [aid(-6), shift(2, -1, { where: W.sv })],
+defCard(1, () => ({
+  u: [
+    freeOp('sa_air_strike', { faction: 'US' }),
+    xfer(anyOf([...US_POOLS], 'out_of_play', 'map', { toWhere: W.city }), 6, { label: 'US piece from Out of Play to a City' }),
+  ],
+  s: [run((g, c) => {
+    let n = 0;
+    for (const p of US_POOLS) { n += g.casualties[p]; g.out_of_play[p] += g.casualties[p]; g.casualties[p] = 0; }
+    log(g, `Congressional regrets: ${n} Casualties go Out of Play.`);
+    track(g, 'aid', -n);
+  })],
 }));
 
-defCard(3, 'NVA Resources -6.', 'NVA Resources +6. Trail +1.', () => ({
-  u: [resources('NVA', -6)],
-  s: [resources('NVA', 6), trail(1)],
+defCard(2, () => ({
+  u: [removeUp(INS_KINDS, (g) => { const n = rollDie(g); log(g, `Operation Menu: die roll ${n}.`); return n; }, { where: W.lc, label: 'Remove Insurgent pieces from Cambodia/Laos' })],
+  s: [
+    xfer(anyOf([...NVA_POOLS], 'available', 'map', { toWhere: W.cambodia }), 2, { by: 'NVA', label: 'NVA places a piece in Cambodia' }),
+    xfer([
+      { pool: 'us_troops', from: 'map', to: 'out_of_play' },
+      { pool: 'us_troops', from: 'available', to: 'out_of_play' },
+      { pool: 'us_troops', from: 'casualties', to: 'out_of_play' },
+    ], 2, { label: 'US Troops to Out of Play' }),
+    aid(-6),
+  ],
 }));
 
-defCard(4, 'Capability: US Air Strike may degrade the Trail by up to 2 instead of 1.',
-  'Capability: US Air Strike degrades the Trail only on a die roll of 4-6.', () => ({ u: [cap()], s: [cap()] }));
+defCard(3, () => ({
+  u: [resources('NVA', -9), run((g) => {
+    if (!g.pivotal_played.includes('US')) { g.tmp = g.tmp ?? {}; g.tmp.peace_talks = true; log(g, 'Peace Talks marker placed on Linebacker II (Support+Available > 25).'); }
+  })],
+  s: [resources('NVA', 9), run((g) => { if (g.trail <= 2) setTrailTo(g, 3); })],
+}));
 
-defCard(5, 'Free US Air Strike.', 'Momentum (until Coup): Wild Weasels - Air Strike may not degrade the Trail.', () => ({
-  u: [freeOp('sa_air_strike', { faction: 'US' })],
+defCard(4, () => ({
+  u: [cap(), run((g) => { if (g.capabilities[33] === 'shaded') { delete g.capabilities[33]; log(g, 'Top Gun cancels shaded MiGs.'); } })],
+  s: [cap()],
+}));
+
+defCard(5, () => ({
+  u: [run((g) => {
+    if (g.capabilities[34] === 'shaded') { delete g.capabilities[34]; log(g, 'Wild Weasels remove shaded SA-2s.'); }
+    else { changeTrail(g, -2); track(g, 'NVA', -9); }
+  })],
   s: [mom()],
 }));
 
-defCard(6, 'Free US Air Strike.', 'Remove up to 2 US Troops from the map to Casualties.', () => ({
-  u: [freeOp('sa_air_strike', { faction: 'US' })],
-  s: [removeUp([...US_TROOPS], 2, { dest: usDest })],
+defCard(6, () => ({
+  u: [
+    ...selectInto('sp', 1, W.outsideSouth, { label: 'Air Strike space outside the South' }),
+    removeUp(INS_KINDS, 6, { air: true, ids: (g, c) => c.d.sp ?? [], label: 'Air Strike: 6 hits' }),
+    trail(-2),
+  ],
+  s: [poolMove('us_troops', 'available', 'casualties', 2), trail(2)],
 }));
 
-defCard(7, 'Momentum (until Coup): ADSID - each time the Trail is improved, NVA Resources -6.', 'Trail +1.', () => ({
+defCard(7, () => ({
   u: [mom()],
-  s: [trail(1)],
+  s: [run((g) => { setTrailTo(g, Math.max(g.trail + 1, 2)); }), resources('ARVN', -9)],
 }));
 
-defCard(8, 'Capability: US Air Strike may include 1 space that has no COIN pieces.',
-  'Capability: When Air Strike hits 2 or more spaces, shift Support 2 levels toward Opposition (instead of 1) in each.', () => ({ u: [cap()], s: [cap()] }));
+defCard(8, () => ({ u: [cap()], s: [cap()] }));
 
-defCard(9, 'Move up to 4 US Troops from Casualties to Available.', 'Move up to 3 US Troops from Available to Out of Play.', () => ({
-  u: [poolMove('us_troops', 'casualties', 'available', 4)],
-  s: [poolMove('us_troops', 'available', 'out_of_play', 3)],
+defCard(9, () => ({
+  u: [xfer([
+    { pool: 'us_troops', from: 'out_of_play', to: 'available' },
+    { pool: 'us_troops', from: 'out_of_play', to: 'map', toWhere: W.sv },
+    { pool: 'us_troops', from: 'map', to: 'available' },
+  ], 3, { label: 'Move US Troops' })],
+  s: [xfer([{ pool: 'us_troops', from: 'map', to: 'out_of_play' }], 3, { label: 'US Troops from the map Out of Play' })],
 }));
 
-defCard(10, 'Momentum (until Coup): Rolling Thunder - the Trail may not be improved (Rally, Laos/Cambodia) or degraded (Air Strike).', 'NVA Resources +6.', () => ({
+defCard(10, () => ({
+  u: [trail(-2), resources('NVA', -9), makeIneligible('NVA')],
+  s: [resources('ARVN', -5), mom()],
+}));
+
+defCard(11, () => ({ u: [cap()], s: [cap()] }));
+
+defCard(12, () => ({
+  u: [
+    run((g) => { for (const id of SPACE_IDS) if (MAP[id].country !== 'south_vietnam') flipAll(g, id, 'active', ['nva_guer_u', 'vc_guer_u']); log(g, 'All Insurgent Guerrillas outside the South flipped Active.'); }),
+    removeUp(['nva_base'], 1, { where: W.outsideSouth, label: 'Remove 1 NVA Base' }),
+  ],
+  s: [
+    placeIn('nva_base', 1, { where: (g, id) => W.outsideSouth(g, id) && W.nvaCtl(g, id), label: 'Place an NVA Base at NVA Control outside the South' }),
+    flipUp(['nva_guer_a'], 3, 'underground', { label: 'Flip NVA Guerrillas Underground' }),
+  ],
+}));
+
+defCard(13, () => ({ u: [cap()], s: [cap()] }));
+defCard(14, () => ({ u: [cap()], s: [cap()] }));
+
+defCard(15, () => ({
   u: [mom()],
-  s: [resources('NVA', 6)],
+  s: [stayEligible(), mom()],
 }));
 
-defCard(11, 'Capability: US Assault may also remove one enemy Base per Assault even while other enemy pieces remain in that space.', 'Capability: US Assault may select at most 2 spaces.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(12, 'Free US Air Strike.', 'Place up to 3 of your Guerrillas in Provinces, at most 1 per Province (NVA or VC, whichever executes).', () => ({
-  u: [freeOp('sa_air_strike', { faction: 'US' })],
-  s: [placeIn(insGuer, 3, { where: W.prov, per: 1 })],
+defCard(16, () => ({
+  u: [aid(10), mom()],
+  s: [aid(-10), shift(1, -1, { where: (g, id) => count(g, id, 'us_troops', 'arvn_troops') > 0 && count(g, id, 'arvn_police') > 0, label: 'Space with Troops and Police' })],
 }));
 
-defCard(13, 'Capability: After a US/ARVN Sweep, the first 2 swept spaces each remove 1 Active enemy piece.', 'Capability: When US Assaults a space, roll a die; on 1-3 remove 1 US Troop from that space.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(14, 'Capability: In Highland or Jungle, up to 2 spaces per Assault remove 2 additional enemy pieces.', 'Capability: After a Patrol, NVA removes up to 2 of the COIN cubes that moved.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(15, 'Momentum (until Coup): Medevac - US Troops that would go to Casualties go to Available instead.', 'Remove up to 3 US Troops from the map to Casualties.', () => ({
-  u: [mom()],
-  s: [removeUp([...US_TROOPS], 3, { dest: usDest })],
+defCard(17, () => ({
+  u: [stayEligible(), mom()],
+  s: [
+    ...selectInto('sp', 1, (g, id) => W.coinBase(g, id) && count(g, id, 'nva_guer_u', 'vc_guer_u') > 0, { label: 'Space with a COIN Base and an Underground Insurgent' }),
+    removeUp(['us_base', 'arvn_base'], 1, { ids: (g, c) => c.d.sp ?? [], label: 'Remove a COIN Base' }),
+    removeUp(['nva_guer_u', 'vc_guer_u'], 1, { ids: (g, c) => c.d.sp ?? [], label: 'Remove an Underground Insurgent' }),
+  ],
 }));
 
-defCard(16, 'Momentum (until Coup): Blowtorch Komer - Pacification costs 1 ARVN Resource.', 'Aid -6.', () => ({
-  u: [mom()],
-  s: [aid(-6)],
+defCard(18, () => ({ u: [cap()], s: [cap()] }));
+defCard(19, () => ({ u: [cap()], s: [cap()] }));
+defCard(20, () => ({ u: [cap()], s: [cap()] }));
+
+defCard(21, () => ({
+  u: [
+    ...selectInto('dst', 1, undefined, { label: 'Destination space (or Done for Available)' }),
+    xfer([
+      { pool: 'us_troops', from: 'map', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
+      { pool: 'us_troops', from: 'map', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
+      { pool: 'us_troops', from: 'out_of_play', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
+      { pool: 'us_troops', from: 'out_of_play', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
+    ], 4, { label: 'Move US Troops' }),
+  ],
+  s: [(g, c) => {
+    // Provinces with US Troops, VC and that could be set to Active Opposition must be chosen first.
+    const hasVCpiece = (id: string) => count(g, id, 'vc_guer_u', 'vc_guer_a', 'vc_base') > 0;
+    const settable = (id: string) => MAP[id].pop > 0 && g.spaces[id].support !== -2;
+    const provs = SPACE_IDS.filter((id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0);
+    const first = provs.filter((id) => hasVCpiece(id) && settable(id));
+    c.d.cands = first.length ? first : provs;
+    void c;
+  }, ...americalPick()],
+}));
+function americalPick() {
+  const st = pick(2, undefined, (g, a, id) => {
+    removePieces(g, a, {
+      n: 1, kinds: ['vc_guer_u', 'vc_guer_a', 'vc_base'], filter: K((gg, aa, i) => i === id), by: a.by, data: {}, label: 'Remove a VC piece',
+      then: K((gg, aa, res) => { if (res.removed > 0 && MAP[id].pop > 0) setSupport(gg, id, -2); }),
+    });
+  }, { label: 'Province with US Troops', ids: (g, c) => c.d.cands ?? [] });
+  return [st];
+}
+
+defCard(22, () => ({
+  u: [xfer([
+    { pool: 'us_troops', from: 'available', to: 'map', toSpace: 'da_nang' },
+    { pool: 'us_troops', from: 'out_of_play', to: 'map', toSpace: 'da_nang', max: 3 },
+  ], 6, { label: 'Place US Troops in Da Nang' })],
+  s: [run((g) => {
+    for (const id of W.near('da_nang')) if (g.spaces[id].support > 0) setSupport(g, id, 0);
+    log(g, 'Support removed within 1 space of Da Nang.');
+  }), mom()],
 }));
 
-defCard(17, 'Momentum (until Coup): Claymores - no Ambush.', 'Place up to 3 of your Guerrillas in COIN-Controlled Cities/Provinces, at most 1 per space.', () => ({
-  u: [mom()],
-  s: [placeIn(insGuer, 3, { where: W.and(W.coinCtl, W.notLoc), per: 1 })],
-}));
-
-defCard(18, 'Capability: US Sweep counts ARVN Police as US Troops.', 'Capability: Terror by insurgents in a space with US Troops and Police shifts Support an extra level.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(19, 'Capability: Pacification may shift up to 3 levels per Pacify instead of 2.', 'Capability: Pacification may shift only 1 level per Pacify.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(20, 'Capability: An Air Strike that removes exactly 1 piece does not shift Support.', 'Capability: Air Strike may hit at most 2 spaces.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(21, 'Place up to 4 US Troops from Available in South Vietnam, in any distribution.', 'Remove up to 3 US Troops in South Vietnam to Casualties.', () => ({
-  u: [placeIn('us_troops', 4, { where: W.sv })],
-  s: [removeUp([...US_TROOPS], 3, { where: W.sv, dest: usDest })],
-}));
-
-defCard(22, 'Momentum (until Coup): Da Nang - US Air Lift into or out of Da Nang is free. Place up to 3 US Troops in Da Nang.',
-  'Place up to 3 of your Guerrillas in Quang Nam, Da Nang and/or Quang Tin-Quang Ngai.', () => ({
-    u: [placeIn('us_troops', 3, { where: W.isId('da_nang') }), mom()],
-    s: [placeIn(insGuer, 3, { where: W.isId('quang_nam', 'da_nang', 'quang_tin_quang_ngai') })],
-  }));
-
-defCard(23, 'Free US Sweep, then free US Assault, in Tay Ninh, Phuoc Long and The Fishhook.', 'Remove up to 3 US Troops in South Vietnam to Casualties.', () => {
-  const sp = { spaces: ['tay_ninh', 'phuoc_long', 'the_fishhook'] };
-  return {
-    u: [freeOp('op_sweep', { faction: 'US', extra: sp }), freeOp('op_assault', { faction: 'US', extra: sp })],
-    s: [removeUp([...US_TROOPS], 3, { where: W.sv, dest: usDest })],
-  };
-});
-
-defCard(24, 'Free US Sweep, then free US Assault, in up to 3 coastal South Vietnam Provinces.', 'Place 1 of your Bases in a coastal Province containing NVA or VC Guerrillas.', () => {
-  const coast = () => SPACE_IDS.filter((id) => MAP[id].type === 'province' && MAP[id].coastal && MAP[id].country === 'south_vietnam');
+defCard(23, () => {
+  const tunnelSp = (g: any, id: string) => W.tunneled(g, id);
   return {
     u: [
-      freeOp('op_sweep', { faction: 'US', extra: () => ({ spaces: coast(), max: 3 }) }),
-      freeOp('op_assault', { faction: 'US', extra: () => ({ spaces: coast(), max: 3 }) }),
+      ...selectInto('sp', 1, tunnelSp, { label: 'Space with a Tunnel' }),
+      freeOp('sa_air_lift', { faction: 'US', extra: (g, c) => (c.d.sp?.length ? { into: c.d.sp[0], spaces: undefined } : false) }),
+      freeOp('op_sweep', { faction: 'US', extra: (g, c) => (c.d.sp?.length ? { spaces: c.d.sp, max: 1, ignoreMonsoon: true } : false) }),
+      freeOp('op_assault', { faction: 'US', extra: (g, c) => (c.d.sp?.length ? { spaces: c.d.sp, max: 1, ignoreTunnel: true } : false) }),
     ],
-    s: [placeIn(insBase, 1, { where: W.and(W.coastal, W.prov, (g, id) => count(g, id, 'vc_guer_u', 'vc_guer_a', 'nva_guer_u', 'nva_guer_a') > 0) })],
+    s: [
+      ...selectInto('sp', 1, tunnelSp, { label: 'Space with a Tunnel' }),
+      removeUp(['us_troops'], (g) => { const n = rollDie(g); log(g, `Heavy casualties: die roll ${n}.`); return n; }, { ids: (g, c) => (c.d.sp?.length ? W.near(c.d.sp[0]) : []), label: 'US Troops to Casualties' }),
+    ],
   };
 });
 
-defCard(25, 'Free ARVN Sweep, then free ARVN Assault, in up to 3 spaces on or adjacent to the Mekong.', 'Add Sabotage to up to 3 Mekong LoCs.', () => {
-  const mk = () => SPACE_IDS.filter((id) => MAP[id].mekong || MAP[id].adjacent.some((a) => MAP[a].mekong));
-  return {
-    u: [
-      freeOp('op_sweep', { faction: 'ARVN', extra: () => ({ spaces: mk(), max: 3 }) }),
-      freeOp('op_assault', { faction: 'ARVN', extra: () => ({ spaces: mk(), max: 3 }) }),
-    ],
-    s: [pick(3, W.and(W.mekong, (g, id) => g.spaces[id].terror === 0), (g, a, id) => { g.spaces[id].terror = 1; }, { label: 'Sabotage a Mekong LoC' })],
-  };
-});
-
-defCard(26, 'Remove up to 3 Guerrillas in Laos, Cambodia or spaces adjacent to them.', 'Remove up to 3 Irregulars and/or Rangers from the map.', () => ({
-  u: [removeUp(GUER_KINDS, 3, { where: (g, id) => W.lc(g, id) || MAP[id].adjacent.some((a) => W.lc(g, a)) })],
-  s: [removeUp([...IRREG, 'arvn_ranger_u', 'arvn_ranger_a'], 3)],
+defCard(24, () => ({
+  u: [
+    ...selectInto('sp', 1, (g, id) => MAP[id].type === 'province' && MAP[id].coastal && (count(g, id, 'us_troops') > 0 || MAP[id].adjacent.some((a) => count(g, a, 'us_troops') > 0)), { label: 'Coastal Province with or adjacent to US Troops' }),
+    run((g, c) => {
+      for (const id of c.d.sp ?? []) for (const k of ['vc_guer_u', 'vc_guer_a', 'vc_base'] as const) remove(g, id, k, count(g, id, k));
+      log(g, 'All VC removed (Tunneled Bases stay).');
+    }),
+  ],
+  s: [
+    pick(3, W.prov, (g, a, id) => { flipAll(g, id, 'underground', ['vc_guer_a']); }, { label: 'Province: flip VC Guerrillas Underground' }),
+    stayEligible(),
+  ],
 }));
 
-defCard(27, 'Remove up to 3 VC pieces from Cities/Provinces in South Vietnam (Bases last).', 'Shift 1 City/Province with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [removeUp(VC_K, 3, { where: W.and(W.sv, W.notLoc) })],
-  s: [shift(1, -1, { where: W.sv })],
+defCard(25, () => ({
+  u: [
+    run((g) => { for (const id of MEK3) for (const k of INS_KINDS) remove(g, id, k, count(g, id, k)); log(g, 'NVA/VC removed from the Mekong LoCs.'); }),
+    ...chooseFaction('f', ['US', 'ARVN'], { text: 'US or ARVN Sweeps and Assaults' }),
+    freeOp('op_sweep', { faction: (g, c) => c.d.f, extra: () => ({ spaces: lowlandsTouchingMekong(), ignoreMonsoon: true }) }),
+    freeOp('op_assault', { faction: (g, c) => c.d.f, extra: () => ({ spaces: lowlandsTouchingMekong() }) }),
+  ],
+  s: [run((g) => {
+    for (const id of MEK3) {
+      place(g, id, 'vc_guer', 2);
+      if (count(g, id, 'vc_guer_u', 'vc_guer_a') > count(g, id, 'us_troops', 'us_irreg_u', 'us_irreg_a', 'arvn_troops', 'arvn_police', 'arvn_ranger_u', 'arvn_ranger_a')) { g.spaces[id].terror = 1; log(g, `Sabotage in ${MAP[id].name}.`); }
+    }
+  })],
 }));
 
-defCard(28, 'Capability: Once per US Assault, also remove 1 Underground Guerrilla from an assaulted space.', 'Capability: Each space that a US or ARVN Assault hits, if it has Population, shifts 1 level toward Opposition.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(29, 'Place up to 3 US Irregulars in Highland spaces, at most 1 per space.', 'Remove up to 3 US Irregulars from the map.', () => ({
-  u: [placeIn('us_irreg', 3, { where: W.highland, per: 1 })],
-  s: [removeUp([...IRREG], 3)],
+defCard(26, () => ({
+  u: [placeIn('us_irreg', 3, { where: W.lc, label: 'Place Irregulars outside the South' }), freeOp('sa_air_strike', { faction: 'US' })],
+  s: [
+    removeUp([...IRREG], 3, { dest: 'casualties', label: 'Irregulars to Casualties' }),
+    run((g, c) => { for (const id of c.last?.spaces ?? []) if (MAP[id].type !== 'loc' && MAP[id].pop > 0) shiftSupport(g, id, -1); }),
+  ],
 }));
 
-defCard(30, 'Remove up to 3 NVA/VC pieces from coastal spaces in South Vietnam (Bases last).', 'Place up to 2 of your Guerrillas in coastal spaces, at most 1 per space.', () => ({
-  u: [removeUp(INS_KINDS, 3, { where: W.and(W.sv, W.coastal) })],
-  s: [placeIn(insGuer, 2, { where: W.coastal, per: 1 })],
+defCard(27, () => ({
+  u: [removeUp(VC_KINDS, 3, { where: W.coinCtl, label: 'Remove VC pieces from COIN Control spaces' })],
+  s: [pick(2, (g, id) => id !== 'saigon' && W.coinCtl(g, id) && count(g, id, 'vc_guer_u', 'vc_guer_a', 'vc_base', 'vc_tunnel') > 0, (g, a, id) => {
+    g.spaces[id].terror += 1;
+    if (MAP[id].pop > 0) setSupport(g, id, -2);
+  }, { label: 'COIN-Controlled space with VC (outside Saigon)' })],
 }));
 
-void [COIN_KINDS, INS_KINDS, GUER_KINDS, count, flip, insBase, mom, patronage, pick, run, stayEligible, RANGERS, VC_K, VC_G, NVA_K, NVA_TROOPS, usDest, ids, laosIds, highlandProvs, IRREG, US_TROOPS, cap, poolMove, trail, resources, shift, aid];
+defCard(28, () => ({ u: [cap()], s: [cap()] }));
+
+defCard(29, () => ({
+  u: [removeUp(INS_KINDS, 4, { where: W.has(...IRREG), label: 'Remove Insurgent pieces from spaces with Irregulars' })],
+  s: [
+    run((g) => {
+      for (const id of SPACE_IDS) {
+        const n = countIn(g, id, [...IRREG]);
+        if (!n) continue;
+        for (const k of IRREG) removeTo(g, id, k, count(g, id, k), 'available');
+        place(g, id, 'vc_guer', n);
+      }
+      log(g, 'Irregulars replaced by VC Guerrillas.');
+    }),
+    pick(1, (g, id) => W.highland(g, id) && W.neutral(g, id), (g, a, id) => { setSupport(g, id, -2); }, { label: 'Neutral Highland to Active Opposition' }),
+    patronage(-3),
+  ],
+}));
+
+defCard(30, () => ({
+  u: [
+    ...chooseFaction('f', ['US', 'ARVN'], { text: 'US or ARVN Air Strikes' }),
+    pick(3, W.coastal, (g, a, id) => {
+      removePieces(g, a, { n: 2, kinds: INS_KINDS, filter: K((gg, aa, i) => i === id), air: true, by: a.by, data: {}, label: 'Fire support: remove up to 2 pieces' });
+    }, { by: (g, c) => c.d.f, label: 'Coastal space to strike' }),
+    run((g, c) => { for (const id of c.last?.touched ?? []) if (MAP[id].type !== 'loc' && MAP[id].pop > 0) shiftSupport(g, id, -1); }),
+  ],
+  s: [shift(2, -2, { where: (g, id) => MAP[id].type === 'province' && MAP[id].coastal && count(g, id, 'us_troops') > 0, label: 'Coastal Province with US Troops' })],
+}));
+
+void [trail, patronage, setSupport, SPACE_IDS];

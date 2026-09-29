@@ -210,10 +210,6 @@ function rallyOpts(g: Game, a: any, f: Ins, id: string): { key: string; label: s
   return out;
 }
 
-function rallyLimit(a: any): number {
-  return a.trailDone && cap(a.g, 31) === 'unshaded' ? 1 : limitOf(a);
-}
-
 function rallyCands(g: Game, a: any): string[] {
   const lim = a.trailDone && cap(g, 31) === 'unshaded' ? 1 : limitOf(a);
   if (a.done.length >= lim) return [];
@@ -225,7 +221,6 @@ function rallyCands(g: Game, a: any): string[] {
     return rallyOpts(g, a, f, id).length > 0;
   });
 }
-void rallyLimit;
 
 const rallyMore = (g: Game, a: any) => trailAllowed(g, a, facOf(g, a));
 const rallyNext = (g: Game, a: any) => next(g, a, rallyCands, rallyMore);

@@ -50,3 +50,12 @@ export function sum(g: Game, w: Where, f: (id: string) => number, ids: string[])
   for (const id of ids) if (w(g, id)) n += f(id);
   return n;
 }
+
+export const outsideSouth: Where = (g, id) => MAP[id].country !== 'south_vietnam';
+export const near = (id: string): string[] => [id, ...MAP[id].adjacent];
+export const withinOneOf = (ids: string[]): Where => (g, id) => ids.some((i) => i === id || MAP[i].adjacent.includes(id));
+export const coinBase: Where = (g, id) => count(g, id, 'us_base', 'arvn_base') > 0;
+export const tunneled: Where = (g, id) => count(g, id, 'nva_tunnel', 'vc_tunnel') > 0;
+export const hasNVA: Where = (g, id) => countFaction(g, id, 'NVA') > 0;
+export const hasVC: Where = (g, id) => countFaction(g, id, 'VC') > 0;
+export const hasUS: Where = (g, id) => countFaction(g, id, 'US') > 0;

@@ -71,25 +71,30 @@ describe('Coup: victory', () => {
 });
 
 describe('Coup: resources', () => {
-  it('sabotages contested LoCs, degrades the Trail, earns resources, and casualties cut Aid', () => {
+  it('sabotages contested LoCs, degrades the Trail, earns resources, and casualties cut Aid by 3 each', () => {
     const g = coupGame();
-    g.aid = 10; g.resources = { ARVN: 5, NVA: 5, VC: 5 };
+    g.aid = 40; g.resources = { ARVN: 5, NVA: 5, VC: 5 };
     put(g, 'loc_saigon_can_tho', 'vc_guer_u', 2); // Econ 2, sabotaged
-    put(g, 'loc_hue_da_nang', 'us_troops', 1);   // Econ 1, safe
+    put(g, 'loc_hue_da_nang', 'us_troops', 1);   // Econ 1, safe (but adjacent to a City: see below)
     put(g, 'loc_hue_da_nang', 'vc_guer_u', 1);
     put(g, 'saigon', 'vc_base', 1);
     put(g, 'central_laos', 'nva_base', 1);
-    put(g, 'central_laos', 'us_troops', 2);      // COIN controlled Laos -> Trail 2 -> 1 (then redeployed away)
+    put(g, 'central_laos', 'us_troops', 2);      // COIN controlled Laos -> Trail 2 -> 1
     g.casualties.us_troops = 4;
     run(g);
-    expect(g.spaces.loc_saigon_can_tho.terror).toBe(0); // reset removes markers at the end
-    expect(g.trail).toBe(1);
-    // Econ = sum of unsabotaged LoC Econ values = all econ minus 2
-    expect(g.resources.ARVN).toBe(5 + 10 + g.econ);
-    expect(g.resources.VC).toBe(5 + 1);
-    expect(g.resources.NVA).toBe(5 + 1 + 2 * 1);
-    expect(g.aid).toBe(0); // 10 - 3 x 4, clamped
+    const line = g.log.find((l) => l.startsWith('Resources:'))!;
+    const [, arvn, vc, nva] = line.match(/ARVN \+(\d+) .*VC \+(\d+), NVA \+(\d+)/)!.map(Number);
+    expect(vc).toBe(1);          // VC Bases on the whole map
+    expect(nva).toBe(1 + 2 * 1); // Laos Base + 2 x degraded Trail
+    expect(arvn).toBe(40 + g.econ);
+    expect(g.aid).toBe(40 - 12); // 3 x 4 Casualties
     expect(g.log.some((l) => l.includes('sabotage'))).toBe(true);
+    expect(g.spaces.loc_saigon_can_tho.terror).toBe(0); // markers are removed at Reset
+  });
+  it('Sabotage also hits a LoC adjacent to a City without COIN Control', () => {
+    const g = coupGame();
+    run(g);
+    expect(g.log.filter((l) => l.includes('sabotage')).length).toBeGreaterThan(0);
   });
 });
 
@@ -153,31 +158,73 @@ describe('Coup: redeploy, commitment, reset', () => {
     expect(n(g, 'the_fishhook', 'arvn_troops')).toBe(0);
     expect(g.available.arvn_troops).toBe(PIECE_TOTALS.arvn_troops);
   });
-  it('human ARVN redeploys troops', () => {
+  it('human ARVN must redeploy Troops from Provinces without COIN Bases', () => {
     const g = coupGame();
     g.humans = ['ARVN'];
     put(g, 'kien_phong', 'arvn_troops', 2);
     run(g);
     expect(getView(g).active).toBe('ARVN');
+    expect(getView(g).actions.some((x) => x.verb === 'done')).toBe(false); // mandatory moves remain
     doAction(g, 'piece', 'kien_phong:arvn_troops');
     doAction(g, 'space', 'saigon');
-    expect(n(g, 'saigon', 'arvn_troops')).toBe(1);
+    doAction(g, 'piece', 'kien_phong:arvn_troops');
+    doAction(g, 'space', 'saigon');
+    expect(n(g, 'saigon', 'arvn_troops')).toBe(2);
     doAction(g, 'done');
     expect(g.stack.length).toBe(0);
   });
-  it('Commitment moves casualties (half Out of Play) and human US can move pieces', () => {
+  it('bot ARVN redeploys mandatory Troops automatically', () => {
+    const g = coupGame();
+    put(g, 'kien_phong', 'arvn_troops', 2);
+    run(g);
+    expect(n(g, 'kien_phong', 'arvn_troops')).toBe(0);
+  });
+  it('Laos/Cambodia: US Troops go Out of Play, other COIN pieces to Available', () => {
+    const g = coupGame();
+    put(g, 'central_laos', 'us_troops', 2);
+    put(g, 'central_laos', 'arvn_troops', 1);
+    put(g, 'central_laos', 'us_irreg_u', 1);
+    run(g);
+    expect(g.out_of_play.us_troops).toBe(2);
+    expect(g.available.arvn_troops).toBe(PIECE_TOTALS.arvn_troops);
+    expect(g.available.us_irreg).toBe(PIECE_TOTALS.us_irreg);
+  });
+  it('the final Coup Round ends after Redeploy with the highest margin winning (no Commitment)', () => {
+    const g = coupGame();
+    g.final_coup = true;
+    g.casualties.us_troops = 3;
+    run(g);
+    expect(g.over).toBe(true);
+    expect(g.casualties.us_troops).toBe(3);
+  });
+  it('Commitment: 1 in 3 Troop casualties out of play, Bases out of play, human US places the rest and may move pieces', () => {
     const g = coupGame();
     g.humans = ['US'];
-    g.casualties.us_troops = 5;
+    g.casualties.us_troops = 6;
+    g.casualties.us_base = 1;
     put(g, 'kien_phong', 'us_troops', 1);
     run(g);
     expect(g.out_of_play.us_troops).toBe(2);
+    expect(g.out_of_play.us_base).toBe(1);
+    expect(getView(g).prompt).toContain('place 4 US Troop');
+    for (let i = 0; i < 4; i++) doAction(g, 'space', 'saigon');
+    expect(n(g, 'saigon', 'us_troops')).toBe(4);
     expect(g.casualties.us_troops).toBe(0);
-    doAction(g, 'piece', 'kien_phong:us_troops');
-    doAction(g, 'space', 'saigon');
-    expect(n(g, 'saigon', 'us_troops')).toBe(1);
+    doAction(g, 'piece', 'saigon:us_troops');
+    doAction(g, 'to_avail');
+    doAction(g, 'piece', 'saigon:us_troops');
+    doAction(g, 'to_avail');
     doAction(g, 'done');
-    expect(g.stack.length).toBe(0);
+    expect(g.stack.length).toBe(0); // 2 pieces withdrawn: VC shifted 1 Pop by bot heuristic
+    expect(g.over).toBe(false);
+  });
+  it('Medevac (unshaded) returns all Troop casualties to Available', () => {
+    const g = coupGame();
+    g.momentum = [15]; g.tmp.momentum_side = { 15: 'unshaded' };
+    g.casualties.us_troops = 6;
+    run(g);
+    expect(g.out_of_play.us_troops).toBe(0);
+    expect(g.available.us_troops).toBe(PIECE_TOTALS.us_troops + 6);
   });
   it('Reset: Trail 0->1 and 4->3, markers removed, guerrillas underground, momentum cleared, all eligible', () => {
     const g = coupGame();
@@ -234,5 +281,43 @@ describe('Coup: leader effects', () => {
     const g = coupGame();
     run(g);
     expect(g.log.some((l) => l.includes('sabotage'))).toBe(true);
+  });
+});
+
+describe('Coup: card effects and victory ranking', () => {
+  it('a Failed Attempt cancels Minh (no Train bonus) and desertion is 1 in 3 per space, before the Victory Phase', () => {
+    const g = coupGame(129);
+    expect(leaderEffect(g).trainAid).toBe(5);
+    put(g, 'saigon', 'arvn_troops', 4);
+    put(g, 'saigon', 'arvn_police', 2);
+    g.spaces.saigon.support = 2;
+    run(g);
+    expect(leaderEffect(g).trainAid).toBe(0);
+    expect(g.leader_box).toEqual([129]);
+    expect(g.leader).toBe(null);
+    expect(n(g, 'saigon', 'arvn_troops') + n(g, 'saigon', 'arvn_police')).toBe(4); // 6 - floor(6/3)
+    expect(g.over).toBe(true);
+  });
+  it('a Failed Attempt leaves another leader in place', () => {
+    const g = coupGame(129);
+    g.leader = 127;
+    run(g);
+    expect(g.leader).toBe(127);
+    expect(g.leader_box).toEqual([129]);
+  });
+  it('a Non-player passing a victory check means all players lose', () => {
+    const g = coupGame();
+    g.humans = ['VC'];
+    g.spaces.saigon.support = 2; // US passes; US is a Non-player
+    run(g);
+    expect(g.over).toBe(true);
+    expect(g.result).toContain('all players lose');
+  });
+  it('ties on margin go to Non-players, then VC, ARVN, NVA', () => {
+    const g = coupGame();
+    g.final_coup = true;
+    g.humans = ['VC', 'NVA'];
+    run(g);
+    expect(g.result).toMatch(/wins with the highest victory margin/);
   });
 });
