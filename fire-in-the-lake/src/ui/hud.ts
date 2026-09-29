@@ -210,7 +210,8 @@ export class Hud {
       this.addUndo(A, view);
       return;
     }
-    P.innerHTML = `<span class="who-dot" style="background:${col}"></span><b style="color:${col}">${who ?? ''}</b> ${esc(view.prompt)}`;
+    const txt = who && view.prompt.startsWith(who + ':') ? view.prompt.slice(who.length + 1).trim() : view.prompt;
+    P.innerHTML = `<span class="who-dot" style="background:${col}"></span><b style="color:${col}">${who ?? ''}</b> ${esc(txt)}`;
     A.innerHTML = '';
     const acts = view.actions.filter((a) => a.verb !== 'space' && a.verb !== 'piece' && a.verb !== 'undo');
     for (const a of acts) {

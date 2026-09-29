@@ -430,8 +430,8 @@ export class Board {
     const label = new CSS2DObject(el);
     const yOff = d.type === 'city' ? 1.3 : d.type === 'loc' ? 0.6 : 0.7;
     const zOff = d.type === 'loc' ? 1.5 : d.type === 'city' ? 2.6 : -(r * 0.8) - 0.3;
-    label.position.set(center.x, center.y + yOff - 1.0, center.z + zOff);
-    label.center.set(0.5, 0);
+    if (d.type === 'city') { label.position.set(center.x + r + 0.35, center.y + 0.3, center.z); label.center.set(0, 0.5); }
+    else { label.position.set(center.x, center.y + yOff - 1.0, center.z + zOff); label.center.set(0.5, 0); }
     group.add(label);
     this.root.add(group);
     const node: SpaceNode = { def: d, group, center, r, capMats, hl, hlMat, hlState: 'none', markers, markerSig: '', labelEl: el, hover: false };
