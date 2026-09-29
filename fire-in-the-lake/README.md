@@ -6,7 +6,7 @@ A browser implementation of GMT Games' *Fire in the Lake* (COIN Series vol. IV) 
 cd fire-in-the-lake
 npm install
 npm run dev        # open the printed URL
-npm test           # 426 engine, event, AI and soak tests
+npm test           # 512 engine, event, AI and soak tests
 npm run build      # static build in dist/
 ```
 
@@ -30,10 +30,10 @@ Debug URL: `?auto=short&seed=7&humans=US,VC` starts a game straight away.
 - All 130 cards: 120 events with both sides, 4 pivotal events and 6 Coup cards.
 - AI bots for every faction. They use rollout lookahead and deny the leading opponent.
 
-## Caveats
+## Sources and caveats
 
-- **No reference source.** The rules text, card text, scenario setups and some map details were written from memory. The Rally the Troops reference repo wasn't reachable from the build environment. Card effects follow the displayed card text exactly, but some cards differ in detail from the printed deck.
-- **One house rule.** VC Terror only shifts a space toward Opposition when it places a new Terror marker. This is for balance with the AI.
-- **Balance.** The AI still favours the insurgents. In AI-only games the VC often wins the Medium scenario at the first Coup.
+- **Sources.** Card text, faction orders, periods and tips are copied from the 2018 GMT Playbook. Rules, scenario setups and non-player priorities come from the 2018 Rulebook. Each scenario's starting victory scores match the rulebook checkpoints. The extracted PDF text sits in `reference/` locally and is not committed.
+- **AI.** The non-player AI follows the rulebook's section 8 priorities. It doesn't use the Random Spaces tables or the detailed per-space priority foldouts, which are not in the rulebook text; it uses heuristics there instead. In AI-only games the VC still wins most often.
+- **Map.** Population and Econ were fitted to the rulebook's victory checkpoints, and adjacency comes from the rules and playbook. A few province-to-province borders may still differ from the printed board.
 
 See `ARCHITECTURE.md` for the engine design and module layout.

@@ -263,12 +263,12 @@ function arvnFollowCandidates(g: Game, a: any): string[] {
   return a.sel.filter((id: string) => assaultHits(g, 'ARVN', id) > 0 && countInsurgent(g, id) > 0);
 }
 
-function followCost(g: Game): number { return hasMomentum(g, 72) ? 0 : 3; }
+function followCost(g: Game, a?: any): number { return hasMomentum(g, 72) || a?.free ? 0 : 3; } // free US Assault: the added ARVN Assault costs 0 (3.1.2)
 
 function assaultDone(g: Game, a: any): void {
   // The US may pay 3 ARVN Resources to follow up with an ARVN Assault in 1 space (3.2.4).
   a.phase = 'follow';
-  if (a.faction !== 'US' || a.noFollow || !canSpend(g, 'US', followCost(g)) || arvnFollowCandidates(g, a).length === 0) finish(g, a);
+  if (a.faction !== 'US' || a.noFollow || !canSpend(g, 'US', followCost(g, a)) || arvnFollowCandidates(g, a).length === 0) finish(g, a);
 }
 
 function assaultCandidates(g: Game, a: any): string[] {
@@ -304,7 +304,7 @@ registerState('op_assault', {
       p.select(a.sel);
       if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, a.sel.length ? 'Done selecting spaces' : 'Done (nothing to do)');
     } else if (a.phase === 'follow') {
-      p.text(`US Assault: pay ${followCost(g)} ARVN Resources to follow up with an ARVN Assault in one of these spaces? (ARVN Resources ${g.resources.ARVN})`);
+      p.text(`US Assault: pay ${followCost(g, a)} ARVN Resources to follow up with an ARVN Assault in one of these spaces? (ARVN Resources ${g.resources.ARVN})`);
       for (const id of arvnFollowCandidates(g, a)) p.space(id, `ARVN Assault in ${name(id)}`);
       p.action('done', undefined, 'No follow-up; finish');
     } else if (a.phase === 'resolve') {
@@ -323,7 +323,7 @@ registerState('op_assault', {
       else beginResolve(g, a, r);
     } else if (a.phase === 'follow') {
       if (verb === 'space') {
-        spend(g, 'US', followCost(g));
+        spend(g, 'US', followCost(g, a));
         a.phase = 'follow_done';
         push(g, 'op_assault', { faction: 'ARVN', free: true, spaces: [String(arg)], max: 1, noFollow: true, noShift: true });
       } else finish(g, a);
@@ -965,7 +965,7 @@ registerState('sa_advise', {
 
 function airLimit(g: Game, a: any, dflt: number): number {
   let m = isMonsoon(g) ? 2 : dflt;
-  if (hasMomentum(g, 115)) m = Math.min(m, 1);
+  if (hasMomentum(g, 115) && !a.override) m = Math.min(m, 1);
   if (a.max != null) m = Math.min(m, a.max);
   return m;
 }
@@ -982,7 +982,7 @@ registerState('sa_air_lift', {
   faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.src = null; a.lifted = 0; a.moved = [];
-    if (hasMomentum(g, 115)) { log(g, 'Typhoon Kate: no Air Lift.'); finish(g, a); return; }
+    if (hasMomentum(g, 115) && !a.override) { log(g, 'Typhoon Kate: no Air Lift.'); finish(g, a); return; }
     if (hasMomentum(g, 15) && momentumSide(g, 15) === 'shaded') { log(g, 'Medevac: no Air Lift.'); finish(g, a); }
   },
   prompt(g, a, p) {
@@ -1059,6 +1059,7 @@ function strikePieces(g: Game, a: any): { sp: string; k: PieceKind }[] {
 }
 
 function canDegrade(g: Game, a: any): boolean {
+  if (a.noTrail) return false; // Event: Air Strike may not Degrade the Trail
   if (a.hits < 2 || a.degraded || hasMomentum(g, 39)) return false; // Oriskany: no Degrade
   if (weasels(g) && a.removed > 0) return false; // Wild Weasels (shaded): remove OR degrade
   if (g.trail <= 0) return false;
@@ -1268,7 +1269,7 @@ registerState('sa_transport', {
   faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'origin'; a.src = null; a.n = 0; a.moved = []; a.dests = [];
-    if (hasMomentum(g, 115)) { log(g, 'Typhoon Kate: no Transport.'); finish(g, a); return; }
+    if (hasMomentum(g, 115) && !a.override) { log(g, 'Typhoon Kate: no Transport.'); finish(g, a); return; }
     if (transportOrigins(g, a).length === 0) finish(g, a);
   },
   prompt(g, a, p) {
