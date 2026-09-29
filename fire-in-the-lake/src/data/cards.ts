@@ -9,7 +9,8 @@ import type { CardDef, Faction } from '../core/types';
 
 export interface CardDefX extends CardDef {
   tips?: string;                 // Playbook implementation tips
-  second_ed?: boolean;           // card text updated for the 2nd Edition
+  secondEd?: boolean;            // card text updated for the 2nd Edition
+  edition?: string;              // '2nd Ed' when secondEd (read by the card panel)
   dual?: boolean;                // single printed text (no separate shaded side)
   cap_faction?: Faction;         // owner of the CAPABILITY marker
   momentum_unshaded?: boolean;   // the unshaded text is a MOMENTUM effect
@@ -161,7 +162,7 @@ function build(r: Row): CardDefX {
     id, title, coup: id >= 125, order: [...ord].map((ch) => F[ch]), unshaded, shaded,
   };
   if (period) c.period = period as CardDef['period'];
-  if (second) c.second_ed = true;
+  if (second) { c.secondEd = true; c.edition = '2nd Ed'; }
   if (capf) { c.capability = true; c.cap_faction = CAPF[capf]; }
   if (mom) {
     c.momentum = true;
