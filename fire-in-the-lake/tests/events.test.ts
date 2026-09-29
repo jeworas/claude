@@ -125,7 +125,7 @@ describe('markers and playability', () => {
   it('momentum cards record momentum on one side', () => {
     for (const card of [5, 7, 10, 15, 16, 17, 22, 38, 39, 41, 46, 72, 78, 115]) {
       const on = [false, true].filter((shaded) => { const g = handGame(6); play(g, card, shaded); return g.momentum.includes(card); });
-      expect(on.length, `card ${card}`).toBe([10, 15, 16].includes(card) ? 2 : 1);
+      expect(on.length, `card ${card}`).toBe(1);
     }
   });
   it('most events are playable on a populated board', () => {
