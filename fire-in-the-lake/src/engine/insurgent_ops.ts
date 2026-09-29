@@ -573,9 +573,12 @@ registerState('op_terror', {
     const st = g.spaces[id];
     const fresh = st.terror === 0;
     if (fresh) st.terror = 1;
-    // The shift only happens with a newly placed marker: re-Terrorizing a marked space does nothing more.
+    // 3.3.4: VC Terror shifts the space 1 level toward Active Opposition; NVA Terror only
+    // shifts Support 1 level toward Neutral. House rule for balance: the shift only happens
+    // when a new Terror marker is placed (re-Terrorizing a marked space does not shift again).
     if (fresh && s.type !== 'loc' && canHaveSupport(id)) {
-      if (st.support > 0) shiftSupport(g, id, -1); // Terror never creates Opposition (that is Agitation's job)
+      if (f === 'VC') shiftSupport(g, id, -1);
+      else if (st.support > 0) shiftSupport(g, id, -1);
     }
     log(g, `${f} Terror in ${s.name}${s.type === 'loc' ? ' (Sabotage)' : ''}.`);
     spaceDone(g, a, id, terrorCands);

@@ -595,7 +595,7 @@ export class Board {
     const W = this.stage.el.clientWidth, H = this.stage.el.clientHeight;
     const dist = cam.position.distanceTo(this.stage.controls.target);
     const showLoc = dist < 46;
-    const showMinor = dist < 78;
+    const showMinor = dist < 130;
     const order = Object.values(this.nodes).map((n) => {
       const forced = n.hlState !== 'none' || n.flashT > 0 || n.def.id === this.hoverId;
       return { n, p: n.prio + (forced ? 20 : 0), forced };

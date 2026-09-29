@@ -373,13 +373,13 @@ describe('Special Activities', () => {
 });
 
 describe('Terror balance rules', () => {
-  it('never shifts into Opposition and only shifts on a fresh marker', () => {
+  it('VC Terror shifts toward Opposition, but only when placing a fresh marker', () => {
     const g = mk();
     g.spaces.kien_phong.support = 0;
     put(g, 'kien_phong', 'vc_guer_u', 2);
     push(g, 'op_terror', { faction: 'VC' });
     do_(g, 'space', 'kien_phong');
-    expect(g.spaces.kien_phong.support).toBe(0);
+    expect(g.spaces.kien_phong.support).toBe(-1);
     const h = mk();
     h.spaces.kien_phong.support = 2;
     h.spaces.kien_phong.terror = 1;
