@@ -10,7 +10,7 @@
 //  * Loop safety: per-frame selection counter and per-option use counts force a finish verb.
 import { cloneGame, currentFaction, doAction, getView, top } from '../core/framework';
 import {
-  victoryMargin, totalSupport, coinControlledPop, nvaControlledPop, countOnMap,
+  victoryMargin, totalSupport, totalOpposition, coinControlledPop, nvaControlledPop, countOnMap,
   countCOIN, countFaction, countBases, space,
 } from '../core/pieces';
 import type { ActionOption, Faction, Game } from '../core/types';
@@ -54,10 +54,10 @@ export function evaluate(g: Game, f: Faction): number {
   if (lead > -4) s -= 3 * urgency * (lead + 4) / 4; // threatening to win: extra penalty
   switch (f) {
     case 'US':
-      s += 0.5 * totalSupport(g) + 0.3 * coinControlledPop(g) - 0.2 * g.casualties.us_troops - 0.2 * g.casualties.us_base;
+      s += 0.5 * totalSupport(g) - 0.4 * totalOpposition(g) - 0.6 * countOnMap(g, 'vc_base', 'vc_tunnel') + 0.3 * coinControlledPop(g) - 0.2 * g.casualties.us_troops - 0.2 * g.casualties.us_base;
       break;
     case 'ARVN':
-      s += 0.4 * coinControlledPop(g) + 0.3 * g.patronage + 0.15 * g.resources.ARVN + 0.05 * g.aid;
+      s += 0.4 * coinControlledPop(g) - 0.3 * totalOpposition(g) - 0.5 * countOnMap(g, 'vc_base', 'vc_tunnel', 'nva_base', 'nva_tunnel') + 0.3 * g.patronage + 0.15 * g.resources.ARVN + 0.05 * g.aid;
       break;
     case 'NVA':
       s += 0.4 * nvaControlledPop(g) + 1.0 * countOnMap(g, 'nva_base', 'nva_tunnel') + 1.0 * g.trail + 0.2 * g.resources.NVA

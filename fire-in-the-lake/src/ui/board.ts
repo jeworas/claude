@@ -38,6 +38,7 @@ export interface SpaceNode {
   cands: THREE.Vector3[];
   prio: number;
   labelHtml: string;
+  wCache: number;
   flashT: number;
   hover: boolean;
 }
@@ -462,7 +463,7 @@ export class Board {
     label.position.copy(cands[0]);
     group.add(label);
     this.root.add(group);
-    const node: SpaceNode = { def: d, group, center, r, capMats, hl, hlMat, hlState: 'none', markers, markerSig: '', labelEl: el, label, cands, labelHtml: '', flashT: 0, hover: false,
+    const node: SpaceNode = { def: d, group, center, r, capMats, hl, hlMat, hlState: 'none', markers, markerSig: '', labelEl: el, label, cands, labelHtml: '', wCache: 0, flashT: 0, hover: false,
       prio: d.type === 'city' ? 5 + d.pop * 0.3 : d.type === 'province' ? (d.pop > 0 ? 3 + d.pop * 0.3 : 2) : d.econ > 0 ? 0.6 : 0.2 };
     hlMat.opacity = 0;
     hl.visible = false;
@@ -610,7 +611,9 @@ export class Board {
       let ok = false;
       if (allowed) {
         const len = d.name.length * (d.type === 'city' ? 7.4 : d.type === 'loc' ? 5.2 : 6.2) + (d.type === 'loc' ? 34 : 50);
-        const w = Math.min(len, 260), h = d.type === 'city' ? 22 : 18;
+        const meas = n.labelEl.offsetWidth;
+        if (meas > 0) n.wCache = meas;
+        const w = Math.min(n.wCache || len, 300) + 4, h = (n.labelEl.offsetHeight || (d.type === 'city' ? 22 : 18)) + 2;
         for (let i = 0; i < n.cands.length && !ok; i++) {
           this.pos.copy(n.cands[i]).project(cam);
           if (this.pos.z > 1 || this.pos.z < -1) continue;

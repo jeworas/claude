@@ -23,23 +23,23 @@ function def(n: number, text: string, steps: Step[]): void {
 }
 CUR.card = 121; CUR.n = 0;
 
-def(121, 'Trail to 0. NVA Resources -50%. The US may Air Strike anywhere.', [
+def(121, 'Requires 2+ cards in the RVN Leader box and Support + Available US pieces > 40. Trail to 0. NVA Resources -50%. Free US Air Strike that may target any space.', [
   run((g) => { g.trail = 0; g.resources.NVA -= Math.floor(g.resources.NVA / 2); }),
   freeOp('sa_air_strike', { faction: 'US', extra: { anywhere: true } }),
 ]);
 
-def(122, 'NVA free March, then free Attack with +1 bonus.', [
+def(122, 'Requires 2+ cards in the RVN Leader box and more NVA Troops than US Troops on the map. Free NVA March, then free NVA Attack with +1 bonus.', [
   freeOp('op_march', { faction: 'NVA' }),
   freeOp('op_attack', { faction: 'NVA', extra: { bonus: 1 } }),
 ]);
 
-def(123, 'US Troops on the map to Available. Free ARVN Train and Govern.', [
+def(123, 'Requires 2+ cards in the RVN Leader box and fewer than 20 US Troops on the map. Move all US Troops from the map to Available. Free ARVN Train, then free ARVN Govern.', [
   run((g) => { for (const id of SPACE_IDS) removeTo(g, id, 'us_troops', 99, 'available'); }),
   freeOp('op_train', { faction: 'ARVN' }),
   freeOp('sa_govern', { faction: 'ARVN' }),
 ]);
 
-def(124, 'Free VC Terror in every space with VC Guerrillas, then free VC Attack.', [
+def(124, 'Requires 2+ cards in the RVN Leader box and more than 20 VC Guerrillas in South Vietnam. Free VC Terror in every space with VC Guerrillas (no flipping), then free VC Attack.', [
   freeOp('op_terror', { faction: 'VC', extra: (g: Game) => ({ spaces: SPACE_IDS.filter((id) => count(g, id, 'vc_guer_u', 'vc_guer_a') > 0), noFlip: true }) }),
   freeOp('op_attack', { faction: 'VC' }),
 ]);

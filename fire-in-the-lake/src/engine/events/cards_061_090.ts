@@ -19,79 +19,79 @@ const ids = (...x: string[]) => x;
 const laosIds = ['central_laos', 'southern_laos'];
 const highlandProvs = () => SPACE_IDS.filter((id) => MAP[id].type === 'province' && MAP[id].terrain === 'highland' && MAP[id].country === 'south_vietnam');
 
-defCard(61, 'Capability: Armored Cavalry - US/ARVN Sweep helps.', 'Capability: Armored Cavalry - COIN losses.', () => ({ u: [cap()], s: [cap()] }));
+defCard(61, 'Capability: After ARVN Transport, ARVN may Assault free in the destination spaces.', 'Capability: ARVN Rangers moved by Transport flip to Active.', () => ({ u: [cap()], s: [cap()] }));
 
-defCard(62, 'Remove up to 3 NVA/VC pieces in Cambodia.', 'Place up to 3 NVA Troops in Cambodia.', () => ({
+defCard(62, 'Remove up to 3 NVA/VC pieces from Cambodia (Bases last).', 'Place up to 3 NVA Troops in Cambodia.', () => ({
   u: [removeUp(INS_KINDS, 3, { where: W.cambodia })],
   s: [placeIn('nva_troops', 3, { where: W.cambodia, by: 'NVA' })],
 }));
 
-defCard(63, 'Shift up to 2 spaces one level toward Support.', 'Patronage -4.', () => ({
+defCard(63, 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Patronage -4.', () => ({
   u: [shift(2, 1, { where: W.sv })],
   s: [patronage(-4)],
 }));
 
-defCard(64, 'Aid +6. Shift up to 2 spaces one level toward Support.', 'Aid -6.', () => ({
+defCard(64, 'Aid +6. Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Aid -6.', () => ({
   u: [aid(6), shift(2, 1, { where: W.sv })],
   s: [aid(-6)],
 }));
 
-defCard(65, 'Place up to 3 ARVN Police in South Vietnam Cities/Provinces.', 'Remove up to 3 ARVN Police.', () => ({
+defCard(65, 'Place up to 3 ARVN Police in South Vietnam Cities/Provinces.', 'Remove up to 3 ARVN Police from the map.', () => ({
   u: [placeIn('arvn_police', 3, { where: W.and(W.sv, W.notLoc) })],
   s: [removeUp(['arvn_police'], 3)],
 }));
 
-defCard(66, 'Aid +6. Shift up to 2 spaces one level toward Support.', 'Aid -6. Shift up to 2 spaces one level toward Opposition.', () => ({
+defCard(66, 'Aid +6. Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Aid -6. Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [aid(6), shift(2, 1, { where: W.sv })],
   s: [aid(-6), shift(1, -1, { where: W.sv })],
 }));
 
-defCard(67, 'Place up to 3 US Troops in coastal South Vietnam, then a free US Sweep in up to 2 spaces.', 'Remove up to 2 US Troops from coastal spaces.', () => ({
+defCard(67, 'Place up to 3 US Troops in coastal South Vietnam spaces, then free US Sweep in up to 2 spaces.', 'Remove up to 2 US Troops from coastal spaces.', () => ({
   u: [placeIn('us_troops', 3, { where: W.and(W.sv, W.coastal) }), freeOp('op_sweep', { faction: 'US', extra: { max: 2 } })],
   s: [removeUp([...US_TROOPS], 2, { where: W.coastal })],
 }));
 
-defCard(68, 'Place up to 3 Irregulars in Provinces.', 'Remove up to 3 Irregulars.', () => ({
+defCard(68, 'Place up to 3 US Irregulars in Provinces, in any distribution.', 'Remove up to 3 US Irregulars from the map.', () => ({
   u: [placeIn('us_irreg', 3, { where: W.prov })],
   s: [removeUp([...IRREG], 3)],
 }));
 
-defCard(69, 'Free US Sweep then Assault in up to 2 spaces.', 'Remove up to 2 US Troops from the map.', () => ({
+defCard(69, 'Free US Sweep, then free US Assault, each in up to 2 spaces.', 'Remove up to 2 US Troops from the map.', () => ({
   u: [freeOp('op_sweep', { faction: 'US', extra: { max: 2 } }), freeOp('op_assault', { faction: 'US', extra: { max: 2 } })],
   s: [removeUp([...US_TROOPS], 2)],
 }));
 
-defCard(70, 'Place up to 4 ARVN Troops in South Vietnam, then a free ARVN Sweep in up to 2 spaces.', 'Remove up to 3 ARVN Troops.', () => ({
+defCard(70, 'Place up to 4 ARVN Troops in South Vietnam Cities/Provinces, then free ARVN Sweep in up to 2 spaces.', 'Remove up to 3 ARVN Troops from the map.', () => ({
   u: [placeIn('arvn_troops', 4, { where: W.and(W.sv, W.notLoc) }), freeOp('op_sweep', { faction: 'ARVN', extra: { max: 2 } })],
   s: [removeUp(['arvn_troops'], 3)],
 }));
 
-defCard(71, 'Free ARVN Assault in An Loc, Tay Ninh and Phuoc Long.', 'Place up to 3 NVA Troops in An Loc / Tay Ninh / Phuoc Long; remove up to 2 ARVN Troops there.', () => ({
+defCard(71, 'Free ARVN Assault in An Loc, Tay Ninh and Phuoc Long.', 'Place up to 3 NVA Troops in An Loc, Tay Ninh and/or Phuoc Long, then remove up to 2 ARVN Troops there.', () => ({
   u: [freeOp('op_assault', { faction: 'ARVN', extra: { spaces: ['an_loc', 'tay_ninh', 'phuoc_long'] } })],
   s: [placeIn('nva_troops', 3, { where: W.isId('an_loc', 'tay_ninh', 'phuoc_long'), by: 'NVA' }), removeUp(['arvn_troops'], 2, { where: W.isId('an_loc', 'tay_ninh', 'phuoc_long') })],
 }));
 
-defCard(72, 'Momentum (until Coup): Assaults add Body Count bonuses.', 'Shift up to 2 spaces one level toward Opposition.', () => ({
+defCard(72, 'Momentum (until Coup): Body Count - each enemy piece removed by US/ARVN Assault adds 1 to Aid.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [mom()],
   s: [shift(2, -1, { where: W.sv })],
 }));
 
-defCard(73, 'Aid +6. Up to 2 US Troops from Out of Play to Available.', 'Aid -6.', () => ({
+defCard(73, 'Aid +6. Move up to 2 US Troops from Out of Play to Available.', 'Aid -6.', () => ({
   u: [aid(6), poolMove('us_troops', 'out_of_play', 'available', 2)],
   s: [aid(-6)],
 }));
 
-defCard(74, 'Free ARVN Sweep then Assault in Laos.', 'Place up to 3 NVA Troops in Laos; remove up to 3 ARVN Troops in Laos.', () => ({
+defCard(74, 'Free ARVN Sweep, then free ARVN Assault, in Central Laos and Southern Laos.', 'Place up to 3 NVA Troops in Laos, then remove up to 3 ARVN Troops from Laos.', () => ({
   u: [freeOp('op_sweep', { faction: 'ARVN', extra: { spaces: laosIds } }), freeOp('op_assault', { faction: 'ARVN', extra: { spaces: laosIds } })],
   s: [placeIn('nva_troops', 3, { where: W.laos, by: 'NVA' }), removeUp(['arvn_troops'], 3, { where: W.laos })],
 }));
 
-defCard(75, 'Free ARVN Sweep in Cambodia.', 'Place up to 3 Guerrillas in Cambodia.', () => ({
+defCard(75, 'Free ARVN Sweep in Cambodia.', 'Place up to 3 of your Guerrillas in Cambodia.', () => ({
   u: [freeOp('op_sweep', { faction: 'ARVN', extra: { spaces: ids('northeast_cambodia', 'the_fishhook', 'the_parrots_beak', 'sihanoukville') } })],
   s: [placeIn(insGuer, 3, { where: W.cambodia })],
 }));
 
-defCard(76, 'Remove up to 2 NVA/VC pieces in South Vietnam.', 'Place up to 3 NVA Troops in South Vietnam Provinces.', () => ({
+defCard(76, 'Remove up to 2 NVA/VC pieces from South Vietnam (Bases last).', 'Place up to 3 NVA Troops in South Vietnam Provinces.', () => ({
   u: [removeUp(INS_KINDS, 2, { where: W.sv })],
   s: [placeIn('nva_troops', 3, { where: W.and(W.sv, W.prov), by: 'NVA' })],
 }));
@@ -101,29 +101,29 @@ defCard(77, 'NVA Resources -6. Trail -1.', 'Trail +1. VC Resources +3.', () => (
   s: [trail(1), resources('VC', 3)],
 }));
 
-defCard(78, 'Momentum (until Coup): Patronage cannot be lost through Transport.', 'Aid -3.', () => ({
+defCard(78, 'Momentum (until Coup): General Lansdale - Patronage may not be reduced.', 'Aid -3.', () => ({
   u: [mom()],
   s: [aid(-3)],
 }));
 
 defCard(79, 'Aid +6. Patronage -3.', 'Patronage +6. Aid -3.', () => ({ u: [aid(6), patronage(-3)], s: [patronage(6), aid(-3)] }));
 
-defCard(80, 'Aid +6. Shift up to 2 spaces one level toward Support.', 'Aid -6. Shift up to 2 spaces one level toward Opposition.', () => ({
+defCard(80, 'Aid +6. Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Aid -6. Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [aid(6), shift(2, 1, { where: W.sv })],
   s: [aid(-6), shift(1, -1, { where: W.sv })],
 }));
 
-defCard(81, 'Place up to 3 Irregulars in Highland spaces.', 'Remove up to 3 Irregulars from the map.', () => ({
+defCard(81, 'Place up to 3 US Irregulars in Highland spaces, at most 1 per space.', 'Remove up to 3 US Irregulars from the map.', () => ({
   u: [placeIn('us_irreg', 3, { where: W.highland, per: 1 })],
   s: [removeUp([...IRREG], 3)],
 }));
 
-defCard(82, 'Aid +9.', 'Shift up to 2 spaces one level toward Opposition.', () => ({
+defCard(82, 'Aid +6.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [aid(6)],
   s: [shift(2, -1, { where: W.sv })],
 }));
 
-defCard(83, 'Shift up to 3 spaces one level toward Support.', 'Shift up to 3 spaces one level toward Opposition.', () => ({
+defCard(83, 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [shift(2, 1, { where: W.sv })],
   s: [shift(2, -1, { where: W.sv })],
 }));
@@ -138,24 +138,24 @@ defCard(85, 'Aid +6. ARVN Resources +6.', 'Aid -6. Patronage -3.', () => ({
   s: [aid(-6), patronage(-3)],
 }));
 
-defCard(86, 'Capability: Mandate of Heaven - Govern strengthened.', 'Capability: Mandate of Heaven - Govern weakened.', () => ({ u: [cap()], s: [cap()] }));
+defCard(86, 'Capability: ARVN Govern may select up to 2 spaces.', 'Capability: ARVN Govern may select only 1 space.', () => ({ u: [cap()], s: [cap()] }));
 
-defCard(87, 'Place up to 3 ARVN Rangers in Provinces.', 'Patronage -5. Remove up to 2 ARVN Troops.', () => ({
+defCard(87, 'Place up to 3 ARVN Rangers in South Vietnam Provinces, in any distribution.', 'Patronage -5. Remove up to 2 ARVN Troops from the map.', () => ({
   u: [placeIn('arvn_ranger', 3, { where: W.and(W.sv, W.prov) })],
   s: [patronage(-5), removeUp(['arvn_troops'], 2)],
 }));
 
-defCard(88, 'Patronage -3. Shift 1 space one level toward Support.', 'Patronage +3. Shift 1 space one level toward Opposition.', () => ({
+defCard(88, 'Patronage -3. Shift 1 City/Province with Population in South Vietnam 1 level toward Active Support.', 'Patronage +3. Shift 1 City/Province with Population in South Vietnam 1 level toward Active Opposition.', () => ({
   u: [patronage(-3), shift(1, 1, { where: W.sv })],
   s: [patronage(3), shift(1, -1, { where: W.sv })],
 }));
 
-defCard(89, 'Shift up to 2 Cities one level toward Support.', 'Shift up to 2 Cities one level toward Opposition.', () => ({
+defCard(89, 'Shift up to 2 Cities 1 level toward Active Support.', 'Shift up to 2 Cities 1 level toward Active Opposition.', () => ({
   u: [shift(2, 1, { where: W.city })],
   s: [shift(2, -1, { where: W.city })],
 }));
 
-defCard(90, 'Free Air Strike. Trail -1.', 'Trail +1. NVA Resources +3.', () => ({
+defCard(90, 'Free US Air Strike. Trail -1.', 'Trail +1. NVA Resources +3.', () => ({
   u: [freeOp('sa_air_strike', { faction: 'US' }), trail(-1)],
   s: [trail(1), resources('NVA', 3)],
 }));
