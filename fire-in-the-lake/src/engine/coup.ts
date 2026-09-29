@@ -78,22 +78,16 @@ function leaderPhase(g: Game): void {
     g.leader = card.id;
     log(g, `New RVN leader: ${card.title}.`);
   } else if (card.title === 'Failed Attempt') {
-    // GUESS: desertion of 1 in 5 ARVN cubes on the map (rounded down), most crowded spaces first; Patronage -2.
-    let total = 0;
-    for (const id of SPACE_IDS) total += count(g, id, 'arvn_troops', 'arvn_police');
-    let n = Math.floor(total / 5);
-    const spaces = SPACE_IDS.filter((id) => count(g, id, 'arvn_troops', 'arvn_police') > 0)
-      .sort((a, b) => count(g, b, 'arvn_troops', 'arvn_police') - count(g, a, 'arvn_troops', 'arvn_police'));
-    while (n > 0 && spaces.length) {
-      for (const id of spaces) {
-        if (n <= 0) break;
-        const k: PieceKind = count(g, id, 'arvn_troops') > 0 ? 'arvn_troops' : 'arvn_police';
-        if (count(g, id, k) > 0) { remove(g, id, k, 1); n--; }
+    // Desertion: in EACH space remove 1 in 3 ARVN cubes (rounded down), Troops first. Patronage unchanged.
+    let removed = 0;
+    for (const id of SPACE_IDS) {
+      let n = Math.floor(count(g, id, 'arvn_troops', 'arvn_police') / 3);
+      for (const k of ['arvn_troops', 'arvn_police'] as PieceKind[]) {
+        const r = remove(g, id, k, n);
+        n -= r; removed += r;
       }
-      for (let i = spaces.length - 1; i >= 0; i--) if (count(g, spaces[i], 'arvn_troops', 'arvn_police') === 0) spaces.splice(i, 1);
     }
-    addPatronage(g, -2);
-    log(g, `Failed Attempt: ARVN desertion (${Math.floor(total / 5)} cubes), Patronage -2.`);
+    log(g, `Failed Attempt: ARVN desertion (${removed} cubes).`);
   }
 }
 
@@ -115,13 +109,14 @@ export function computeEcon(g: Game): number {
 }
 
 function resourcesPhase(g: Game): void {
-  // Sabotage: LoCs with more Insurgent Guerrillas than COIN pieces (GUESS: highest Econ first, marker cap 15).
+  // Sabotage: LoCs with more Insurgent Guerrillas than COIN pieces, or adjacent to a City without COIN Control (GUESS: highest Econ first, marker cap 15).
   const locs = SPACE_IDS.filter((id) => {
     const s = space(id);
     if (s.type !== 'loc' || s.econ <= 0 || g.spaces[id].terror > 0) return false;
     const guer = count(g, id, 'nva_guer_u', 'nva_guer_a', 'vc_guer_u', 'vc_guer_a');
     const coin = countFaction(g, id, 'US') + countFaction(g, id, 'ARVN');
-    return guer > coin;
+    if (guer > coin) return true;
+    return space(id).adjacent.some((n) => space(n).type === 'city' && control(g, n) !== 'COIN');
   }).sort((a, b) => space(b).econ - space(a).econ);
   for (const id of locs) {
     if (totalMarkers(g) >= TERROR_MARKER_CAP) break;
@@ -140,21 +135,38 @@ function resourcesPhase(g: Game): void {
   let vcBases = 0, nvaBases = 0;
   for (const id of SPACE_IDS) {
     const c = space(id).country;
-    if (c === 'south_vietnam') vcBases += count(g, id, 'vc_base', 'vc_tunnel');
+    vcBases += count(g, id, 'vc_base', 'vc_tunnel');
     if (c === 'laos' || c === 'cambodia') nvaBases += count(g, id, 'nva_base', 'nva_tunnel');
   }
   const nva = nvaBases + 2 * g.trail;
   addResources(g, 'VC', vcBases);
   addResources(g, 'NVA', nva);
   log(g, `Resources: ARVN +${arvn} (Aid ${g.aid} + Econ ${g.econ}), VC +${vcBases}, NVA +${nva}.`);
-  // US casualties reduce Aid (GUESS: 1 per piece in the Casualties box).
+  // US casualties reduce Aid (3 per piece in the Casualties box).
   const cas = g.casualties.us_troops + g.casualties.us_base + g.casualties.us_irreg;
-  if (cas > 0) { addAid(g, -cas); log(g, `US Casualties (${cas}) reduce Aid to ${g.aid}.`); }
+  if (cas > 0) { addAid(g, -3 * cas); log(g, `US Casualties (${cas}) reduce Aid to ${g.aid}.`); }
 }
 
 // ---------------------------------------------------------------- support (6.3)
 
-const pacifyCost = (g: Game) => (g.leader === 127 ? 4 : 3); // Nguyen Cao Ky
+/**
+ * RVN leader effects (for Agent B's Train / Transport / Govern and this file's Pacification).
+ *   Minh (g.leader === null): trainAid = 5   -> +5 Aid each time ARVN Trains.
+ *   Khanh (125):              transportMaxLocs = 1 -> ARVN Transport may use at most 1 LoC.
+ *   Young Turks (126):        governPatronage = 2  -> each ARVN Govern adds +2 Patronage.
+ *   Ky (127):                 pacifyCost = 4 (Resources per Pacification step, default 3).
+ *   Thieu (128):              no effect.
+ */
+export interface LeaderEffect { trainAid: number; transportMaxLocs: number; governPatronage: number; pacifyCost: number }
+export function leaderEffect(g: Game): LeaderEffect {
+  return {
+    trainAid: g.leader === null ? 5 : 0,
+    transportMaxLocs: g.leader === 125 ? 1 : Infinity,
+    governPatronage: g.leader === 126 ? 2 : 0,
+    pacifyCost: g.leader === 127 ? 4 : 3,
+  };
+}
+const pacifyCost = (g: Game) => leaderEffect(g).pacifyCost;
 
 export function pacifyCands(g: Game, done: string[]): string[] {
   if (done.length >= PACIFY_MAX_SPACES || g.resources.ARVN < pacifyCost(g)) return [];

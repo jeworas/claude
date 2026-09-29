@@ -1,19 +1,23 @@
-// Events 1-30 (US-flavoured deck section).
-// NOTE: the card texts are reconstructed from memory of the printed deck; numbers and fine wording are
-// approximations throughout (each defCard() carries the text that is actually implemented). Capability cards
-// only record the marker (4, 8, 11, 13, 14, 18, 19, 20, 28); momentum cards record the id in g.momentum and the
-// side in g.tmp.momentum_side (5 shaded, 7, 10, 15, 16, 17, 22 unshaded).
+// Events 1-30, in the canonical Fire in the Lake deck order (titles in src/data/cards.ts).
+// Effects are reconstructed from memory of the printed cards; numbers/wording are approximations.
+// Capabilities only record the marker. Momentum is recorded in g.momentum (side in g.tmp.momentum_side).
 import { COIN_KINDS, INS_KINDS, GUER_KINDS, defCard } from './helpers';
-import { FACTION_PIECES, count } from '../../core/pieces';
+import { FACTION_PIECES, count, flip } from '../../core/pieces';
 import { MAP, SPACE_IDS } from '../../data/map';
-import { aid, cap, freeOp, insBase, insGuer, mom, pick, placeIn, poolMove, removeUp, resources, run, shift, stayEligible, trail } from './dsl';
+import { aid, cap, freeOp, insBase, insGuer, mom, patronage, pick, placeIn, poolMove, removeUp, resources, run, shift, stayEligible, trail } from './dsl';
 import * as W from './wh';
 
 const US_TROOPS = ['us_troops'] as const;
 const IRREG = ['us_irreg_u', 'us_irreg_a'] as const;
+const RANGERS = ['arvn_ranger_u', 'arvn_ranger_a'] as const;
 const VC_K = FACTION_PIECES.VC;
+const VC_G = ['vc_guer_u', 'vc_guer_a'] as const;
 const NVA_K = FACTION_PIECES.NVA;
+const NVA_TROOPS = ['nva_troops'] as const;
 const usDest = 'casualties' as const;
+const ids = (...x: string[]) => x;
+const laosIds = ['central_laos', 'southern_laos'];
+const highlandProvs = () => SPACE_IDS.filter((id) => MAP[id].type === 'province' && MAP[id].terrain === 'highland' && MAP[id].country === 'south_vietnam');
 
 defCard(1, 'Free Air Strike. Then up to 3 US Troops from Casualties to Available.',
   'Aid -6. Remove up to 3 US Troops from the map Out of Play.', () => ({
@@ -21,11 +25,10 @@ defCard(1, 'Free Air Strike. Then up to 3 US Troops from Casualties to Available
     s: [aid(-6), removeUp([...US_TROOPS], 3, { dest: 'out_of_play' })],
   }));
 
-defCard(2, 'Remove up to 3 NVA/VC pieces (Bases last) in Laos and/or Cambodia.',
-  'NVA places 1 Base and 2 Guerrillas in Laos/Cambodia.', () => ({
-    u: [removeUp(INS_KINDS, 3, { where: W.lc })],
-    s: [placeIn('nva_base', 1, { where: W.lc, by: 'NVA' }), placeIn('nva_guer', 2, { where: W.lc, by: 'NVA' })],
-  }));
+defCard(2, 'Aid +6. Place up to 3 Irregulars in Provinces.', 'Aid -6. Shift up to 2 spaces one level toward Opposition.', () => ({
+  u: [aid(6), placeIn('us_irreg', 3, { where: W.prov })],
+  s: [aid(-6), shift(2, -1, { where: W.sv })],
+}));
 
 defCard(3, 'NVA Resources -9.', 'NVA Resources +6. Trail +1.', () => ({
   u: [resources('NVA', -9)],
@@ -58,9 +61,9 @@ defCard(9, 'Up to 4 US Troops from Casualties to Available.', 'Up to 3 US Troops
   s: [poolMove('us_troops', 'available', 'out_of_play', 3)],
 }));
 
-defCard(10, 'Momentum (until Coup): the Trail may not be improved.', 'NVA Resources +6.', () => ({
+defCard(10, 'Momentum (until Coup): the Trail may not be improved.', 'Momentum (until Coup): NVA Rally is stronger. NVA Resources +6.', () => ({
   u: [mom()],
-  s: [resources('NVA', 6)],
+  s: [mom(), resources('NVA', 6)],
 }));
 
 defCard(11, 'Capability: US Assault more effective.', 'Capability: US Assault less effective.', () => ({ u: [cap()], s: [cap()] }));
@@ -71,16 +74,17 @@ defCard(12, 'Free Air Strike.', 'Place up to 3 Guerrillas in Provinces (executin
 }));
 
 defCard(13, 'Capability: US/ARVN Assault helicopter bonus.', 'Capability: US loses a Troop when it Assaults.', () => ({ u: [cap()], s: [cap()] }));
+
 defCard(14, 'Capability: Assault bonus in Lowland.', 'Capability: NVA/VC Ambush bonus.', () => ({ u: [cap()], s: [cap()] }));
 
-defCard(15, 'Momentum (until Coup): US Casualties return to Available.', 'Remove up to 3 US Troops from the map to Casualties.', () => ({
+defCard(15, 'Momentum (until Coup): US Casualties return to Available.', 'Momentum (until Coup): no Medevac. Remove up to 3 US Troops from the map to Casualties.', () => ({
   u: [mom()],
-  s: [removeUp([...US_TROOPS], 3, { dest: usDest })],
+  s: [mom(), removeUp([...US_TROOPS], 3, { dest: usDest })],
 }));
 
-defCard(16, 'Momentum (until Coup): Pacification is cheaper.', 'Aid -6.', () => ({
+defCard(16, 'Momentum (until Coup): Pacification is cheaper.', 'Momentum (until Coup): Pacification limited. Aid -6.', () => ({
   u: [mom()],
-  s: [aid(-6)],
+  s: [mom(), aid(-6)],
 }));
 
 defCard(17, 'Momentum (until Coup): insurgent Marches are hindered.', 'Place up to 3 Guerrillas in COIN-controlled spaces (Bases stay).', () => ({
@@ -89,7 +93,9 @@ defCard(17, 'Momentum (until Coup): insurgent Marches are hindered.', 'Place up 
 }));
 
 defCard(18, 'Capability: Civic Action shifts easier.', 'Capability: Terror can shift Support more.', () => ({ u: [cap()], s: [cap()] }));
+
 defCard(19, 'Capability: Pacification shifts 2 levels.', 'Capability: Pacification shifts only 1 level.', () => ({ u: [cap()], s: [cap()] }));
+
 defCard(20, 'Capability: Air Strike removes without US losses.', 'Capability: Air Strike restricted.', () => ({ u: [cap()], s: [cap()] }));
 
 defCard(21, 'Place up to 4 US Troops from Available in South Vietnam.', 'Remove up to 3 US Troops in South Vietnam to Casualties.', () => ({
@@ -155,4 +161,4 @@ defCard(30, 'Remove up to 3 NVA/VC pieces in coastal South Vietnam.', 'Place up 
   s: [placeIn(insGuer, 2, { where: W.coastal, per: 1 })],
 }));
 
-void COIN_KINDS; void NVA_K; void stayEligible; void run;
+void [COIN_KINDS, INS_KINDS, GUER_KINDS, count, flip, insBase, mom, patronage, pick, run, stayEligible, RANGERS, VC_K, VC_G, NVA_K, NVA_TROOPS, usDest, ids, laosIds, highlandProvs, IRREG, US_TROOPS, cap, poolMove, trail, resources, shift, aid];

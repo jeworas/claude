@@ -23,7 +23,7 @@ import type { Faction, Game, PieceKind, PoolKind } from '../core/types';
 import { SPACE_IDS } from '../data/map';
 import {
   space, count, countCOIN, countBases, place, remove, move, flip, addResources, setTrail, addPatronage,
-  shiftSupport, isBase, PIECE_NAME, canHaveSupport,
+  shiftSupport, control, isBase, PIECE_NAME, canHaveSupport,
 } from '../core/pieces';
 import { isMonsoon } from './sequence';
 
@@ -296,7 +296,7 @@ function marchCands(g: Game, a: any): string[] {
 }
 
 function lockAdd(a: any, id: string, k: PieceKind, n: number): void {
-  if (n <= 0) return;
+  if (n === 0) return;
   a.lock = a.lock ?? {};
   a.lock[id] = a.lock[id] ?? {};
   a.lock[id][k] = (a.lock[id][k] ?? 0) + n;
@@ -329,11 +329,22 @@ function finishDest(g: Game, a: any): void {
   pay(g, f, marchCost(g, a, f, D), a);
   log(g, `${f} March: ${a.cur.count} piece(s) into ${nm(D)}${fu > 0 ? ' (Guerrillas activated)' : ''}.`);
   a.done.push(D);
+  if (a.ambush !== false && ambushOk(g, a, f, D)) {
+    a.phase = 'ambushq';
+    a.cur = { dest: D };
+    return;
+  }
   next(g, a, marchCands);
 }
 
 registerState('op_march', {
   faction: (g, a) => facOf(g, a),
+  resume(g, a, result) {
+    const pd = a.pending;
+    if (!pd) return;
+    applyAttrition(g, a, pd, result);
+    next(g, a, marchCands);
+  },
   enter(g, a) {
     initArgs(a);
     a.lock = {};
@@ -347,6 +358,13 @@ registerState('op_march', {
       return;
     }
     const D = a.cur.dest as string;
+    if (a.phase === 'ambushq') {
+      p.text(`Ambush from ${nm(D)}?`);
+      p.select([D]);
+      p.action('opt', 'ambush', 'Ambush (Special Activity)', { space: D });
+      p.action('skip', undefined, 'No Ambush');
+      return;
+    }
     p.text(`March into ${nm(D)}: click pieces to move (${a.cur.count} moved).`);
     p.select([D]);
     const srcs = marchSources(g, f, D);
@@ -367,6 +385,15 @@ registerState('op_march', {
       return;
     }
     const D = a.cur.dest as string;
+    if (a.phase === 'ambushq') {
+      if (verb === 'skip') return next(g, a, marchCands);
+      const dd = GK[f];
+      flip(g, D, dd.u, dd.a, 1);
+      if (lockOf(a, D, dd.u) > 0) { lockAdd(a, D, dd.u, -1); lockAdd(a, D, dd.a, 1); }
+      log(g, `${f} Ambushes in ${nm(D)} after March.`);
+      a.pending = { type: 'ambush', space: D };
+      return startRemove(g, f, D, 2);
+    }
     if (verb === 'back') { a.cur = null; a.phase = 'select'; return; }
     if (verb === 'done') return finishDest(g, a);
     if (verb === 'all') {
@@ -418,9 +445,7 @@ function attackCands(g: Game, a: any): string[] {
   });
 }
 
-function attackResume(g: Game, a: any, result: any): void {
-  const pd = a.pending;
-  if (!pd) return;
+function applyAttrition(g: Game, a: any, pd: any, result: any): void {
   const f = facOf(g, a);
   const d = GK[f];
   const removed: Record<string, number> = result?.removed ?? {};
@@ -435,6 +460,12 @@ function attackResume(g: Game, a: any, result: any): void {
   }
   if (pd.type === 'troops' && cap(g, 45) === 'unshaded') remove(g, pd.space, 'nva_troops', 1); // PT-76 (unshaded): a Troop is lost
   if (pd.type === 'ambush') a.ambushes = (a.ambushes ?? 0) + 1;
+}
+
+function attackResume(g: Game, a: any, result: any): void {
+  const pd = a.pending;
+  if (!pd) return;
+  applyAttrition(g, a, pd, result);
   spaceDone(g, a, pd.space, attackCands);
 }
 
@@ -511,12 +542,14 @@ function terrorEffective(g: Game, id: string, f: Ins): boolean {
   return gU(g, id, f) > 0 || (f === 'NVA' && count(g, id, 'nva_troops') > 0);
 }
 
+const terrorCost = (id: string) => (space(id).type === 'loc' ? 0 : 1);
+
 function terrorCands(g: Game, a: any): string[] {
   if (!roomLeft(a)) return [];
   const f = facOf(g, a);
-  if (!canPay(g, f, 1, a)) return [];
   return SPACE_IDS.filter((id) => {
     if (!openSpace(a, id) || !terrorEffective(g, id, f)) return false;
+    if (!canPay(g, f, terrorCost(id), a)) return false;
     return g.spaces[id].terror > 0 || totalTerror(g) < TERROR_MARKER_CAP;
   });
 }
@@ -535,7 +568,7 @@ registerState('op_terror', {
     const f = facOf(g, a);
     const id = String(arg);
     const s = space(id);
-    pay(g, f, 1, a);
+    pay(g, f, terrorCost(id), a);
     if (gU(g, id, f) > 0) flip(g, id, GK[f].u, GK[f].a, 1);
     const st = g.spaces[id];
     if (st.terror === 0) st.terror = 1;
@@ -657,7 +690,8 @@ function bombardSource(g: Game, a: any, t: string): string | null {
 function bombardCands(g: Game, a: any): string[] {
   if (!roomLeft(a)) return [];
   return SPACE_IDS.filter((id) =>
-    openSpace(a, id) && count(g, id, 'us_troops', 'arvn_troops') > 0 && bombardSource(g, a, id) !== null);
+    openSpace(a, id) && (count(g, id, 'us_troops', 'arvn_troops') >= 3 || count(g, id, 'us_base', 'arvn_base') > 0)
+    && bombardSource(g, a, id) !== null);
 }
 
 registerState('sa_bombard', {
@@ -667,7 +701,7 @@ registerState('sa_bombard', {
     a.faction = 'NVA';
     a.usedSrc = [];
     const c32 = cap(g, 32);
-    const dflt = c32 === 'unshaded' ? 1 : (c32 === 'shaded' ? 3 : 2);
+    const dflt = c32 === 'unshaded' ? 1 : (c32 === 'shaded' ? 3 : 2); // Long Range Guns: unshaded 1 space, shaded 3
     a.max = Math.min(a.max ?? Infinity, dflt);
     if (bombardCands(g, a).length === 0) { log(g, 'No legal Bombard targets.'); finish(g, a); }
   },
@@ -679,7 +713,7 @@ registerState('sa_bombard', {
     a.usedSrc.push(src);
     a.pending = { space: id };
     log(g, `NVA Bombards ${nm(id)} from ${nm(src)}.`);
-    startRemove(g, 'NVA', id, 1, ['us_troops', 'arvn_troops']);
+    startRemove(g, 'NVA', id, 1, ['us_troops', 'arvn_troops', 'us_base', 'arvn_base']);
   },
   resume(g, a) {
     if (!a.pending) return;
@@ -691,7 +725,7 @@ registerState('sa_bombard', {
 
 function taxCands(g: Game, a: any): string[] {
   if (!roomLeft(a)) return [];
-  return SPACE_IDS.filter((id) => openSpace(a, id) && gU(g, id, 'VC') > 0);
+  return SPACE_IDS.filter((id) => openSpace(a, id) && gU(g, id, 'VC') > 0 && control(g, id) !== 'COIN');
 }
 
 registerState('sa_tax', {
@@ -708,8 +742,9 @@ registerState('sa_tax', {
     const id = String(arg);
     const s = space(id);
     flip(g, id, 'vc_guer_u', 'vc_guer_a', 1);
-    const gain = s.type === 'loc' ? s.econ : 2;
+    const gain = s.type === 'loc' ? s.econ : 2 * s.pop;
     addResources(g, 'VC', gain);
+    if (s.type !== 'loc') shiftSupport(g, id, 1); // toward Active Support
     log(g, `VC Taxes ${s.name}: +${gain} Resources.`);
     spaceDone(g, a, id, taxCands);
   },

@@ -4,7 +4,8 @@ import { POOL_KINDS, PIECE_TOTALS, PIECE_KINDS } from '../src/core/types';
 import { doAction, getView, log, push, random, top } from '../src/core/framework';
 import { SPACE_IDS } from '../src/data/map';
 import { POOL_OF } from '../src/core/pieces';
-import { IMPL, eventPlayable, pivotalPreconditionMet } from '../src/engine/events';
+import { CARD } from '../src/data/cards';
+import { IMPL, TEXT, eventPlayable, pivotalPreconditionMet } from '../src/engine/events';
 
 // A hand-built, well-populated game so that every event has something to act on.
 function handGame(seed: number): Game {
@@ -122,7 +123,7 @@ describe('markers and playability', () => {
   it('momentum cards record momentum on one side', () => {
     for (const card of [5, 7, 10, 15, 16, 17, 22, 38, 39, 41, 46, 72, 78, 115]) {
       const on = [false, true].filter((shaded) => { const g = handGame(6); play(g, card, shaded); return g.momentum.includes(card); });
-      expect(on.length, `card ${card}`).toBe(1);
+      expect(on.length, `card ${card}`).toBe([10, 15, 16].includes(card) ? 2 : 1);
     }
   });
   it('most events are playable on a populated board', () => {
@@ -130,5 +131,24 @@ describe('markers and playability', () => {
     let n = 0;
     for (let c = 1; c <= 120; c++) for (const s of [false, true]) if (eventPlayable(g, c, s)) n++;
     expect(n).toBeGreaterThan(200);
+  });
+});
+
+describe('card data matches events', () => {
+  it('cards.ts text equals event TEXT and first faction follows the deck group', () => {
+    const first = ['US', 'NVA', 'ARVN', 'VC'];
+    for (let n = 1; n <= 124; n++) {
+      expect(CARD[n], `card ${n}`).toBeDefined();
+      expect(CARD[n].unshaded).toBe(TEXT[n].u);
+      if (n <= 120) {
+        expect(CARD[n].shaded).toBe(TEXT[n].s);
+        expect(CARD[n].order[0]).toBe(first[Math.floor((n - 1) / 30)]);
+      }
+    }
+  });
+  it('pivotal preconditions need 2 leader cards', () => {
+    const g = handGame(9);
+    g.leader_box = [];
+    for (const c of [121, 122, 123, 124]) expect(pivotalPreconditionMet(g, c)).toBe(false);
   });
 });

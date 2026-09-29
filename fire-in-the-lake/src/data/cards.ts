@@ -1,135 +1,135 @@
-// All 130 Fire in the Lake cards. Titles/order/flags come from memory of the deck; rules text is a
-// concise paraphrase for display only (the engine's event implementations are authoritative).
+// All 130 Fire in the Lake cards. Titles follow the canonical deck order; the rules text is generated from the
+// event implementations in src/engine/events (TEXT), so it always matches what the engine does.
 // Row format: id | title | order (U=US A=ARVN N=NVA V=VC) | flags (c=capability m=momentum) | unshaded | shaded
 import type { CardDef, Faction } from '../core/types';
 
 const F: Record<string, Faction> = { U: 'US', A: 'ARVN', N: 'NVA', V: 'VC' };
 
 const ROWS = `
-1|Gulf of Tonkin|UANV||Remove a Guerrilla or Base in NVA/VC hands from a coastal space; place US Troops there from Out of Play.|Aid -6 and Available US Troops go Out of Play? (Approximate) NVA and VC gain free Attacks on US.
-2|Kissinger|UNAV||Remove a NVA/VC Base in Laos or Cambodia (unshaded per card text).|NVA place a Base in Laos or Cambodia.
-3|Peace Talks|UNVA||NVA lose Resources; Trail cannot be improved until Coup.|Shift Support/Opposition; US Available adjustments.
-4|Top Gun|UAVN|c|US Air Strike may remove 2 more enemy pieces in one space (capability).|Air Strike removes at most 1 piece (capability).
-5|Wild Weasels|UANV|m|Air Strike degrades Trail only with die roll; SA-2 momentum (until Coup).|Air Strike cannot reduce Trail (until Coup).
-6|Aces|UAVN||Air Strike may hit 2 spaces; US Troop bonus.|US Air Strike -1 space; casualties.
-7|ADSID|UANV|m|-6 NVA Resources at any Trail improvement; Trail +1 cost (until Coup).|NVA Trail improvement free (until Coup).
-8|Arc Light|UNAV|c|Air Strike may affect adjacent spaces (capability).|Air Strike limited to 1 space (capability).
-9|Psychedelic Cookie|UAVN||US Troops from Casualties to Available.|US Troops from Available to Out of Play.
-10|Rolling Thunder|UNAV|m|NVA Resources -9; NVA cannot improve the Trail (until Coup).|No Air Strike in North Vietnam (until Coup).
-11|Abrams|UANV|c|US Troops Assault in Highland with 3 Troops per Guerrilla (capability).|US Assault less effective (capability).
-12|Capt Buck Adams|UAVN||Remove up to 3 NVA/VC pieces in a Province with US Air Strike.|Place 3 NVA/VC Guerrillas.
-13|Cobras|UAVN|c|US or ARVN Sweep helicopters: 2 Guerrillas per Assault (capability).|1 US Troop lost per Assault (capability).
-14|M-48 Patton|UAVN|c|US/ARVN Assault removes 2 pieces with Troops in Lowland (capability).|Ambush removes 2 more Troops (capability).
-15|Medevac|UAVN|m|US Casualties return to Available instead of Casualties (until Coup).|US Casualties stay Casualties (until Coup).
-16|Blowtorch Komer|UAVN|m|Pacification costs 1 fewer Resource per shift; +Aid (until Coup).|Pacification limited (until Coup).
-17|Claymores|UANV|m|Guerrillas March/Infiltrate limited; Ambush removes 1 more (until Coup).|Guerrilla March into COIN spaces flips (until Coup).
-18|Combined Action Platoons|UAVN|c|US Troops with Police allow Civic Action shifts (capability).|Terror in Support spaces (capability).
-19|CORDS|UAVN|c|Pacification: shift 2 levels in one space (capability).|Pacification shifts only 1 level (capability).
-20|Laser Guided Bombs|UNAV|c|Air Strike removes without US Troop loss (capability).|Air Strike must remove Underground only (capability).
-21|Americal|UAVN||Place US Troops from Available in South Vietnam.|VC/NVA remove 3 US Troops.
-22|Da Nang|UAVN|m|US Troops in Da Nang, Air Lift free; Da Nang stays COIN Controlled (until Coup).|VC/NVA place Guerrillas near Da Nang (until Coup).
-23|Operation Attleboro|UAVN||Free US Sweep and Assault in Tay Ninh, Phuoc Long, Fishhook.|VC attack: US Troops removed.
-24|Operation Starlite|UAVN||Free Sweep or Assault; remove VC Base in coastal Province.|VC/NVA place Base in coastal Province.
-25|TF-116 Riverines|UANV||US/ARVN free Sweep/Assault along Mekong.|VC Terror on the Mekong.
-26|LRRP|UAVN||Remove up to 3 NVA/VC pieces near Laos/Cambodia.|Place VC Guerrillas.
-27|Phoenix Program|UAVN||Remove Underground VC Guerrillas; ARVN Patronage.|VC place Guerrillas, Terror.
-28|Search and Destroy|UAVN|c|US/ARVN Sweep activates 1 more Guerrilla; Assault in Jungle (capability).|Sweep activates fewer Guerrillas (capability).
-29|Tribesmen|UAVN||Place 4 Irregulars in Highlands.|Remove 4 Irregulars; VC Terror.
-30|USS New Jersey|UAVN||Free Air Strike-like removal in coastal spaces.|NVA/VC place Guerrillas in coastal spaces.
-31|AAA|NAUV|c|Air Strike: die roll to degrade Trail negated (capability).|NVA: Air Strike removes at most 1; costs US Troop on roll 1-3 (capability).
-32|Long Range Guns|NUAV|c|NVA Bombard removes only 1 Troop (capability).|Bombard removes 2 more Troops (capability).
-33|MiGs|NUVA|c|Air Strike degrades Trail on roll 4-6 (capability).|Air Strike may lose US Troop (capability).
-34|SA-2s|NUAV|c|Air Strike may degrade Trail on roll 4-6 (capability).|US Air Strike may lose Troop on roll 1-3 (capability).
-35|Thanh Hoa|NUAV||Air Strike removes NVA pieces in North Vietnam.|NVA gain Resources; Trail +1.
-36|Ia Drang|UNAV||US Troops Sweep/Assault free in Pleiku, remove NVA Troops.|NVA Troops Attack US.
-37|Khe Sanh|UNAV||US Troops in Quang Tri: free Assault; NVA Troops removed.|NVA Attack; US Troops lost.
-38|McNamara Line|UNAV|m|NVA cannot March into South Vietnam without cost (until Coup).|NVA March free of restriction (until Coup).
-39|Oriskany|UAVN|m|US Air Strike may degrade Trail (until Coup).|Air Strike prevented on Trail (until Coup).
-40|Hamburger Hill|UNAV||US Troops Assault in Highland; NVA Troops removed.|US Troops removed from Highland.
-41|Bombing Pause|UNVA|m|Air Strike cannot be used (until Coup).|Air Strike limited; NVA Resources +.
-42|Sappers|NVUA||Remove COIN pieces in a space.|US/ARVN gains.
-43|Rat Pack|NUVA||NVA/VC Troops removed.|COIN pieces removed near Cambodia.
-44|Ho Chi Minh Trail|NVAU||Trail degraded.|Trail improved 2.
-45|PT-76|NAUV|c|NVA Attack removes fewer (capability).|NVA Attack removes 2 more COIN pieces (capability).
-46|559th Transport Grp|NUAV|m|Trail improvement costs more; Infiltrate limited (until Coup).|Trail improvement free; Infiltrate stronger (until Coup).
-47|Russian Arms|NVUA||NVA Resources -.|NVA Resources +; place NVA Troops.
-48|Long Tan|UNAV||US free Assault; NVA/VC pieces removed.|VC Attack.
-49|Masher/White Wing|UAVN||Free Sweep/Assault; remove pieces in Binh Dinh.|VC place Guerrillas in Binh Dinh.
-50|Rach Ba Rai|UAVN||Free Sweep in Mekong Delta.|VC Terror in Mekong Delta.
-51|Henry Cabot Lodge|AUNV||Aid +; Patronage transfer.|ARVN Patronage -; Aid -.
-52|Nguyen Chanh Thi|AUVN||ARVN Troops free Sweep; Patronage.|VC/NVA gain Support shifts.
-53|Ruff-Puff|AUVN||Place Police and Troops.|Remove Police.
-54|Green Berets|AUVN||Place Irregulars, free Civic Action.|Remove Irregulars.
-55|Rangers|AUNV||Place Rangers.|Remove Rangers.
-56|Ambassador Taylor|AUVN||Aid +.|Aid -.
-57|Cambodian Civil War|AUNV||Remove NVA in Cambodia.|Place NVA in Cambodia.
-58|Sihanouk|AVNU||Remove NVA/VC Bases in Cambodia.|NVA/VC place in Cambodia.
-59|Honolulu Conference|AUNV||Aid; US gains.|Support shifts.
-60|Election|AUNV||Patronage +, Aid +.|Patronage shifts.
-61|Armored Cavalry|AUVN|c|ARVN Assault Troops in Lowland (capability).|ARVN Assault less effective (capability).
-62|Chu Luc|AVNU||ARVN Troops free March.|NVA Troops place.
-63|Duong Van Minh|AUNV||Patronage +3.|Patronage -3.
-64|Tri Quang|AUNV||Remove Support.|Shift Support to Opposition.
-65|Bob Hope|AUVN||US gains Support.|US loses.
-66|Walt Rostow|AUNV||Aid +.|Aid -.
-67|Robert McNamara|AUNV||Aid; US Troops.|US Troops out.
-68|Domino Theory|AUNV||US Resources.|Support -.
-69|Nguyen Huu Co|ANUV||Aid +; Patronage.|Aid -; Patronage.
-70|Colonel Chau|AUVN||Place Police, Pacify.|Remove Police, Terror.
-71|My Lai|VUNA||Shift Support toward Neutral.|VC gain.
-72|Body Count|AUVN|m|Assault/Sweep count kills as Aid; Casualties (until Coup).|Body Count ignored (until Coup).
-73|Fragging|VUAN||US Troops removed.|Place US Troops.
-74|Kent State|VUAN||Support shift.|Opposition shift.
-75|Burning Bonze|VUAN||Aid -.|Opposition +.
-76|Fact Finding|AUVN||Place Police.|Remove Police.
-77|Bribery|AUVN||Patronage.|Patronage -.
-78|General Lansdale|AUVN|m|Pacification: Assault limits; ARVN Patronage (until Coup).|Pacification/Assault penalties (until Coup).
-79|Ky|AUVN||Patronage.|Patronage -.
-80|Westmoreland|UAVN||US Troops.|Casualties.
-81|Sappers Attack|NVUA||Remove COIN.|Remove more.
-82|Plei Mei|NUAV||NVA Troops.|NVA Attack.
-83|Cu Chi|VUAN||VC Base removed.|VC gains Tunnel.
-84|Ap Bac|VAUN||VC pieces removed.|VC Attack.
-85|Brinks Hotel|VUAN||VC Terror.|VC Terror in Saigon.
-86|Mandate of Heaven|AUVN|c|Govern: ARVN Patronage +(capability).|Govern costs Aid (capability).
-87|Turning Point|VUAN||US Support.|VC Opposition.
-88|Draft Dodgers|VNUA||US Troops.|US Troops out.
-89|Uncle Ho|NVUA||NVA Resources.|NVA gains.
-90|Vo Nguyen Giap|NVUA||NVA Troops removed.|NVA gains Resources.
-91|Annam|NVUA||NVA Resources.|NVA Bases.
-92|Trucks|NVUA||Trail -1.|Trail +1.
-93|Lam Son 719|UANV||ARVN Troops Assault in Laos.|ARVN Troops lost.
-94|Vietnamization|AUNV||ARVN Troops from Out of Play.|ARVN Troops replaced.
-95|Operation Pegasus|UANV||US Sweep to Khe Sanh.|NVA Attack.
-96|Ambush|VNUA||VC Ambush.|VC Guerrillas.
-97|Tunnel Rats|UAVN||Remove Tunnel marker.|VC Tunnels.
-98|Sea Lords|UAVN||Free Sweep Mekong.|VC.
-99|Operation Menu|UNAV||Remove NVA Bases in Cambodia.|NVA gains.
-100|Mining of Haiphong|UNAV||NVA Resources -.|NVA gains.
-101|Booby Traps|VNUA|c|Sweep/Assault costs a Troop on roll 1-3 (capability).|Sweep/Assault loses Troops (capability).
-102|Cadres Growth|VNUA||VC gains Guerrillas.|VC Base.
-103|Recruitment|VNUA||VC Rally free.|VC Rally.
-104|Main Force Bns|VNAU|c|VC Attack with 3 Guerrillas (capability).|VC Attack needs fewer (capability).
-105|Rural Pressure|VNAU||VC Tax.|VC Terror.
-106|Binh Duong|VUAN||Remove VC.|Place VC.
-107|Huk|VUAN||VC Rally.|VC gains.
-108|Vo Nguyen|VNUA||VC Resources.|VC Resources -.
-109|Pathet Lao|NVUA||Remove NVA in Laos.|NVA in Laos.
-110|Ravine|VUAN||VC.|VC.
-111|Tet Truce|VUAN||Truce.|Truce.
-112|Chinese Support|NVUA||NVA Resources.|NVA Resources +.
-113|Soviet Aid|NVUA||Trail.|Trail.
-114|Peasant Uprising|VUAN||Opposition.|Opposition.
-115|Typhoon Kate|UAVN|m|No Air Lift, Transport, Air Strike; Troops mobility reduced (until Coup).|Movement limited (until Coup).
-116|Cadres|VNUA|c|VC Rally/Terror limited (capability).|VC Terror/Agitate extra (capability).
-117|Sabotage|VNUA||Sabotage LoCs.|Sabotage LoCs.
-118|Agent Orange|UAVN||Remove Jungle cover.|Place VC.
-119|Monsoon|NVUA||Trail.|Trail.
-120|Tunnel Warfare|VNUA||VC Tunnels.|VC Tunnels.
-121|Linebacker II|UANV|||US pivotal: Trail to 1 etc.|
-122|Easter Offensive|NAUV|||NVA pivotal: free Attack/March.|
-123|Vietnamization|AUNV|||ARVN pivotal: ARVN placement.|
-124|Tet Offensive|VNAU|||VC pivotal: free Terror/Attack.|
+1|Gulf of Tonkin|UNAV||Free Air Strike. Then up to 3 US Troops from Casualties to Available.|Aid -6. Remove up to 3 US Troops from the map Out of Play.
+2|Kennedy Speech|UAVN||Aid +6. Place up to 3 Irregulars in Provinces.|Aid -6. Shift up to 2 spaces one level toward Opposition.
+3|Peace Talks|UANV||NVA Resources -9.|NVA Resources +6. Trail +1.
+4|Top Gun|UNAV|c|Capability: US Air Strike may remove up to 2 more enemy pieces in one space.|Capability: US Air Strike removes at most 1 piece total.
+5|Wild Weasels|UAVN|m|Free Air Strike.|Momentum (until Coup): Air Strike may not degrade the Trail.
+6|Aces|UANV||Free Air Strike.|Remove up to 2 US Troops from the map to Casualties.
+7|ADSID|UNAV|m|Momentum (until Coup): -6 NVA Resources whenever the Trail is improved.|Trail +1.
+8|Arc Light|UAVN|c|Capability: Air Strike may also affect spaces adjacent to the chosen one.|Capability: Air Strike limited to a single space.
+9|Psychedelic Cookie|UANV||Up to 4 US Troops from Casualties to Available.|Up to 3 US Troops from Available to Out of Play.
+10|Rolling Thunder|UNAV|m|Momentum (until Coup): the Trail may not be improved.|Momentum (until Coup): NVA Rally is stronger. NVA Resources +6.
+11|Abrams|UAVN|c|Capability: US Assault more effective.|Capability: US Assault less effective.
+12|Capt Buck Adams|UANV||Free Air Strike.|Place up to 3 Guerrillas in Provinces (executing insurgent).
+13|Cobras|UNAV|c|Capability: US/ARVN Assault helicopter bonus.|Capability: US loses a Troop when it Assaults.
+14|M-48 Patton|UAVN|c|Capability: Assault bonus in Lowland.|Capability: NVA/VC Ambush bonus.
+15|Medevac|UANV|m|Momentum (until Coup): US Casualties return to Available.|Momentum (until Coup): no Medevac. Remove up to 3 US Troops from the map to Casualties.
+16|Blowtorch Komer|UNAV|m|Momentum (until Coup): Pacification is cheaper.|Momentum (until Coup): Pacification limited. Aid -6.
+17|Claymores|UAVN|m|Momentum (until Coup): insurgent Marches are hindered.|Place up to 3 Guerrillas in COIN-controlled spaces (Bases stay).
+18|Combined Action Platoons|UANV|c|Capability: Civic Action shifts easier.|Capability: Terror can shift Support more.
+19|CORDS|UNAV|c|Capability: Pacification shifts 2 levels.|Capability: Pacification shifts only 1 level.
+20|Laser Guided Bombs|UAVN|c|Capability: Air Strike removes without US losses.|Capability: Air Strike restricted.
+21|Americal|UANV||Place up to 4 US Troops from Available in South Vietnam.|Remove up to 3 US Troops in South Vietnam to Casualties.
+22|Da Nang|UNAV|m|Momentum (until Coup): free Air Lift into/out of Da Nang. Place up to 3 US Troops in Da Nang.|Place up to 3 Guerrillas in Quang Nam / Da Nang / Quang Tin.
+23|Operation Attleboro|UAVN||Free US Sweep then Assault in Tay Ninh, Phuoc Long and The Fishhook.|Remove up to 3 US Troops in South Vietnam to Casualties.
+24|Operation Starlite|UANV||Free US Sweep and Assault in up to 3 coastal Provinces.|Place 1 Base in a coastal Province with your Guerrillas.
+25|TF-116 Riverines|UNAV||Free ARVN Sweep and Assault along the Mekong.|Sabotage up to 3 Mekong LoCs.
+26|LRRP|UAVN||Remove up to 3 Guerrillas in or adjacent to Laos/Cambodia.|Remove up to 3 Irregulars/Rangers from the map.
+27|Phoenix Program|UANV||Remove up to 3 VC pieces in Cities/Provinces of South Vietnam.|Shift up to 2 spaces one level toward Opposition.
+28|Search and Destroy|UNAV|c|Capability: Sweep/Assault bonus.|Capability: Sweep penalty.
+29|Tribesmen|UAVN||Place up to 3 Irregulars in Highland spaces.|Remove up to 3 Irregulars from the map.
+30|USS New Jersey|UANV||Remove up to 3 NVA/VC pieces in coastal South Vietnam.|Place up to 2 Guerrillas in coastal spaces.
+31|AAA|NAUV|c|Capability: Air Strike may degrade the Trail regardless of NVA defences (AAA neutralised).|Capability: AAA - Air Strike may cost the US a Troop and removes fewer pieces.
+32|Long Range Guns|NUVA|c|Capability: NVA Bombard removes only 1 Troop.|Capability: NVA Bombard removes 2 more Troops.
+33|MiGs|NVUA|c|Capability: Air Strike degrades the Trail on 4-6 only.|Capability: MiGs - Air Strike may cost a US Troop.
+34|SA-2s|NAUV|c|Capability: SA-2s neutralised.|Capability: SA-2s - Air Strike may lose a US Troop on roll 1-3.
+35|Thanh Hoa|NUVA||Free Air Strike.|NVA Resources +6. Trail +1.
+36|Hamburger Hill|NVUA||Free US Assault in one Highland Province.|Remove up to 3 US Troops from one Highland Province.
+37|Khe Sanh|NAUV||Remove up to 3 NVA Troops in Quang Tri-Thua Thien / Laos.|NVA places 3 Troops in Quang Tri-Thua Thien; remove up to 2 US Troops there.
+38|McNamara Line|NUVA|m|Momentum (until Coup): NVA Marches into South Vietnam are costly.|NVA places 3 Troops in Laos/North Vietnam.
+39|Oriskany|NVUA|m|Momentum (until Coup): US Air Strikes are strengthened.|Trail +1.
+40|PoWs|NAUV||Up to 3 US Troops from Casualties to Available. NVA Resources -3.|Up to 2 US Troops from Available to Out of Play. Aid -3.
+41|Bombing Pause|NUVA|m|Trail -1.|Momentum (until Coup): no Air Strikes. NVA Resources +3.
+42|Chou En Lai|NVUA||NVA Resources -6.|NVA Resources +6. Place up to 2 NVA Troops in Laos/Cambodia/North Vietnam.
+43|Economic Aid|NAUV||Aid +9.|NVA and VC Resources +3 each. Aid -3.
+44|Ia Drang|NUVA||Free US Sweep then Assault in Pleiku-Darlac.|NVA places 3 Troops in a Highland/Pleiku space; remove up to 2 US Troops there.
+45|PT-76|NVUA|c|Capability: NVA Attack removes fewer pieces (PT-76 neutralised).|Capability: PT-76 - NVA Troop Attack removes 2 more COIN pieces.
+46|559th Transport Grp|NAUV|m|Remove up to 3 NVA Troops in Laos/Cambodia.|Momentum (until Coup): Trail improvement is free. Trail +1.
+47|Chu Luc|NUVA||Remove up to 3 NVA Troops in South Vietnam.|Place up to 3 NVA Troops and 2 NVA Guerrillas in South Vietnam.
+48|Nam Dong|NVUA||Place up to 2 Irregulars in a South Vietnam Highland space, then remove up to 2 insurgent pieces in Highlands.|Remove up to 3 Irregulars. Place up to 2 Guerrillas in Highland South Vietnam.
+49|Russian Arms|NAUV||NVA Resources -6.|NVA Resources +6. Place up to 3 NVA Troops in Laos/North Vietnam/Cambodia.
+50|Uncle Ho|NUVA||Remove up to 2 NVA/VC Bases (only if no Guerrillas remain in the space).|NVA and VC Resources +4 each.
+51|301st Supply Bn|NVUA||NVA Resources -6.|NVA Resources +6. Place up to 3 NVA Troops in Laos.
+52|RAND|NAUV||Aid +4. Shift up to 2 spaces one level toward Support.|Shift up to 2 spaces one level toward Opposition. Aid -4.
+53|Sappers|NUVA||Remove up to 2 Guerrillas from spaces with COIN pieces.|Remove up to 3 COIN pieces (Bases last) from spaces with insurgents.
+54|Son Tay|NVUA||Free Air Strike. Remove up to 2 NVA/VC pieces in North Vietnam.|Remove up to 2 US Troops from the map. NVA Resources +3.
+55|Trucks|NAUV||Trail -1. Remove up to 3 NVA Troops in Laos.|Trail +1. NVA Resources +3.
+56|Vo Nguyen Giap|NUVA||NVA Resources -6.|Free NVA March then free NVA Attack.
+57|International Unrest|NVUA||Up to 3 US Troops from Out of Play to Available.|Up to 3 US Troops from Available to Out of Play. Aid -3.
+58|Pathet Lao|NAUV||Remove up to 3 NVA pieces in Laos.|Place up to 3 NVA Troops in Laos and 1 NVA Base.
+59|Plei Mei|NUVA||Free US Sweep then Assault in Pleiku-Darlac.|Place up to 3 NVA Troops in Pleiku-Darlac; remove up to 2 US Troops there.
+60|War Photographer|NVUA||Shift 1 space one level toward Support.|Shift up to 3 spaces one level toward Opposition. Aid -3.
+61|Armored Cavalry|AUVN|c|Capability: Armored Cavalry - US/ARVN Sweep helps.|Capability: Armored Cavalry - COIN losses.
+62|Cambodian Civil War|ANUV||Remove up to 3 NVA/VC pieces in Cambodia.|Place up to 3 NVA Troops in Cambodia.
+63|Fact Finding|AUNV||Shift up to 2 spaces one level toward Support.|Patronage -4.
+64|Honolulu Conference|AUVN||Aid +6. Shift up to 2 spaces one level toward Support.|Aid -6.
+65|International Forces|ANUV||Place up to 3 ARVN Police in South Vietnam Cities/Provinces.|Remove up to 3 ARVN Police.
+66|Ambassador Taylor|AUNV||Aid +6. Shift up to 2 spaces one level toward Support.|Aid -6. Shift up to 2 spaces one level toward Opposition.
+67|Amphib Landing|AUVN||Place up to 3 US Troops in coastal South Vietnam, then a free US Sweep in up to 2 spaces.|Remove up to 2 US Troops from coastal spaces.
+68|Green Berets|ANUV||Place up to 3 Irregulars in Provinces.|Remove up to 3 Irregulars.
+69|MACV|AUNV||Free US Sweep then Assault in up to 2 spaces.|Remove up to 2 US Troops from the map.
+70|ROKs|AUVN||Place up to 4 ARVN Troops in South Vietnam, then a free ARVN Sweep in up to 2 spaces.|Remove up to 3 ARVN Troops.
+71|An Loc|ANUV||Free ARVN Assault in An Loc, Tay Ninh and Phuoc Long.|Place up to 3 NVA Troops in An Loc / Tay Ninh / Phuoc Long; remove up to 2 ARVN Troops there.
+72|Body Count|AUNV|m|Momentum (until Coup): Assaults add Body Count bonuses.|Shift up to 2 spaces one level toward Opposition.
+73|Great Society|AUVN||Aid +6. Up to 2 US Troops from Out of Play to Available.|Aid -6.
+74|Lam Son 719|ANUV||Free ARVN Sweep then Assault in Laos.|Place up to 3 NVA Troops in Laos; remove up to 3 ARVN Troops in Laos.
+75|Sihanouk|AUNV||Free ARVN Sweep in Cambodia.|Place up to 3 Guerrillas in Cambodia.
+76|Annam|AUVN||Remove up to 2 NVA/VC pieces in South Vietnam.|Place up to 3 NVA Troops in South Vietnam Provinces.
+77|Detente|ANUV||NVA Resources -6. Trail -1.|Trail +1. VC Resources +3.
+78|General Lansdale|AUNV|m|Momentum (until Coup): Patronage cannot be lost through Transport.|Aid -3.
+79|Henry Cabot Lodge|AUVN||Aid +6. Patronage -3.|Patronage +6. Aid -3.
+80|Light at the End of the Tunnel|ANUV||Aid +6. Shift up to 2 spaces one level toward Support.|Aid -6. Shift up to 2 spaces one level toward Opposition.
+81|CIDG|AUNV||Place up to 3 Irregulars in Highland spaces.|Remove up to 3 Irregulars from the map.
+82|Domino Theory|AUVN||Aid +9.|Shift up to 2 spaces one level toward Opposition.
+83|Election|ANUV||Shift up to 3 spaces one level toward Support.|Shift up to 3 spaces one level toward Opposition.
+84|To Quoc|AUNV||Patronage +5. Place up to 3 ARVN Troops in Cities.|Patronage -5.
+85|USAID|AUVN||Aid +6. ARVN Resources +6.|Aid -6. Patronage -3.
+86|Mandate of Heaven|ANUV|c|Capability: Mandate of Heaven - Govern strengthened.|Capability: Mandate of Heaven - Govern weakened.
+87|Nguyen Chanh Thi|AUNV||Place up to 3 ARVN Rangers in Provinces.|Patronage -5. Remove up to 2 ARVN Troops.
+88|Phan Quang Dan|AUVN||Patronage -3. Shift 1 space one level toward Support.|Patronage +3. Shift 1 space one level toward Opposition.
+89|Tam Chau|ANUV||Shift up to 2 Cities one level toward Support.|Shift up to 2 Cities one level toward Opposition.
+90|Walt Rostow|AUNV||Free Air Strike. Trail -1.|Trail +1. NVA Resources +3.
+91|Bob Hope|VUAN||Aid +4. Up to 2 US Troops from Casualties to Available.|Up to 2 US Troops from Available to Out of Play.
+92|SEALORDS|VNAU||Remove up to 3 insurgent pieces from coastal spaces.|Place up to 3 Guerrillas in coastal spaces.
+93|Senator Fulbright|VNUA||Aid +3.|Aid -6. Up to 3 US Troops from Available to Out of Play.
+94|Tunnel Rats|VUAN||Up to 2 Tunneled Bases lose their Tunnel marker.|Up to 2 insurgent Bases gain a Tunnel marker.
+95|Westmoreland|VNAU||Place up to 4 US Troops in South Vietnam, then a free US Assault.|Remove up to 3 US Troops from the map to Casualties.
+96|APC|VNUA||Place up to 3 ARVN Troops in South Vietnam, then a free ARVN Sweep in up to 2 spaces.|Remove up to 3 ARVN Troops.
+97|Brinks Hotel|VUAN||Shift 1 City one level toward Support.|Shift up to 2 Cities one level toward Opposition; Terror in Saigon. Aid -3.
+98|Long Tan|VNAU||Remove up to 3 VC Guerrillas in one South Vietnam Province.|Remove up to 2 US Troops from South Vietnam.
+99|Masher/White Wing|VNUA||Free US Sweep then Assault in Binh Dinh.|Place 2 Guerrillas in Binh Dinh; remove up to 2 US Troops there.
+100|Rach Ba Rai|VUAN||Free ARVN Sweep then Assault in the Mekong Delta.|Place up to 3 VC Guerrillas in the Delta; Terror there.
+101|Booby Traps|VNAU|c|Capability: Booby Traps - insurgent Ambush/defence weakened.|Capability: Booby Traps - Sweep/Assault losses for COIN.
+102|Cu Chi|VNUA||Free ARVN Assault in Tay Ninh / Saigon.|Place a Tunneled VC Base and 2 Guerrillas in Tay Ninh.
+103|Kent State|VUAN||Aid +3.|Remove up to 3 US Troops from the map Out of Play. Aid -3.
+104|Main Force Bns|VNAU|c|Capability: Main Force Bns - Guerrilla concentrations limited.|Capability: Main Force Bns - VC Attack/March stronger.
+105|Rural Pressure|VNUA||Shift up to 2 spaces one level toward Support.|Shift up to 2 spaces one level toward Opposition.
+106|Binh Duong|VUAN||Free US Sweep then Assault in Tay Ninh / An Loc.|Place up to 3 VC Guerrillas in Tay Ninh / An Loc / Phuoc Long.
+107|Burning Bonze|VNAU||Patronage +3. Shift up to 1 space one level toward Support.|Shift up to 2 spaces one level toward Opposition. Patronage -3.
+108|Draft Dodgers|VNUA||Up to 3 US Troops from Out of Play to Available.|Up to 3 US Troops from Available to Out of Play.
+109|Nguyen Huu Tho|VUAN||Remove up to 3 VC pieces in Provinces.|Place up to 3 VC Guerrillas; VC Resources +3.
+110|No Contact|VNAU||Remove up to 3 Guerrillas in Provinces.|Free Ambush by the executing insurgent.
+111|Agent Orange|VNUA||Remove up to 3 Guerrillas from Jungle spaces.|Place up to 3 Guerrillas in Jungle spaces.
+112|Colonel Chau|VUAN||Place up to 2 ARVN Police in a Province and shift it one level toward Support.|Remove up to 2 Police; shift up to 2 spaces toward Opposition.
+113|Ruff Puff|VNAU||Place up to 4 ARVN Police in South Vietnam Cities/Provinces.|Remove up to 4 ARVN Police.
+114|Tri Quang|VNUA||Shift up to 2 spaces one level toward Support.|Shift up to 3 spaces one level toward Opposition.
+115|Typhoon Kate|VUAN|m|Momentum (until Coup): no NVA/VC Rally or March in Provinces without adjacent friendly pieces (Typhoon Kate).|NVA Resources +3.
+116|Cadres|VNAU|c|Capability: Cadres - Terror/Agitate limited.|Capability: Cadres - VC Rally/Terror stronger.
+117|Corps Commanders|VNUA||Patronage +5. Place up to 2 ARVN Rangers.|Patronage -5.
+118|Korean War Arms|VUAN||NVA Resources -3. Trail -1.|NVA and VC Resources +6 each.
+119|My Lai|VNAU||Shift up to 1 space one level toward Support.|Shift up to 3 spaces one level toward Opposition. Aid -3.
+120|US Press Corps|VNUA||Shift up to 2 spaces one level toward Support.|VC Resources +3. Shift up to 2 spaces one level toward Opposition.
+121|Linebacker II|UANV||Trail to 0. NVA Resources -50%. The US may Air Strike anywhere.|
+122|Easter Offensive|NAUV||NVA free March, then free Attack with +1 bonus.|
+123|Vietnamization|AUNV||US Troops on the map to Available. Free ARVN Train and Govern.|
+124|Tet Offensive|VNAU||Free VC Terror in every space with VC Guerrillas, then free VC Attack.|
 `.trim();
 
 const CAP_M = (s: string) => ({ capability: s.includes('c'), momentum: s.includes('m') });

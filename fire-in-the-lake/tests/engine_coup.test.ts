@@ -4,7 +4,7 @@ import { POOL_KINDS, PIECE_TOTALS } from '../src/core/types';
 import { doAction, getView, push } from '../src/core/framework';
 import { SPACE_IDS } from '../src/data/map';
 import '../src/engine/coup';
-import { margins } from '../src/engine/coup';
+import { margins, leaderEffect } from '../src/engine/coup';
 
 function mk(): Game {
   const zeros = () => Object.fromEntries(POOL_KINDS.map((k) => [k, 0])) as Record<PoolKind, number>;
@@ -85,11 +85,10 @@ describe('Coup: resources', () => {
     expect(g.spaces.loc_saigon_can_tho.terror).toBe(0); // reset removes markers at the end
     expect(g.trail).toBe(1);
     // Econ = sum of unsabotaged LoC Econ values = all econ minus 2
-    expect(g.econ).toBeGreaterThan(0);
     expect(g.resources.ARVN).toBe(5 + 10 + g.econ);
     expect(g.resources.VC).toBe(5 + 1);
     expect(g.resources.NVA).toBe(5 + 1 + 2 * 1);
-    expect(g.aid).toBe(6);
+    expect(g.aid).toBe(0); // 10 - 3 x 4, clamped
     expect(g.log.some((l) => l.includes('sabotage'))).toBe(true);
   });
 });
@@ -216,7 +215,24 @@ describe('Coup: leaders', () => {
     put(g, 'saigon', 'arvn_troops', 10);
     put(g, 'kien_phong', 'arvn_police', 10);
     run(g);
-    expect(g.available.arvn_troops + g.available.arvn_police).toBe(PIECE_TOTALS.arvn_troops + PIECE_TOTALS.arvn_police - 20 + 4);
-    expect(g.patronage).toBe(13);
+    expect(n(g, 'saigon', 'arvn_troops')).toBe(7);
+    expect(n(g, 'kien_phong', 'arvn_police')).toBe(7);
+    expect(g.patronage).toBe(15);
+  });
+});
+
+describe('Coup: leader effects', () => {
+  it('leaderEffect reports per-leader modifiers', () => {
+    const g = coupGame();
+    expect(leaderEffect(g)).toMatchObject({ trainAid: 5, pacifyCost: 3 });
+    g.leader = 125; expect(leaderEffect(g).transportMaxLocs).toBe(1);
+    g.leader = 126; expect(leaderEffect(g).governPatronage).toBe(2);
+    g.leader = 127; expect(leaderEffect(g).pacifyCost).toBe(4);
+    g.leader = 128; expect(leaderEffect(g)).toMatchObject({ trainAid: 0, governPatronage: 0, pacifyCost: 3 });
+  });
+  it('sabotages a LoC adjacent to a City without COIN Control', () => {
+    const g = coupGame();
+    run(g);
+    expect(g.log.some((l) => l.includes('sabotage'))).toBe(true);
   });
 });

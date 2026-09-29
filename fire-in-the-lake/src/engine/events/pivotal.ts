@@ -1,63 +1,56 @@
-// Pivotal events 121-124. Preconditions and effects are reconstructed from memory / approximated:
-//  121 Linebacker II (US): needs Trail >= 3. Trail to 1, NVA Resources -9, free Air Strike, up to 4 US Troops
-//      Casualties -> Available.
-//  122 Easter Offensive (NVA): needs >= 10 NVA Troops on the map. Up to 6 NVA Troops placed in Laos/Cambodia/NVN,
-//      then a free NVA March and a free NVA Attack.
-//  123 Vietnamization (ARVN): needs >= 5 US Troops on the map. Up to 6 US Troops to Available, up to 6 ARVN
-//      Troops placed in South Vietnam, ARVN Resources +9.
-//  124 Tet Offensive (VC): needs >= 12 VC Guerrillas on the map. Free VC Terror, then free VC Attack; VC Resources +6.
+// Pivotal events 121-124. Every one requires 2+ cards in the RVN Leader box plus:
+//  121 Linebacker II (US): Support + Available US pieces > 40. Trail to 0, NVA Resources halved, the US may
+//      Air Strike anywhere (arg `anywhere: true`, no range/Trail limits).
+//  122 Easter Offensive (NVA): more NVA Troops than US Troops on the map. Free NVA March, then free NVA Attack
+//      with a +1 bonus (arg `bonus: 1`).
+//  123 Vietnamization (ARVN): fewer than 20 US Troops on the map. US Troops on the map go Available (all),
+//      then free ARVN Train and Govern.
+//  124 Tet Offensive (VC): more than 20 VC Guerrillas in South Vietnam. Free VC Terror in every space with VC
+//      Guerrillas, then free VC Attack.
+// Details of the printed effects are approximated.
 import type { Game } from '../../core/types';
-import { countOnMap } from '../../core/pieces';
-import { freeOp, placeIn, poolMove, removeUp, resources, trail, run } from './dsl';
+import { count, countOnMap, removeTo, victoryScore } from '../../core/pieces';
+import { SPACE_IDS, MAP } from '../../data/map';
+import { freeOp, run } from './dsl';
 import { CUR, TEXT } from './helpers';
 import type { Step } from './helpers';
-import * as W from './wh';
 
 export const PIVOTAL: Record<number, Step[]> = {};
 
 function def(n: number, text: string, steps: Step[]): void {
-  CUR.card = n;
-  CUR.n = 0;
   TEXT[n] = { u: text, s: '' };
   PIVOTAL[n] = steps;
 }
+CUR.card = 121; CUR.n = 0;
 
-def(121, 'Trail to 1. NVA Resources -9. Free Air Strike. Up to 4 US Troops Casualties to Available.', (() => {
-  CUR.card = 121; CUR.n = 0;
-  return [run((g) => { g.trail = 1; }), resources('NVA', -9), freeOp('sa_air_strike', { faction: 'US' }), poolMove('us_troops', 'casualties', 'available', 4)];
-})());
+def(121, 'Trail to 0. NVA Resources -50%. The US may Air Strike anywhere.', [
+  run((g) => { g.trail = 0; g.resources.NVA -= Math.floor(g.resources.NVA / 2); }),
+  freeOp('sa_air_strike', { faction: 'US', extra: { anywhere: true } }),
+]);
 
-def(122, 'Place up to 6 NVA Troops in Laos/Cambodia/North Vietnam; free NVA March; free NVA Attack.', (() => {
-  CUR.card = 122; CUR.n = 0;
-  return [
-    placeIn('nva_troops', 6, { where: (g, id) => W.lc(g, id) || W.nvn(g, id), by: 'NVA' }),
-    freeOp('op_march', { faction: 'NVA' }),
-    freeOp('op_attack', { faction: 'NVA' }),
-  ];
-})());
+def(122, 'NVA free March, then free Attack with +1 bonus.', [
+  freeOp('op_march', { faction: 'NVA' }),
+  freeOp('op_attack', { faction: 'NVA', extra: { bonus: 1 } }),
+]);
 
-def(123, 'Up to 6 US Troops from the map to Available; place up to 6 ARVN Troops; ARVN Resources +9.', (() => {
-  CUR.card = 123; CUR.n = 0;
-  return [
-    removeUp(['us_troops'], 6, { dest: 'available', where: W.sv }),
-    placeIn('arvn_troops', 6, { where: W.and(W.sv, W.notLoc), by: 'ARVN' }),
-    resources('ARVN', 9),
-  ];
-})());
+def(123, 'US Troops on the map to Available. Free ARVN Train and Govern.', [
+  run((g) => { for (const id of SPACE_IDS) removeTo(g, id, 'us_troops', 99, 'available'); }),
+  freeOp('op_train', { faction: 'ARVN' }),
+  freeOp('sa_govern', { faction: 'ARVN' }),
+]);
 
-def(124, 'Free VC Terror, then free VC Attack. VC Resources +6.', (() => {
-  CUR.card = 124; CUR.n = 0;
-  return [freeOp('op_terror', { faction: 'VC' }), freeOp('op_attack', { faction: 'VC' }), resources('VC', 6)];
-})());
-
-void trail;
+def(124, 'Free VC Terror in every space with VC Guerrillas, then free VC Attack.', [
+  freeOp('op_terror', { faction: 'VC', extra: (g: Game) => ({ spaces: SPACE_IDS.filter((id) => count(g, id, 'vc_guer_u', 'vc_guer_a') > 0), noFlip: true }) }),
+  freeOp('op_attack', { faction: 'VC' }),
+]);
 
 export function pivotalPrecondition(g: Game, card: number): boolean {
+  if (g.leader_box.length < 2) return false;
   switch (card) {
-    case 121: return g.trail >= 3;
-    case 122: return countOnMap(g, 'nva_troops') >= 10;
-    case 123: return countOnMap(g, 'us_troops') >= 5;
-    case 124: return countOnMap(g, 'vc_guer_u', 'vc_guer_a') >= 12;
+    case 121: return victoryScore(g, 'US') > 40;
+    case 122: return countOnMap(g, 'nva_troops') > countOnMap(g, 'us_troops');
+    case 123: return countOnMap(g, 'us_troops') < 20;
+    case 124: return SPACE_IDS.filter((id) => MAP[id].country === 'south_vietnam').reduce((n, id) => n + count(g, id, 'vc_guer_u', 'vc_guer_a'), 0) > 20;
     default: return false;
   }
 }

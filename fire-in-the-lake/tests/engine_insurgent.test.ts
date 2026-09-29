@@ -281,7 +281,7 @@ describe('Special Activities', () => {
   it('Bombard removes one COIN Troop with 3+ NVA Troops in range', () => {
     const g = mk();
     put(g, 'central_laos', 'nva_troops', 3);
-    put(g, 'quang_tri_thua_thien', 'us_troops', 1);
+    put(g, 'quang_tri_thua_thien', 'us_troops', 3);
     put(g, 'quang_tri_thua_thien', 'arvn_troops', 1);
     push(g, 'sa_bombard', {});
     do_(g, 'space', 'quang_tri_thua_thien');
@@ -289,14 +289,54 @@ describe('Special Activities', () => {
     expect(g.casualties.us_troops).toBe(1);
     expect(g.stack.length).toBe(0);
   });
-  it('Tax flips a guerrilla and earns Econ on LoCs, 2 elsewhere', () => {
+  it('Bombard can target a lone COIN Base but not 2 troops', () => {
+    const g = mk();
+    put(g, 'central_laos', 'nva_troops', 3);
+    put(g, 'quang_tri_thua_thien', 'us_troops', 2);
+    push(g, 'sa_bombard', {});
+    expect(has(g, 'space', 'quang_tri_thua_thien')).toBe(false);
+    g.stack = [];
+    put(g, 'quang_tri_thua_thien', 'us_base', 1);
+    push(g, 'sa_bombard', {});
+    do_(g, 'space', 'quang_tri_thua_thien');
+    expect(g.casualties.us_troops).toBe(1); // troops go before the Base
+  });
+  it('Tax is not allowed under COIN Control', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    put(g, 'kien_phong', 'us_troops', 2);
+    push(g, 'sa_tax', {});
+    expect(g.stack.length).toBe(0);
+  });
+  it('LoC Terror is free', () => {
+    const g = mk();
+    put(g, 'loc_can_tho_chau_doc', 'vc_guer_u', 1);
+    push(g, 'op_terror', { faction: 'VC' });
+    do_(g, 'space', 'loc_can_tho_chau_doc');
+    expect(g.resources.VC).toBe(15);
+  });
+  it('March can Ambush from the space it entered', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'vc_guer_u', 2);
+    put(g, 'tay_ninh', 'arvn_troops', 3);
+    put(g, 'tay_ninh', 'vc_guer_u', 1);
+    push(g, 'op_march', { faction: 'VC', max: 1 });
+    do_(g, 'space', 'tay_ninh');
+    do_(g, 'all', 'kien_phong');
+    do_(g, 'done');
+    do_(g, 'opt', 'ambush');
+    expect(n(g, 'tay_ninh', 'arvn_troops')).toBe(1);
+    expect(g.stack.length).toBe(0);
+  });
+  it('Tax flips a guerrilla and earns Econ on LoCs, 2 x Pop elsewhere', () => {
     const g = mk();
     put(g, 'loc_saigon_can_tho', 'vc_guer_u', 1);
     put(g, 'kien_phong', 'vc_guer_u', 1);
     push(g, 'sa_tax', {});
     do_(g, 'space', 'loc_saigon_can_tho');
     do_(g, 'space', 'kien_phong');
-    expect(g.resources.VC).toBe(15 + 2 + 2);
+    expect(g.resources.VC).toBe(15 + 2 + 4);
+    expect(g.spaces.kien_phong.support).toBe(1);
     expect(n(g, 'kien_phong', 'vc_guer_a')).toBe(1);
   });
   it('Subvert removes 2 ARVN cubes or replaces one, lowering Patronage', () => {
