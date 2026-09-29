@@ -1,12 +1,14 @@
 // 'op_menu' state: args {faction, limited, sa, free}.
 // Offers the faction's four Operations and, when sa is true, its three Special Activities.
-// The SA may be done before or after the Operation, or declined. Pops with
-// {done: true, used_op, used_sa, spaces}.
-// Verbs: 'op' arg <state name>, 'sa' arg <state name>, 'done'.
+// The SA may be done before, during (between spaces is not modelled) or after the Operation, or
+// declined (4.1). Special Activities that may only accompany certain Operations are enforced in
+// both directions (4.1.1). Pops with {done: true, used_op, used_sa, spaces}.
+// Verbs: 'op' arg <state name>, 'sa' arg <state name>, 'cav' arg <space>, 'done'.
 
 import { registerState, push, pop, log, hasState } from '../core/framework';
 import type { Faction, Game } from '../core/types';
 import { isMonsoon } from './sequence';
+import { space } from '../core/pieces';
 
 export const OP_STATES: Record<Faction, string[]> = {
   US: ['op_train', 'op_patrol', 'op_sweep', 'op_assault'],
@@ -31,6 +33,16 @@ export const STATE_LABEL: Record<string, string> = {
   sa_tax: 'Tax', sa_subvert: 'Subvert',
 };
 
+// Which Operations each restricted Special Activity may accompany (4.1.1, 4.2-4.5).
+const ACCOMPANY: Record<string, string[]> = {
+  sa_advise: ['op_train', 'op_patrol'],
+  sa_govern: ['op_train', 'op_patrol'],
+  sa_raid: ['op_patrol', 'op_sweep', 'op_assault'],
+  sa_infiltrate: ['op_rally', 'op_march'],
+  sa_subvert: ['op_rally', 'op_march', 'op_terror'],
+  sa_ambush: ['op_march', 'op_attack'],
+};
+
 // Resource cost per selected space for an Operation (0 for US, whose costs are per action
 // inside the op). ARVN Patrol costs 3 in total, not per space.
 export function opCost(faction: Faction, state: string): number {
@@ -39,18 +51,35 @@ export function opCost(faction: Faction, state: string): number {
   return state === 'op_march' || state === 'op_rally' || state === 'op_attack' || state === 'op_terror' ? 1 : 0;
 }
 
-function opAllowed(g: Game, faction: Faction, state: string): boolean {
+function opAllowed(g: Game, a: any, state: string): boolean {
+  const f: Faction = a.faction;
   if (!hasState(state)) return false;
   if (isMonsoon(g) && (state === 'op_sweep' || state === 'op_march')) return false;
-  if (state === 'op_sweep' && faction !== 'US' && faction !== 'ARVN') return false;
+  if (state === 'op_assault' && f === 'US' && g.momentum.includes(78)) return false; // Lansdale (shaded)
+  if (a.saState && ACCOMPANY[a.saState] && !ACCOMPANY[a.saState].includes(state)) return false;
   return true;
 }
 
-function saAllowed(g: Game, state: string): boolean {
+function saAllowed(g: Game, a: any, state: string): boolean {
   if (!hasState(state)) return false;
-  if (state === 'sa_air_strike' && g.momentum.includes(41)) return false; // Bombing Pause
-  if (state === 'sa_air_lift' && g.momentum.includes(115)) return false;  // Typhoon Kate
+  if (a.opState && ACCOMPANY[state] && !ACCOMPANY[state].includes(a.opState)) return false;
+  if (state === 'sa_air_strike' && (g.momentum.includes(41) || g.momentum.includes(10) || g.momentum.includes(22))) return false; // Bombing Pause / Rolling Thunder / Da Nang
+  if (state === 'sa_air_lift' && (g.momentum.includes(115) || (g.momentum.includes(15) && g.tmp?.momentum_side?.[15] === 'shaded'))) return false; // Typhoon Kate / Medevac
+  if ((state === 'sa_transport' || state === 'sa_bombard') && g.momentum.includes(115)) return false;
   return true;
+}
+
+function finishMenu(g: Game, a: any): void {
+  pop(g, { done: true, used_op: a.used_op, used_sa: a.used_sa, spaces: a.spaces });
+}
+
+function ready(a: any): boolean {
+  return a.used_op && (!a.sa || a.used_sa);
+}
+
+// Armored Cavalry (unshaded): after Ops, ARVN may Assault free in 1 Transport destination.
+function cavPending(a: any): boolean {
+  return !!(a.cav && a.cav.length && !a.cavDone);
 }
 
 registerState('op_menu', {
@@ -61,49 +90,77 @@ registerState('op_menu', {
     a.used_sa = false;
     a.attempts = 0;
     a.spaces = [];
+    a.opState = null;
+    a.saState = null;
+    a.opSpaces = [];
+    a.saSpaces = [];
   },
   prompt(g, a, p) {
     const f: Faction = a.faction;
+    if (a.phase === 'cav') {
+      p.text('Armored Cavalry: ARVN may Assault free in 1 Transport destination.');
+      for (const d of a.cav) p.space(d, space(d).name);
+      p.action('done', undefined, 'No free Assault; finish');
+      return;
+    }
     const lim = a.limited ? 'Limited ' : '';
-    p.text(`${f}: ${a.used_op ? 'Operation done. ' : `choose a ${lim}Operation. `}${a.sa ? (a.used_sa ? 'Special Activity done.' : 'You may also perform a Special Activity (before or after).') : ''}`);
+    p.text(`${f}: ${a.used_op ? 'Operation done. ' : `choose a ${lim}Operation. `}${a.sa ? (a.used_sa ? 'Special Activity done.' : 'You may also perform a Special Activity (before or after the Operation).') : ''}`);
     if (!a.used_op) {
-      for (const s of OP_STATES[f]) if (opAllowed(g, f, s)) p.action('op', s, `${lim}${STATE_LABEL[s]}`);
+      for (const s of OP_STATES[f]) if (opAllowed(g, a, s)) p.action('op', s, `${lim}${STATE_LABEL[s]}`);
     }
     if (a.sa && !a.used_sa) {
-      for (const s of SA_STATES[f]) if (saAllowed(g, s)) p.action('sa', s, `Special Activity: ${STATE_LABEL[s]}`);
+      for (const s of SA_STATES[f]) if (saAllowed(g, a, s)) p.action('sa', s, `Special Activity: ${STATE_LABEL[s]}`);
     }
     if (a.used_op || a.attempts > 0) p.action('done', undefined, 'Finish (end this action)');
-    else if (!OP_STATES[f].some((s) => opAllowed(g, f, s))) p.action('done', undefined, 'Finish (no Operation is available)');
+    else if (!OP_STATES[f].some((s) => opAllowed(g, a, s))) p.action('done', undefined, 'Finish (no Operation is available)');
   },
   act(g, a, verb, arg) {
+    if (a.phase === 'cav') {
+      if (verb === 'space') {
+        a.cavDone = true;
+        a.phase = 'cav_done';
+        push(g, 'op_assault', { faction: 'ARVN', free: true, spaces: [String(arg)], max: 1, noFollow: true });
+      } else { a.cavDone = true; finishMenu(g, a); }
+      return;
+    }
     if (verb === 'done') {
-      pop(g, { done: true, used_op: a.used_op, used_sa: a.used_sa, spaces: a.spaces });
+      if (cavPending(a)) { a.phase = 'cav'; return; }
+      finishMenu(g, a);
       return;
     }
     const state = String(arg);
     const args: any = { faction: a.faction, free: !!a.free };
     if (verb === 'op') {
       a.cur = 'op';
+      a.curState = state;
       if (a.limited) { args.limited = true; args.max = 1; }
+      if (a.saState && (a.saState === 'sa_advise' || a.saState === 'sa_govern') && state === 'op_train') args.exclude = [...a.saSpaces];
     } else {
       a.cur = 'sa';
+      a.curState = state;
+      if (g.momentum.includes(115)) args.max = 1; // Typhoon Kate: other SAs max 1 space
+      if ((state === 'sa_advise' || state === 'sa_govern') && a.opState === 'op_train') args.exclude = [...a.opSpaces];
     }
     log(g, `${a.faction} ${verb === 'op' ? 'Operation' : 'Special Activity'}: ${STATE_LABEL[state]}.`);
     push(g, state, args);
   },
   resume(g, a, result) {
+    if (a.phase === 'cav_done') { finishMenu(g, a); return; }
     const spaces: string[] = result && Array.isArray(result.spaces) ? result.spaces : [];
     const did = spaces.length > 0 || !!(result && result.used);
     if (did) {
-      if (a.cur === 'op') a.used_op = true; else a.used_sa = true;
+      if (a.cur === 'op') { a.used_op = true; a.opState = a.curState; a.opSpaces = spaces; }
+      else { a.used_sa = true; a.saState = a.curState; a.saSpaces = spaces; }
       for (const s of spaces) if (!a.spaces.includes(s)) a.spaces.push(s);
+      if (result && result.cav) a.cav = result.cav;
     } else {
       a.attempts++;
     }
     g.active = a.faction;
     a.cur = undefined;
-    if (a.used_op && (!a.sa || a.used_sa)) {
-      pop(g, { done: true, used_op: a.used_op, used_sa: a.used_sa, spaces: a.spaces });
+    if (ready(a)) {
+      if (cavPending(a)) { a.phase = 'cav'; return; }
+      finishMenu(g, a);
     }
   },
 });

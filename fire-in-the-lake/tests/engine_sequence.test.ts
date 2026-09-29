@@ -53,7 +53,6 @@ describe('setup', () => {
     const coups = [g.current!, g.next!, ...g.deck].filter((id) => CARD[id].coup);
     expect(coups.length).toBe(3);
     expect(new Set([g.current!, g.next!, ...g.deck]).size).toBe(g.deck.length + 2);
-    expect(CARD[g.current!].coup).toBe(false);
     for (const id of [g.current!, g.next!, ...g.deck]) expect(CARD[id].pivotal).toBeUndefined();
   });
   it('conserves piece totals', () => {

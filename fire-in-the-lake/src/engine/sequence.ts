@@ -11,14 +11,15 @@
 // Notes / simplifications:
 //  * Pivotal events are offered before the 1st Eligible acts, to Eligible factions listed in
 //    g.pivotal_available (the owner of the pivotal state maintains that list, including card
-//    specific preconditions). Never during Monsoon. Trump order: ARVN, VC, NVA, US.
+//    specific preconditions). Never during Monsoon. Trump order: VC, ARVN, NVA, US.
 //  * A Coup card that immediately follows another Coup card has no Coup Round, except the last one.
 
 import { registerState, push, pop, log, hasState } from '../core/framework';
 import type { ActionKind, Faction, Game } from '../core/types';
 import { FACTIONS } from '../core/types';
 import { CARD, CARDS } from '../data/cards';
-import { addResources, victoryMargin } from '../core/pieces';
+import { addResources, victoryMargin, count, remove } from '../core/pieces';
+import { SPACE_IDS } from '../data/map';
 import { pivotalPreconditionMet } from './events';
 
 // ------------------------------------------------------------------ helpers
@@ -45,7 +46,8 @@ function cardOrder(id: number | null): Faction[] {
   return o && o.length ? o : FACTIONS;
 }
 
-const TRUMP: Faction[] = ['ARVN', 'VC', 'NVA', 'US'];
+// Trumping (2.3.8): VC over anyone, ARVN over US/NVA, NVA over US, US over none.
+const TRUMP: Faction[] = ['VC', 'ARVN', 'NVA', 'US'];
 
 function pivotalCardOf(f: Faction): number | null {
   const c = CARDS.find((x) => x.pivotal === f);
@@ -81,6 +83,25 @@ function deckHasCoup(g: Game): boolean {
   return g.deck.some((id) => isCoupCard(id)) || isCoupCard(g.next);
 }
 
+function applyCoupCardOnly(g: Game, id: number): void {
+  const card = CARD[id];
+  if (card?.leader) {
+    if (g.leader !== null && g.leader !== id) g.leader_box.push(g.leader);
+    g.leader = id;
+    log(g, `New RVN leader: ${card.title}.`);
+  } else if (card && card.title === 'Failed Attempt') {
+    let removed = 0;
+    for (const sp of SPACE_IDS) {
+      let n = Math.floor(count(g, sp, 'arvn_troops', 'arvn_police') / 3);
+      for (const k of ['arvn_troops', 'arvn_police'] as const) {
+        const r = remove(g, sp, k, n);
+        n -= r; removed += r;
+      }
+    }
+    log(g, `Failed Attempt: ARVN desertion (${removed} cubes).`);
+  }
+}
+
 function startCard(g: Game): void {
   if (g.over) return;
   if (g.current == null) { fallbackEnd(g); return; }
@@ -92,8 +113,12 @@ function startCard(g: Game): void {
     g.final_coup = !deckHasCoup(g);
     const prev = g.discard.length ? g.discard[g.discard.length - 1] : null;
     log(g, `--- Coup card: ${cardTitle(id)} ---`);
-    if (isCoupCard(prev) && !g.final_coup && hasState('coup')) {
+    if (isCoupCard(prev)) {
+      // 6.0: never more than 1 Coup Round in a row; additional Coup cards only apply their leader /
+      // immediate effect. If it is the final Coup card the game ends (7.3).
       log(g, 'Consecutive Coup card: no Coup Round.');
+      applyCoupCardOnly(g, id);
+      if (g.final_coup) { fallbackEnd(g); return; }
       endCard(g);
       return;
     }
@@ -155,7 +180,8 @@ registerState('game', {
 
 function nextActor(g: Game, args: any): Faction | null {
   if (g.current == null) return null;
-  for (const f of cardOrder(g.current)) {
+  // After a Pivotal Event the new Eligibility sequence follows the Pivotal card's order (2.3.8).
+  for (const f of cardOrder(args.orderCard ?? g.current)) {
     if (g.eligible[f] && !args.decided.includes(f)) return f;
   }
   return null;
@@ -277,7 +303,7 @@ registerState('pivotal_offer', {
       g.first_action = 'event';
       g.acted.push(f);
       const parent = g.stack[g.stack.length - 2];
-      if (parent && parent.args.decided) parent.args.decided.push(f);
+      if (parent && parent.args.decided) { parent.args.decided.push(f); parent.args.orderCard = id; }
       push(g, 'pivotal', { card: id, faction: f });
       return;
     }

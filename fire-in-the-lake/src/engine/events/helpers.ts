@@ -1,5 +1,23 @@
 // Reusable event machinery.
 //
+// USAGE GUIDE (see also dsl.ts, which wraps these in one-liner Step combinators):
+//   defCard(n, () => ({ u: [step, ...], s: [step, ...] }));      // (the 4-arg form with text strings still works)
+//   A Step is (g, c) => void, c = {card, shaded, faction, last, d}. c.last is what the previous helper state
+//   popped with; c.d is scratch that persists across the steps of one event (use it to remember a chosen space).
+//   Helper states (all take `by` = who decides, default the executing faction; all always offer 'done'):
+//     ev_spaces   choose up to n spaces, call an apply fn on each (pop {spaces, touched})
+//     ev_place    place n pieces of one pool one at a time (respects stacking)
+//     ev_remove   remove n pieces one at a time. Options: kinds, filter, pfilter, dest, per, basesLast, air, tunnels, then
+//                 Events may remove any piece EXCEPT Tunneled Bases (unless tunnels:true). air:true = Air Strike rules
+//                 (NVA Troops first, Active Guerrillas only, Bases only when no other Insurgents remain).
+//     ev_transfer general "move pieces between map / Available / Casualties / Out of Play" (rules list)
+//     ev_flip     flip Guerrillas/Irregulars/Rangers Active<->Underground or Bases Tunneled<->not
+//     ev_move     move pieces between map spaces (optionally to adjacent)
+//     ev_choose   pick one of several labelled options
+//     ev_each     run a fn once per item (used to sequence free ops)
+//   Lambdas cannot live in game state: register them with K(fn) while a card is being defined (defCard's build
+//   function runs at module load) and pass the returned string key.
+//
 // A card side is a list of Steps. The 'event' state runs the steps in order; a step may push helper
 // states (ev_spaces, ev_place, ev_remove, ev_move, ev_choose, or a free Op/SA) and the event resumes with the
 // next step when they pop. Everything that lives in game state is JSON: helper states refer to behaviour by
@@ -44,16 +62,22 @@ export interface CardImpl {
 }
 export const IMPL: Record<number, CardImpl> = {};
 
-export const TEXT: Record<number, { u: string; s: string }> = {};
+// Card text lives in src/data/cards.ts; TEXT is a read-only view of it kept for older callers.
+export const TEXT: Record<number, { u: string; s: string }> = new Proxy({} as Record<number, { u: string; s: string }>, {
+  get: (_t, k) => { const c = CARD[Number(k)]; return c ? { u: c.unshaded, s: c.shaded } : undefined; },
+  has: (_t, k) => !!CARD[Number(k)],
+});
 export const CUR = { card: 0, n: 0 };
 // Register a lambda under a deterministic key while a card definition is being built (at module load).
 export function K(fn: Fn): string {
   return regFn(`c${CUR.card}.${CUR.n++}`, fn);
 }
-export function defCard(n: number, u: string, s: string, build: () => CardImpl): void {
+export function defCard(n: number, build: () => CardImpl): void;
+export function defCard(n: number, u: string, s: string, build: () => CardImpl): void;
+export function defCard(n: number, ...rest: any[]): void {
+  const build = rest[rest.length - 1] as () => CardImpl;
   CUR.card = n;
   CUR.n = 0;
-  TEXT[n] = { u, s };
   IMPL[n] = build();
 }
 

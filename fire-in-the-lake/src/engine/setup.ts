@@ -84,6 +84,8 @@ export function newGame(scenarioId: string, humans: Faction[], seed: number = Da
   };
 
   buildDeck(g, sc);
+  // Short scenario: "remove all Pivotal Events" (2.1); mark them unavailable.
+  if (scenarioId === 'short') g.pivotal_played = ['US', 'ARVN', 'NVA', 'VC'];
 
   g.current = g.deck.length ? g.deck.shift()! : null;
   g.next = g.deck.length ? g.deck.shift()! : null;
@@ -105,10 +107,17 @@ function buildDeck(g: Game, sc: import('../core/types').ScenarioDef): void {
     && c.id !== cfg.first_card).map((c) => c.id);
   shuffle(g, events);
 
+  // Coup cards: the scenario's list minus the leader cards already in the RVN Leader box.
   let coupPool = (cfg.coup_cards ?? CARDS.filter((c) => c.coup).map((c) => c.id))
     .filter((id) => !exclude.has(id) && id !== sc.leader && !sc.leader_box.includes(id));
-  if (coupPool.length === 0) coupPool = cfg.coup_cards ?? [];
   coupPool = [...coupPool];
+  // "Remove 1 Failed Attempt" (Short) etc.: when there are more Coup cards than piles, drop Failed
+  // Attempts first (129/130), then random cards.
+  while (coupPool.length > cfg.piles) {
+    const failed = coupPool.filter((id) => id === 129 || id === 130);
+    const drop = failed.length ? failed[0] : coupPool[coupPool.length - 1];
+    coupPool.splice(coupPool.indexOf(drop), 1);
+  }
   shuffle(g, coupPool);
 
   const deck: number[] = [];
@@ -120,11 +129,6 @@ function buildDeck(g: Game, sc: import('../core/types').ScenarioDef): void {
     shuffle(g, pile);
     if (i === 0 && cfg.first_card != null) pile.unshift(cfg.first_card);
     deck.push(...pile);
-  }
-  // The very first card is never a Coup card.
-  if (deck.length && isCoup(deck[0])) {
-    const j = deck.findIndex((id) => !isCoup(id));
-    if (j > 0) [deck[0], deck[j]] = [deck[j], deck[0]];
   }
   g.deck = deck;
 }
