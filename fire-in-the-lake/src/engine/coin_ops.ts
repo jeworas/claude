@@ -129,13 +129,13 @@ export function strikeTargets(g: Game, sp: string): PieceKind[] {
   return BASE_KINDS.filter((k) => c(k) > 0 && !TUNNELS.includes(k));
 }
 
-interface HitCtx { faction?: Faction; assault?: boolean }
+interface HitCtx { faction?: Faction; assault?: boolean; ignoreTunnel?: boolean }
 
 // Remove one enemy piece. A Tunneled Base is not removed: roll, 4-6 removes the marker (returns 'stop',
 // since removal in that space ends). Assault side effects: +6 Aid per Base removed by an ARVN Assault,
 // +3 Aid per Guerrilla under Body Count.
 export function applyHit(g: Game, sp: string, k: PieceKind, ctx: HitCtx = {}): 'stop' | boolean {
-  if (TUNNELS.includes(k)) {
+  if (TUNNELS.includes(k) && !ctx.ignoreTunnel) {
     const r = rollDie(g);
     if (r >= 4) {
       flip(g, sp, k, k === 'nva_tunnel' ? 'nva_base' : 'vc_base', 1);
@@ -202,11 +202,12 @@ function beginResolve(g: Game, a: any, r: Resolver): void {
 
 // ------------------------------------------------------------------ Assault (3.2.4)
 
-export function assaultHits(g: Game, faction: Faction, sp: string): number {
+export function assaultHits(g: Game, faction: Faction, sp: string, asUS = false): number {
   const s = space(sp);
   const c = (k: PieceKind) => count(g, sp, k);
-  if (faction === 'US') {
-    const t = c('us_troops');
+  if (faction === 'US' || asUS) {
+    // asUS (ROKs): all US Troops, ARVN Troops and Police count as US Troops.
+    const t = c('us_troops') + (asUS ? c('arvn_troops') + c('arvn_police') : 0);
     if (c('us_base') > 0) return t * 2;
     if (s.terrain === 'highland') return Math.floor(t / 2);
     return t;
@@ -218,7 +219,7 @@ export function assaultHits(g: Game, faction: Faction, sp: string): number {
 
 function assaultKinds(g: Game, a: any, sp: string): PieceKind[] {
   let kinds = assaultTargets(g, sp);
-  if (a.faction === 'US') {
+  if (a.faction === 'US' || a.asUS) {
     if (capability(g, 11) === 'unshaded' && !a.abramsUsed) { // Abrams: 1 non-Tunnel Base first
       const b = BASE_KINDS.filter((k) => count(g, sp, k) > 0 && !TUNNELS.includes(k) && !kinds.includes(k));
       kinds = [...kinds, ...b];
@@ -233,14 +234,14 @@ function assaultKinds(g: Game, a: any, sp: string): PieceKind[] {
 
 const assaultResolver = (a: any): Resolver => ({
   hits: (g, sp) => {
-    let h = assaultHits(g, a.faction, sp);
+    let h = assaultHits(g, a.faction, sp, !!a.asUS);
     if (h <= 0) return 0;
     const s = space(sp);
-    if (a.faction === 'US' && capability(g, 13) === 'shaded') { // Cobras (shaded)
+    if ((a.faction === 'US' || a.asUS) && capability(g, 13) === 'shaded') { // Cobras (shaded)
       const r = rollDie(g);
       if (r <= 3) { remove(g, sp, 'us_troops', 1); log(g, `Cobras: a US Troop is lost in ${name(sp)} (roll ${r}).`); }
     }
-    if (a.faction === 'US' && capability(g, 14) === 'unshaded' && (s.terrain === 'highland' || s.terrain === 'jungle') && (a.patton ?? 0) < 2) {
+    if ((a.faction === 'US' || a.asUS) && capability(g, 14) === 'unshaded' && (s.terrain === 'highland' || s.terrain === 'jungle') && (a.patton ?? 0) < 2) {
       a.patton = (a.patton ?? 0) + 1; h += 2; // M-48 Patton
     }
     if (capability(g, 28) === 'shaded' && s.type === 'province' && s.pop > 0 && !a.noShift) { // Search and Destroy (shaded)
@@ -253,7 +254,7 @@ const assaultResolver = (a: any): Resolver => ({
   apply: (g, sp, k) => {
     if (UNDERGROUND_INS.includes(k)) { a.sdDone = [...(a.sdDone ?? []), sp]; }
     else if (BASE_KINDS.includes(k) && !TUNNELS.includes(k) && !assaultTargets(g, sp).includes(k)) a.abramsUsed = true;
-    return applyHit(g, sp, k, { faction: a.faction, assault: true }) === 'stop' ? 'stop' : undefined;
+    return applyHit(g, sp, k, { faction: a.faction, assault: true, ignoreTunnel: !!a.ignoreTunnel }) === 'stop' ? 'stop' : undefined;
   },
   done: (g, aa) => assaultDone(g, aa),
 });
@@ -271,7 +272,7 @@ function assaultDone(g: Game, a: any): void {
 }
 
 function assaultCandidates(g: Game, a: any): string[] {
-  return SPACE_IDS.filter((id) => allowed(a, id) && !a.sel.includes(id) && assaultHits(g, a.faction, id) > 0 && countInsurgent(g, id) > 0);
+  return SPACE_IDS.filter((id) => allowed(a, id) && !a.sel.includes(id) && assaultHits(g, a.faction, id, !!a.asUS) > 0 && countInsurgent(g, id) > 0);
 }
 
 function assaultMax(g: Game, a: any): number {
@@ -279,9 +280,10 @@ function assaultMax(g: Game, a: any): number {
 }
 
 registerState('op_assault', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.i = 0; a.hits = null; a.sdDone = [];
-    if (a.faction === 'US' && hasMomentum(g, 78)) { log(g, 'General Lansdale: no US Assault.'); finish(g, a); return; }
+    if ((a.faction === 'US' || a.asUS) && hasMomentum(g, 78) && a.faction === 'US') { log(g, 'General Lansdale: no US Assault.'); finish(g, a); return; }
     const cost = copCost(g, a, 'assault');
     const cands = assaultCandidates(g, a).filter(() => canSpend(g, a.faction, cost));
     if (cands.length === 0) { finish(g, a); return; }
@@ -298,7 +300,7 @@ registerState('op_assault', {
       const cands = assaultCandidates(g, a).filter(() => canSpend(g, a.faction, cost));
       const mx = assaultMax(g, a);
       p.text(`${a.faction} Assault: select spaces (${selNote(g, a, mx, cost)}).`);
-      if (a.sel.length < mx) for (const id of cands) p.space(id, `${name(id)} (${assaultHits(g, a.faction, id)} hits)`);
+      if (a.sel.length < mx) for (const id of cands) p.space(id, `${name(id)} (${assaultHits(g, a.faction, id, !!a.asUS)} hits)`);
       p.select(a.sel);
       if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, a.sel.length ? 'Done selecting spaces' : 'Done (nothing to do)');
     } else if (a.phase === 'follow') {
@@ -332,11 +334,16 @@ registerState('op_assault', {
 
 // ------------------------------------------------------------------ Sweep (3.2.3)
 
-function sweepPieces(faction: Faction): PieceKind[] { return faction === 'US' ? ['us_troops'] : ['arvn_troops']; }
+function sweepPieces(faction: Faction, asUS = false): PieceKind[] {
+  if (asUS) return ['us_troops', 'arvn_troops', 'arvn_police'];
+  return faction === 'US' ? ['us_troops'] : ['arvn_troops'];
+}
 
-export function sweepPower(g: Game, faction: Faction, sp: string): number {
+export function sweepPower(g: Game, faction: Faction, sp: string, asUS = false): number {
   const c = (k: PieceKind) => count(g, sp, k);
-  const n = faction === 'US'
+  const n = asUS
+    ? c('us_troops') + c('arvn_troops') + c('arvn_police') + c('us_irreg_u') + c('us_irreg_a') + c('arvn_ranger_u') + c('arvn_ranger_a')
+    : faction === 'US'
     ? c('us_troops') + c('us_irreg_u') + c('us_irreg_a')
     : c('arvn_troops') + c('arvn_police') + c('arvn_ranger_u') + c('arvn_ranger_a');
   return space(sp).terrain === 'jungle' ? Math.floor(n / 2) : n; // Jungle: 1 per 2; no Highland halving
@@ -355,12 +362,15 @@ function sweepSources(g: Game, a: any, dest: string): { sp: string; kind: PieceK
     if (isLoc(n) && countInsurgent(g, n) === 0) for (const m of space(n).adjacent) if (m !== dest) from.add(m);
   }
   const out: { sp: string; kind: PieceKind }[] = [];
-  for (const sp of from) for (const k of sweepPieces(a.faction)) if (movable(g, a, sp, k) > 0) out.push({ sp, kind: k });
+  for (const sp of from) {
+    if (a.within && !a.within.includes(sp)) continue; // e.g. Cambodian Civil War: Sweep within Cambodia
+    for (const k of sweepPieces(a.faction, !!a.asUS)) if (movable(g, a, sp, k) > 0) out.push({ sp, kind: k });
+  }
   return out;
 }
 
 const sweepResolver = (a: any): Resolver => ({
-  hits: (g, sp) => sweepPower(g, a.faction, sp),
+  hits: (g, sp) => sweepPower(g, a.faction, sp, !!a.asUS),
   kinds: (g, sp) => UNDERGROUND_INS.filter((k) => count(g, sp, k) > 0),
   apply: (g, sp, k) => {
     flip(g, sp, k, otherSideOf(k), 1);
@@ -393,7 +403,7 @@ const curSweep = (a: any): Resolver => (a.cobras ? cobraResolver() : sweepResolv
 function sweepCandidates(g: Game, a: any): string[] {
   return SPACE_IDS.filter((id) => {
     if (isLoc(id) || isNV(id) || !allowed(a, id) || a.sel.includes(id)) return false;
-    return sweepPower(g, a.faction, id) > 0 || count(g, id, ...sweepPieces(a.faction)) > 0 || sweepSources(g, a, id).length > 0;
+    return sweepPower(g, a.faction, id, !!a.asUS) > 0 || sweepSources(g, a, id).length > 0;
   });
 }
 
@@ -407,9 +417,10 @@ function sweepAdvanceMove(g: Game, a: any): void {
 }
 
 registerState('op_sweep', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.mi = 0; a.moved = {}; a.i = 0; a.hits = null;
-    if (isMonsoon(g)) { log(g, 'Monsoon: no Sweep.'); finish(g, a); return; }
+    if (isMonsoon(g) && !a.ignoreMonsoon) { log(g, 'Monsoon: no Sweep.'); finish(g, a); return; }
     const cost = copCost(g, a, 'sweep');
     const cands = sweepCandidates(g, a).filter(() => canSpend(g, a.faction, cost));
     if (cands.length === 0) { finish(g, a); return; }
@@ -554,6 +565,7 @@ function patrolFinish(g: Game, a: any): void {
 }
 
 registerState('op_patrol', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'move'; a.moved = {}; a.i = 0; a.hits = null; a.paid = false; a.src = null; a.all = false; a.dest = null;
     a.sel0 = [];
@@ -718,6 +730,7 @@ function trainNextSpace(g: Game, a: any): void {
 }
 
 registerState('op_train', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.i = 0; a.paid = []; a.mode = null; a.spSp = null; a.steps = 0; a.pacDone = []; a.used = false;
     a.cur = { mode: null, sfN: 0, cubes: 0, irregs: 0, rangers: 0 };
@@ -855,6 +868,7 @@ function trainToSpecial2(g: Game, a: any): void {
 // ------------------------------------------------------------------ Irregular / Ranger strike (Advise, Raid)
 
 registerState('sf_strike', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = [a.space]; a.i = 0; a.hits = null; a.phase = 'resolve';
     flip(g, a.space, a.kind, otherSideOf(a.kind), 1);
@@ -889,6 +903,7 @@ function advOptions(g: Game, sp: string): string[] {
 }
 
 registerState('sa_advise', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.i = 0; a.used = false;
     if (advCandidates(g, a).length === 0) finish(g, a);
@@ -957,8 +972,14 @@ function airLimit(g: Game, a: any, dflt: number): number {
 
 const LIFT_KINDS: PieceKind[] = ['us_troops', 'us_irreg_u', 'us_irreg_a', 'arvn_troops', 'arvn_ranger_u', 'arvn_ranger_a'];
 const isUSTroop = (k: PieceKind) => k === 'us_troops';
+// Events: "Air Lift into X" restricts destinations to the given space(s).
+function intoOK(a: any, id: string): boolean {
+  if (!a.into) return true;
+  return Array.isArray(a.into) ? a.into.includes(id) : a.into === id;
+}
 
 registerState('sa_air_lift', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.src = null; a.lifted = 0; a.moved = [];
     if (hasMomentum(g, 115)) { log(g, 'Typhoon Kate: no Air Lift.'); finish(g, a); return; }
@@ -986,7 +1007,7 @@ registerState('sa_air_lift', {
       const { sp, kind } = parsePiece(a.src);
       p.text(`Move ${PIECE_NAME[kind]} from ${name(sp)} to which selected space?`);
       p.select([sp]);
-      for (const d of a.sel) if (d !== sp) p.space(d, name(d));
+      for (const d of a.sel) if (d !== sp && intoOK(a, d)) p.space(d, name(d));
       p.action('cancel', undefined, 'Choose another piece');
     }
   },
@@ -994,6 +1015,7 @@ registerState('sa_air_lift', {
     if (a.phase === 'select') {
       if (verb === 'space') { a.sel.push(String(arg)); return; }
       if (a.sel.length < 2) { finish(g, { sel: [] }); return; }
+      if (a.into && !a.sel.some((id: string) => intoOK(a, id))) { finish(g, { sel: [] }); return; }
       a.phase = 'move';
       return;
     }
@@ -1026,17 +1048,19 @@ function strikeCandidates(g: Game, a: any): string[] {
   });
 }
 
-function strikePieceCap(g: Game): number { return capability(g, 20) === 'shaded' ? 2 : 6; } // Laser Guided Bombs (shaded)
+function weasels(g: Game): boolean { return hasMomentum(g, 5) && momentumSide(g, 5) === 'shaded'; }
+function strikePieceCap(g: Game): number { return weasels(g) ? 1 : capability(g, 20) === 'shaded' ? 2 : 6; } // Laser Guided Bombs (shaded)
 
 function strikePieces(g: Game, a: any): { sp: string; k: PieceKind }[] {
   const out: { sp: string; k: PieceKind }[] = [];
-  if (a.hits < 1 || a.removed >= strikePieceCap(g)) return out;
+  if (a.hits < 1 || a.removed >= strikePieceCap(g) || a.degraded && weasels(g)) return out;
   for (const sp of a.sel) for (const k of airTargets(g, sp)) out.push({ sp, k });
   return out;
 }
 
 function canDegrade(g: Game, a: any): boolean {
   if (a.hits < 2 || a.degraded || hasMomentum(g, 39)) return false; // Oriskany: no Degrade
+  if (weasels(g) && a.removed > 0) return false; // Wild Weasels (shaded): remove OR degrade
   if (g.trail <= 0) return false;
   if (capability(g, 31) === 'shaded' && g.trail <= 2) return false; // AAA: not below 2
   return true;
@@ -1061,6 +1085,7 @@ function strikeCheck(g: Game, a: any): void {
 }
 
 registerState('sa_air_strike', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.removed = 0; a.by = {}; a.degraded = false; a.roll = 0; a.hits = 0;
     if (hasMomentum(g, 41) || hasMomentum(g, 10) || hasMomentum(g, 22)) { log(g, 'No Air Strike (momentum in effect).'); finish(g, a); return; }
@@ -1146,6 +1171,7 @@ function canTransferGovern(g: Game, sp: string): boolean {
 }
 
 registerState('sa_govern', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.pending = null; a.mandateUsed = false;
     if (governCandidates(g, a).length === 0) finish(g, a);
@@ -1239,6 +1265,7 @@ function transportFinish(g: Game, a: any): void {
 }
 
 registerState('sa_transport', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'origin'; a.src = null; a.n = 0; a.moved = []; a.dests = [];
     if (hasMomentum(g, 115)) { log(g, 'Typhoon Kate: no Transport.'); finish(g, a); return; }
@@ -1297,6 +1324,7 @@ function raidSources(g: Game, sp: string): { sp: string; kind: PieceKind }[] {
 }
 
 registerState('sa_raid', {
+  faction: (_g, a) => a.decider ?? a.faction,
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.i = 0; a.used = false;
     if (raidCandidates(g, a).length === 0) finish(g, a);

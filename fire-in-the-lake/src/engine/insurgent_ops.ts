@@ -94,7 +94,7 @@ function selectPrompt(a: any, p: Prompt, cands: string[], text: string): void {
   p.text(text);
   p.select(a.done);
   for (const id of cands) p.space(id, nm(id));
-  p.action('done', undefined, 'Done');
+  if (!(a.mandatory && cands.length > 0)) p.action('done', undefined, 'Done'); // mandatory: every legal space must be used
 }
 
 type Cands = (g: Game, a: any) => string[];
@@ -341,8 +341,9 @@ function lockAdd(a: any, id: string, k: PieceKind, n: number): void {
 
 // Sources the current Resources allow: with Trail 4 the NVA may leave Laos/Cambodia for free.
 function allowedSources(g: Game, a: any, f: Ins, D: string): string[] {
-  const all = marchSources(g, f, D);
-  if (a.free || space(D).type === 'loc' || g.resources[f] >= 1) return all;
+  let all = marchSources(g, f, D);
+  if (a.fromOutsideSouth) all = all.filter((s) => space(s).country !== 'south_vietnam'); // Event: March starts outside the South
+  if (a.free || space(D).type === 'loc' || (a.fromOutsideSouth && g.trail >= 1) || g.resources[f] >= 1) return all;
   if (f === 'NVA' && g.trail >= 4) return isLaosCamb(D) ? all : all.filter(isLaosCamb);
   return [];
 }
@@ -409,7 +410,7 @@ function finishDest(g: Game, a: any): void {
     if (rem > 0) log(g, `Claymores remove ${rem} marching Guerrilla(s) in ${nm(D)}.`);
   }
   // Cost: 1 per Province/City moved into, 0 for LoCs; NVA with Trail 4 pays 0 into or out of Laos/Cambodia.
-  let cost = a.free || s.type === 'loc' ? 0 : 1;
+  let cost = a.free || s.type === 'loc' || (a.fromOutsideSouth && g.trail >= 1) ? 0 : 1;
   if (cost === 1 && f === 'NVA' && g.trail >= 4 && (isLaosCamb(D) || allLC)) cost = 0;
   pay(g, f, cost, a);
   // The Trail: NVA groups that reached Laos/Cambodia may keep moving (not in a LimOp).
@@ -462,7 +463,8 @@ function applyAttrition(g: Game, a: any, pd: any, result: any): void {
   const us = (removed['us_troops'] ?? 0) + (removed['us_base'] ?? 0);
   if (us > 0) {
     let lose = us;
-    const order: PieceKind[] = pd.type === 'troops' ? ['nva_troops'] : [d.a, d.u];
+    const order: PieceKind[] = pd.type === 'troops' ? ['nva_troops']
+      : a.includeNVA && f === 'VC' ? [d.a, d.u, GK.NVA.a, GK.NVA.u] : [d.a, d.u]; // vcFirst: VC before NVA
     for (const k of order) if (lose > 0) lose -= remove(g, pd.space, k, lose);
     log(g, `${f} suffers Attrition (${us - lose}) in ${nm(pd.space)}.`);
   }
@@ -486,7 +488,7 @@ registerState('op_march', {
     initArgs(a);
     a.lock = {};
     a.ambushes = 0;
-    if (!a.free && isMonsoon(g)) { log(g, 'Monsoon: no March.'); return finish(g, a); }
+    if (!a.free && !a.ignoreMonsoon && isMonsoon(g)) { log(g, 'Monsoon: no March.'); return finish(g, a); }
     if (marchCands(g, a).length === 0) { log(g, 'No legal March.'); finish(g, a); }
   },
   prompt(g, a, p) {
@@ -552,12 +554,13 @@ registerState('op_march', {
 function attackOpts(g: Game, a: any, f: Ins, id: string): { key: string; label: string }[] {
   const out: { key: string; label: string }[] = [];
   const coin = countCOIN(g, id) > 0;
+  const gCount = gTot(g, id, f) + (a.includeNVA ? gTot(g, id, 'NVA') : 0);
   if (!a.saOnly && coin) {
-    if (gTot(g, id, f) > 0) out.push({ key: 'attack', label: 'Attack with Guerrillas' });
+    if (gCount > 0 && !a.troopsOnly) out.push({ key: 'attack', label: 'Attack with Guerrillas' });
     const per = f === 'NVA' && cap(g, 45) === 'shaded' && !a.ptUsed ? 1 : 2;
     if (f === 'NVA' && !a.guerOnly && count(g, id, 'nva_troops') >= per) out.push({ key: 'troops', label: 'Attack with NVA Troops' });
   }
-  if (ambushAllowed(g, a, f, id)) out.push({ key: 'ambush', label: a.saOnly ? 'Ambush' : 'Ambush (Special Activity)' });
+  if (!a.troopsOnly && !a.mandatory && ambushAllowed(g, a, f, id)) out.push({ key: 'ambush', label: a.saOnly ? 'Ambush' : 'Ambush (Special Activity)' });
   return out;
 }
 
@@ -598,8 +601,10 @@ function attackAct(g: Game, a: any, verb: string, arg: string | number | undefin
   if (arg === 'ambush') return beginAmbush(g, a, f, id, 'attack');
   ptFirst(g, a, f, id);
   if (arg === 'attack') {
-    const n = gTot(g, id, f);
+    const withNVA = a.includeNVA && f === 'VC';
+    const n = gTot(g, id, f) + (withNVA ? gTot(g, id, 'NVA') : 0); // Tet Offensive: VC and NVA Guerrillas add together
     flip(g, id, d.u, d.a, gU(g, id, f));
+    if (withNVA) flip(g, id, GK.NVA.u, GK.NVA.a, gU(g, id, 'NVA'));
     const roll = rollDie(g);
     log(g, `${f} Attacks ${nm(id)} with ${n} Guerrilla(s): rolls ${roll}.`);
     if (roll <= n) {
@@ -660,7 +665,7 @@ function terrorCands(g: Game, a: any): string[] {
   return SPACE_IDS.filter((id) => {
     if (!openSpace(a, id)) return false;
     if (!(gU(g, id, f) > 0 || (f === 'NVA' && count(g, id, 'nva_troops') > 0))) return false;
-    if (f === 'VC' && cap(g, 116) === 'unshaded' && gTot(g, id, 'VC') < 2) return false; // Cadres
+    if (f === 'VC' && !a.oneGuerrillaPerSpace && cap(g, 116) === 'unshaded' && gTot(g, id, 'VC') < 2) return false; // Cadres
     return canPay(g, f, terrorCost(id), a);
   });
 }
@@ -681,7 +686,7 @@ registerState('op_terror', {
     const s = space(id);
     pay(g, f, terrorCost(id), a);
     if (gU(g, id, f) > 0) flip(g, id, GK[f].u, GK[f].a, 1);
-    if (f === 'VC' && cap(g, 116) === 'unshaded') remove(g, id, 'vc_guer_a', 2 - remove(g, id, 'vc_guer_u', 2));
+    if (f === 'VC' && !a.oneGuerrillaPerSpace && cap(g, 116) === 'unshaded') remove(g, id, 'vc_guer_a', 2 - remove(g, id, 'vc_guer_u', 2));
     const st = g.spaces[id];
     if (st.terror === 0) {
       if (totalTerror(g) < TERROR_MARKER_CAP) st.terror = 1;

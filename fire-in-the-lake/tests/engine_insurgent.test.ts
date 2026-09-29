@@ -493,3 +493,68 @@ describe('Terror rules (3.3.4)', () => {
     expect(n(h, 'kien_phong', 'vc_guer_u') + n(h, 'kien_phong', 'vc_guer_a')).toBe(1);
   });
 });
+
+describe('Event-driven arguments', () => {
+  it('fromOutsideSouth: March starts outside the South and is free while the Trail is above 0; ignoreMonsoon', () => {
+    const g = mk();
+    g.current = 1; g.next = 125;
+    put(g, 'central_laos', 'nva_troops', 2);
+    put(g, 'kien_phong', 'nva_troops', 2);
+    g.resources.NVA = 0;
+    push(g, 'op_march', { faction: 'NVA', fromOutsideSouth: true, ignoreMonsoon: true });
+    expect(has(g, 'space', 'quang_nam')).toBe(true);
+    do_(g, 'space', 'quang_nam');
+    expect(has(g, 'all', 'kien_phong')).toBe(false);
+    do_(g, 'all', 'central_laos');
+    do_(g, 'done');
+    expect(n(g, 'quang_nam', 'nva_troops')).toBe(2);
+    expect(g.resources.NVA).toBe(0);
+  });
+  it('troopsOnly + mandatory Attack (Easter Offensive): only NVA Troops, no early Done', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'nva_troops', 4);
+    put(g, 'kien_phong', 'nva_guer_u', 3);
+    put(g, 'kien_phong', 'arvn_troops', 5);
+    push(g, 'op_attack', { faction: 'NVA', free: true, troopsOnly: true, mandatory: true });
+    expect(has(g, 'done')).toBe(false);
+    do_(g, 'space', 'kien_phong');
+    expect(has(g, 'opt', 'attack')).toBe(false);
+    do_(g, 'opt', 'troops');
+    expect(n(g, 'kien_phong', 'arvn_troops')).toBe(3);
+    expect(n(g, 'kien_phong', 'nva_guer_u')).toBe(3);
+  });
+  it('includeNVA Attack (Tet Offensive) adds VC and NVA Guerrillas for the die roll and Attrition takes VC first', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    put(g, 'kien_phong', 'nva_guer_u', 5);
+    put(g, 'kien_phong', 'us_troops', 4);
+    g.seed = (() => { for (let s = 1; s < 500; s++) { const h = mk(); h.seed = s; if (rollDie(h) <= 6) return s; } return 1; })();
+    push(g, 'op_attack', { faction: 'VC', free: true, mandatory: true, includeNVA: true, vcFirst: true, ambush: false });
+    do_(g, 'space', 'kien_phong');
+    do_(g, 'opt', 'attack');
+    expect(n(g, 'kien_phong', 'us_troops')).toBe(2); // 6 Guerrillas: any roll succeeds
+    expect(n(g, 'kien_phong', 'vc_guer_a')).toBe(0); // Attrition removes the VC Guerrilla first
+    expect(n(g, 'kien_phong', 'nva_guer_a')).toBe(4);
+  });
+  it('mandatory Terror (oneGuerrillaPerSpace) has no early Done', () => {
+    const g = mk();
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    push(g, 'op_terror', { faction: 'VC', free: true, spaces: ['kien_phong'], mandatory: true, oneGuerrillaPerSpace: true });
+    expect(has(g, 'done')).toBe(false);
+    do_(g, 'space', 'kien_phong');
+    expect(g.spaces.kien_phong.terror).toBe(1);
+  });
+  it('Typhoon Kate: no Bombard, other SAs max 1 space', () => {
+    const g = mk();
+    g.momentum = [115];
+    put(g, 'central_laos', 'nva_troops', 3);
+    put(g, 'quang_tri_thua_thien', 'us_troops', 3);
+    push(g, 'sa_bombard', {});
+    expect(g.stack.length).toBe(0);
+    put(g, 'kien_phong', 'vc_guer_u', 1);
+    put(g, 'tay_ninh', 'vc_guer_u', 1);
+    push(g, 'sa_tax', {});
+    do_(g, 'space', 'kien_phong');
+    expect(g.stack.length).toBe(0);
+  });
+});

@@ -129,7 +129,7 @@ describe('events 91-120 (playbook text)', () => {
   it('103 Kent State shaded: 3 Troop Casualties out of play, Aid -6, US Ineligible', () => {
     const g = mk();
     g.casualties.us_troops = 4;
-    play(g, 103, true, 'VC');
+    play(g, 103, true, 'VC', [['mv'], ['mv'], ['mv']]);
     expect(g.out_of_play.us_troops).toBe(3);
     expect(g.casualties.us_troops).toBe(1);
     expect(g.aid).toBe(14);
