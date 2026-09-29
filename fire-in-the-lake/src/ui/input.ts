@@ -14,7 +14,7 @@ export interface InputHost {
   act(verb: string, arg?: string | number): void;
 }
 
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
+const cap = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 export class Input {
   private ray = new THREE.Raycaster();
@@ -68,6 +68,7 @@ export class Input {
   private hover(e: PointerEvent) {
     const { space } = this.pick(e);
     const g = this.host.game();
+    if (!this.menu.classList.contains('hidden')) return;
     if (!space || !g) { this.clearHover(); return; }
     if (space !== this.hoverId) { this.hoverId = space; this.board.setHover(space); this.tip.innerHTML = this.tipHtml(g, space); }
     const view = this.host.view();

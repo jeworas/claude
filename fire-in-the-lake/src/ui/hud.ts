@@ -35,6 +35,7 @@ export class Hud {
   private lastView: View | null = null;
   private lastBusy = false;
   private lastThinking: Faction | null = null;
+  private overShown = false;
 
   constructor(private root: HTMLElement, private h: HudHandlers) {
     root.innerHTML = `
@@ -210,7 +211,7 @@ export class Hud {
       this.addUndo(A, view);
       return;
     }
-    const txt = who && view.prompt.startsWith(who + ':') ? view.prompt.slice(who.length + 1).trim() : view.prompt;
+    const txt = who && view.prompt.startsWith(who) && /^\W|\s/.test(view.prompt.charAt(who.length)) ? view.prompt.slice(who.length).replace(/^:?\s*/, '') : view.prompt;
     P.innerHTML = `<span class="who-dot" style="background:${col}"></span><b style="color:${col}">${who ?? ''}</b> ${esc(txt)}`;
     A.innerHTML = '';
     const acts = view.actions.filter((a) => a.verb !== 'space' && a.verb !== 'piece' && a.verb !== 'undo');
@@ -243,9 +244,12 @@ export class Hud {
 
   private renderOver(g: Game) {
     const o = this.el.gameover;
-    o.classList.toggle('hidden', !g.over);
-    if (g.over) {
-      o.innerHTML = `<div class="panel"><h2>Game Over</h2><p>${esc(g.result ?? '')}</p><button class="btn act" id="go-new">New game</button></div>`;
+    if (!g.over) { o.classList.add('hidden'); this.overShown = false; return; }
+    if (!this.overShown) {
+      this.overShown = true;
+      o.classList.remove('hidden');
+      o.innerHTML = `<div class="panel"><h2>Game Over</h2><p>${esc(g.result ?? '')}</p><button class="btn act" id="go-new">New game</button> <button class="btn" id="go-view">View board</button></div>`;
+      o.querySelector<HTMLElement>('#go-view')!.onclick = () => o.classList.add('hidden');
       o.querySelector<HTMLElement>('#go-new')!.onclick = this.h.onNewGame;
     }
   }

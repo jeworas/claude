@@ -19,6 +19,7 @@ import type { ActionKind, Faction, Game } from '../core/types';
 import { FACTIONS } from '../core/types';
 import { CARD, CARDS } from '../data/cards';
 import { addResources, victoryMargin } from '../core/pieces';
+import { pivotalPreconditionMet } from './events';
 
 // ------------------------------------------------------------------ helpers
 
@@ -53,8 +54,13 @@ function pivotalCardOf(f: Faction): number | null {
 
 function pivotalCandidates(g: Game): Faction[] {
   if (isMonsoon(g)) return [];
-  return TRUMP.filter((f) => g.pivotal_available.includes(f) && g.eligible[f]
-    && !g.pivotal_played.includes(f) && pivotalCardOf(f) != null);
+  return TRUMP.filter((f) => {
+    const id = pivotalCardOf(f);
+    if (id == null || !g.eligible[f] || g.pivotal_played.includes(f)) return false;
+    let ok = false;
+    try { ok = pivotalPreconditionMet(g, id); } catch { ok = false; }
+    return ok;
+  });
 }
 
 function fallbackEnd(g: Game): void {
@@ -160,6 +166,7 @@ function advance(g: Game, args: any): void {
   if (!args.pivotChecked && g.acted.length === 0) {
     args.pivotChecked = true;
     const c = pivotalCandidates(g);
+    g.pivotal_available = c;
     if (c.length && hasState('pivotal')) { push(g, 'pivotal_offer', { candidates: c, idx: 0 }); return; }
   }
   const f = nextActor(g, args);

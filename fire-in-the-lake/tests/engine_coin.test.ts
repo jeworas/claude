@@ -45,8 +45,8 @@ describe('Assault', () => {
     push(g, 'op_assault', { faction: 'ARVN' });
     act(g, 'space', 'tay_ninh');
     act(g, 'done');
-    // province: 6 cubes / 2 = 3 hits: guerrilla, base, base
-    expect(c(g, 'tay_ninh', 'vc_base')).toBe(0);
+    // province: Police do not count, 4 Troops / 2 = 2 hits: guerrilla, then one base
+    expect(c(g, 'tay_ninh', 'vc_base')).toBe(1);
     expect(g.resources.ARVN).toBe(27);
   });
   it('Highland halves US damage unless there is a US Base', () => {
@@ -59,7 +59,51 @@ describe('Assault', () => {
     put(h, 'quang_nam', { us_troops: 3, us_base: 1, nva_troops: 3 });
     push(h, 'op_assault', { faction: 'US' });
     act(h, 'space', 'quang_nam'); act(h, 'done');
-    expect(c(h, 'quang_nam', 'nva_troops')).toBe(0);
+    expect(c(h, 'quang_nam', 'nva_troops')).toBe(1); // floor(3/2)=1, doubled by the Base
+  });
+  it('ARVN: Police count in Cities only; Highland is 1 per 3', () => {
+    const g = blank();
+    put(g, 'hue', { arvn_troops: 1, arvn_police: 3, nva_guer_a: 3 });
+    push(g, 'op_assault', { faction: 'ARVN' });
+    act(g, 'space', 'hue'); act(g, 'done');
+    expect(c(g, 'hue', 'nva_guer_a')).toBe(1); // 4 cubes / 2
+    const h = blank();
+    put(h, 'quang_nam', { arvn_troops: 5, nva_guer_a: 3 });
+    push(h, 'op_assault', { faction: 'ARVN' });
+    act(h, 'space', 'quang_nam'); act(h, 'done');
+    expect(c(h, 'quang_nam', 'nva_guer_a')).toBe(2); // floor(5/3)=1
+  });
+  it('US Assault may add an ARVN Assault for 3 ARVN Resources', () => {
+    const g = blank();
+    put(g, 'tay_ninh', { us_troops: 1, arvn_troops: 2, vc_guer_a: 3 });
+    push(g, 'op_assault', { faction: 'US' });
+    act(g, 'space', 'tay_ninh'); act(g, 'done');
+    act(g, 'space', 'tay_ninh');
+    expect(c(g, 'tay_ninh', 'vc_guer_a')).toBe(1);
+    expect(g.resources.ARVN).toBe(27);
+    expect(g.stack.length).toBe(0);
+  });
+  it('Abrams shaded limits US Assault to 2 spaces; Abrams unshaded lets a Base go first', () => {
+    const g = blank();
+    g.capabilities[11] = 'shaded';
+    for (const id of ['tay_ninh', 'kien_phong', 'binh_dinh']) put(g, id, { us_troops: 1, vc_guer_a: 1 });
+    push(g, 'op_assault', { faction: 'US' });
+    act(g, 'space', 'tay_ninh'); act(g, 'space', 'kien_phong');
+    expect(has(g, 'space', 'binh_dinh')).toBe(false);
+    const h = blank();
+    h.capabilities[11] = 'unshaded';
+    put(h, 'tay_ninh', { us_troops: 1, vc_guer_u: 2, vc_base: 1 });
+    push(h, 'op_assault', { faction: 'US' });
+    act(h, 'space', 'tay_ninh'); act(h, 'done');
+    expect(c(h, 'tay_ninh', 'vc_base')).toBe(0);
+  });
+  it('Search and Destroy (unshaded) removes an Underground guerrilla', () => {
+    const g = blank();
+    g.capabilities[28] = 'unshaded';
+    put(g, 'tay_ninh', { us_troops: 1, vc_guer_u: 2 });
+    push(g, 'op_assault', { faction: 'US' });
+    act(g, 'space', 'tay_ninh'); act(g, 'done');
+    expect(c(g, 'tay_ninh', 'vc_guer_u')).toBe(1);
   });
   it('Tunneled Base needs a die roll and never disappears in one hit', () => {
     const g = blank();
@@ -209,54 +253,96 @@ describe('Train', () => {
   });
 });
 
+describe('Momentum', () => {
+  it('Blowtorch Komer makes Pacification cost 1 per step', () => {
+    const g = blank();
+    g.momentum = [16];
+    put(g, 'saigon', { us_troops: 2, arvn_police: 2 });
+    push(g, 'op_train', { faction: 'US' });
+    act(g, 'space', 'saigon'); act(g, 'done'); act(g, 'next');
+    act(g, 'space', 'saigon'); act(g, 'shift');
+    expect(g.resources.ARVN).toBe(29);
+  });
+});
+
 describe('Special Activities', () => {
-  it('Govern: Aid gives 3x Pop Resources; Young Turks adds Patronage', () => {
+  it('Govern: Aid +3xPop; Young Turks adds Patronage; Saigon and non-Support spaces excluded', () => {
     const g = blank();
     g.leader = 126;
-    put(g, 'saigon', { arvn_police: 2, arvn_troops: 1 });
+    put(g, 'hue', { arvn_police: 2, arvn_troops: 1 });
+    g.spaces.hue.support = 1;
+    put(g, 'saigon', { arvn_police: 2 });
+    g.spaces.saigon.support = 1;
+    put(g, 'da_nang', { arvn_police: 2 });
     push(g, 'sa_govern', { faction: 'ARVN' });
-    act(g, 'space', 'saigon'); act(g, 'aid');
-    expect(g.resources.ARVN).toBe(30 + 18);
+    expect(has(g, 'space', 'saigon')).toBe(false);
+    expect(has(g, 'space', 'da_nang')).toBe(false);
+    act(g, 'space', 'hue'); act(g, 'aid');
+    expect(g.aid).toBe(16);
     expect(g.patronage).toBe(12);
     expect(g.stack.length).toBe(0);
   });
-  it('Govern: Patronage option', () => {
+  it('Govern: transfers Pop from Aid to Patronage', () => {
     const g = blank();
-    put(g, 'saigon', { arvn_police: 2, arvn_troops: 1 });
+    put(g, 'hue', { arvn_police: 2, arvn_troops: 1 });
+    g.spaces.hue.support = 2;
     push(g, 'sa_govern', { faction: 'ARVN' });
-    act(g, 'space', 'saigon'); act(g, 'patronage');
-    expect(g.patronage).toBe(16);
+    act(g, 'space', 'hue'); act(g, 'patronage');
+    expect(g.aid).toBe(8);
+    expect(g.patronage).toBe(12);
   });
   it('Air Strike hits selected spaces and can degrade the Trail', () => {
     const g = blank();
-    put(g, 'central_laos', { nva_troops: 3 });
-    put(g, 'tay_ninh', { vc_guer_a: 2 });
+    put(g, 'central_laos', { us_troops: 1, nva_troops: 3 });
+    put(g, 'tay_ninh', { arvn_troops: 1, vc_guer_a: 2 });
     push(g, 'sa_air_strike', { faction: 'US' });
     act(g, 'space', 'central_laos'); act(g, 'space', 'tay_ninh'); act(g, 'done');
-    expect(c(g, 'central_laos', 'nva_troops')).toBe(2);
-    expect(c(g, 'tay_ninh', 'vc_guer_a')).toBe(1);
+    for (let i = 0; i < 3; i++) act(g, 'piece', 'central_laos:nva_troops');
+    act(g, 'piece', 'tay_ninh:vc_guer_a');
+    act(g, 'piece', 'tay_ninh:vc_guer_a');
+    expect(g.spaces.tay_ninh.support).toBe(-1); // shifted toward Opposition
     act(g, 'degrade');
     expect(g.trail).toBe(2);
+  });
+  it('Air Strike removes at most 6 pieces in total', () => {
+    const g = blank();
+    put(g, 'tay_ninh', { us_troops: 1, vc_guer_a: 8 });
+    push(g, 'sa_air_strike', { faction: 'US' });
+    act(g, 'space', 'tay_ninh'); act(g, 'done');
+    for (let i = 0; i < 6; i++) act(g, 'piece', 'tay_ninh:vc_guer_a');
+    expect(c(g, 'tay_ninh', 'vc_guer_a')).toBe(2);
+  });
+  it('Air Strike needs COIN pieces (unless Arc Light) and never takes Bases before other insurgents', () => {
+    const g = blank();
+    put(g, 'tay_ninh', { vc_guer_a: 1 });
+    put(g, 'kien_phong', { us_troops: 1, vc_guer_u: 1, vc_base: 1 });
+    push(g, 'sa_air_strike', { faction: 'US' });
+    expect(g.stack.length).toBe(0);
+    const h = blank();
+    h.capabilities[8] = 'unshaded';
+    put(h, 'tay_ninh', { vc_guer_a: 1 });
+    push(h, 'sa_air_strike', { faction: 'US' });
+    expect(has(h, 'space', 'tay_ninh')).toBe(true);
   });
   it('Air Strike: Monsoon limits to 2 spaces; Bombing Pause forbids', () => {
     const g = blank();
     g.next = 126;
-    for (const id of ['tay_ninh', 'kien_phong', 'binh_dinh']) put(g, id, { vc_guer_a: 1 });
+    for (const id of ['tay_ninh', 'kien_phong', 'binh_dinh']) put(g, id, { us_troops: 1, vc_guer_a: 1 });
     push(g, 'sa_air_strike', { faction: 'US' });
     act(g, 'space', 'tay_ninh'); act(g, 'space', 'kien_phong');
     expect(has(g, 'space', 'binh_dinh')).toBe(false);
     const h = blank();
     h.momentum = [41];
-    put(h, 'tay_ninh', { vc_guer_a: 1 });
+    put(h, 'tay_ninh', { us_troops: 1, vc_guer_a: 1 });
     push(h, 'sa_air_strike', { faction: 'US' });
     expect(h.stack.length).toBe(0);
   });
   it('Air Strike does not degrade the Trail under Rolling Thunder', () => {
     const g = blank();
     g.momentum = [10];
-    put(g, 'central_laos', { nva_troops: 1 });
+    put(g, 'central_laos', { us_troops: 1, nva_troops: 1 });
     push(g, 'sa_air_strike', { faction: 'US' });
-    act(g, 'space', 'central_laos'); act(g, 'done');
+    act(g, 'space', 'central_laos'); act(g, 'done'); act(g, 'piece', 'central_laos:nva_troops');
     expect(g.stack.length).toBe(0);
     expect(g.trail).toBe(3);
   });
@@ -307,7 +393,7 @@ describe('op_menu', () => {
   it('offers ops and SAs, hides Sweep in Monsoon, and pops when both are used', () => {
     const g = blank();
     g.next = 126;
-    put(g, 'tay_ninh', { us_troops: 3, vc_guer_a: 1, nva_troops: 1 });
+    put(g, 'tay_ninh', { us_troops: 3, vc_guer_a: 3, nva_troops: 1 });
     push(g, 'op_menu', { faction: 'US', limited: false, sa: true, free: false });
     expect(has(g, 'op', 'op_sweep')).toBe(false);
     expect(has(g, 'op', 'op_assault')).toBe(true);
@@ -315,6 +401,9 @@ describe('op_menu', () => {
     expect(has(g, 'done')).toBe(false);
     act(g, 'sa', 'sa_air_strike');
     act(g, 'space', 'tay_ninh'); act(g, 'done');
+    act(g, 'piece', 'tay_ninh:nva_troops'); act(g, 'piece', 'tay_ninh:vc_guer_a');
+    act(g, 'done'); // stop removing
+    act(g, 'done'); // decline Trail degrade
     expect(top(g)!.state).toBe('op_menu');
     act(g, 'op', 'op_assault');
     act(g, 'space', 'tay_ninh'); act(g, 'done');

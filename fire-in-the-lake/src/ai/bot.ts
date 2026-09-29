@@ -13,7 +13,7 @@ const FINISH_VERBS = ['done', 'skip', 'pass', 'next', 'end', 'finish', 'ok', 'co
 const AVOID_VERBS = ['cancel', 'back', 'undo'];
 
 // Per-game frame counter: key = stack depth + top state name.
-const counters = new WeakMap<Game, { key: string; n: number }>();
+const counters = new WeakMap<Game, { key: string; n: number; used: Record<string, number> }>();
 
 function hash(...n: number[]): number {
   let h = 2166136261;
@@ -43,7 +43,7 @@ export function evaluate(g: Game, f: Faction): number {
       s += 1.0 * countOnMap(g, 'vc_base', 'vc_tunnel') + 0.12 * g.resources.VC;
       break;
   }
-  if (g.over) s += g.result && g.result.includes(f) ? 1000 : 0;
+  if (g.over && g.result) s += new RegExp(`\b${f} wins\b`).test(g.result) ? 1000 : -200;
   return s;
 }
 
@@ -116,16 +116,29 @@ export function botStep(g: Game): BotAction {
   const key = `${g.stack.length}:${fr?.state ?? ''}`;
 
   let c = counters.get(g);
-  if (!c || c.key !== key) { c = { key, n: 0 }; counters.set(g, c); }
+  if (!c || c.key !== key) { c = { key, n: 0, used: {} }; counters.set(g, c); }
   c.n++;
+  const used = c.used;
+  const sig = (a: ActionOption) => `${a.verb}|${a.arg ?? ''}`;
 
-  const out = (a: ActionOption): BotAction => (a.arg === undefined ? { verb: a.verb } : { verb: a.verb, arg: a.arg });
+  const out = (a: ActionOption): BotAction => {
+    used[sig(a)] = (used[sig(a)] ?? 0) + 1;
+    return a.arg === undefined ? { verb: a.verb } : { verb: a.verb, arg: a.arg };
+  };
 
-  const finish = acts.filter(isFinish);
-  const usable = acts.filter((a) => !AVOID_VERBS.includes(a.verb));
-  const pool = usable.length ? usable : acts;
+  // Cycle breaker: an option already taken 4+ times in this frame is probably part of a loop.
+  const fresh = acts.filter((a) => (used[sig(a)] ?? 0) < 4);
+  const live = fresh.length ? fresh : acts;
+  const finish = live.filter(isFinish);
+  // Allow 'back'/'cancel' once we have been in this frame for a while (they may be the only exit).
+  const usable = live.filter((a) => !AVOID_VERBS.includes(a.verb) || (c!.n > MAX_SELECTIONS && a.verb !== 'undo'));
+  const pool = usable.length ? usable : live;
 
   // Loop breaker: after many selections in the same frame, finish it.
+  if (c.n > MAX_SELECTIONS && !finish.length) {
+    const exit = pool.find((a) => AVOID_VERBS.includes(a.verb));
+    if (exit) return out(exit);
+  }
   if (c.n > MAX_SELECTIONS && finish.length) {
     // Prefer 'done' style over 'pass' where both exist.
     const order = ['done', 'next', 'end', 'finish', 'skip', 'continue', 'ok', 'none', 'no', 'pass'];

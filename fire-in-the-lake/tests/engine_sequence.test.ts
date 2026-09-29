@@ -15,6 +15,16 @@ if (!hasState('event')) registerState('event', { enter(g) { pop(g, { done: true 
 if (!hasState('pivotal')) registerState('pivotal', { enter(g) { pop(g, { done: true }); }, prompt() {}, act() {} });
 if (!hasState('coup')) registerState('coup', { enter(g) { pop(g, { done: true }); }, prompt() {}, act() {} });
 
+// Play the Event, then resolve any interactive event states by taking the first legal action.
+function playEvent(g: Game) {
+  doAction(g, 'event', 'unshaded');
+  for (let i = 0; i < 300 && top(g) && top(g)!.state !== 'card_choice'; i++) {
+    const a = getView(g).actions.find((x) => x.verb !== 'undo');
+    if (!a) break;
+    doAction(g, a.verb, a.arg);
+  }
+}
+
 const verbs = (g: Game) => getView(g).actions.map((a) => a.verb + (a.arg !== undefined ? ':' + a.arg : ''));
 
 function plainCards(): number[] {
@@ -95,7 +105,7 @@ describe('sequence of play', () => {
 
   it('after an Event the 2nd faction may Op (+SA) but not Limited Op', () => {
     const g = fresh();
-    doAction(g, 'event', 'unshaded');
+    playEvent(g);
     expect(g.first_action).toBe('event');
     const v = verbs(g);
     expect(v).toContain('op');
@@ -139,7 +149,7 @@ describe('sequence of play', () => {
     g.resources = { ARVN: 40, NVA: 40, VC: 40 };
     const [a, b] = [g.current!, g.next!];
     const order = CARD[a].order;
-    doAction(g, 'event', 'unshaded');
+    playEvent(g);
     doAction(g, 'op');
     if (verbs(g).includes('done')) doAction(g, 'done');
     while (g.current === a && getView(g).actions.some((x) => x.verb === 'done')) doAction(g, 'done');
@@ -154,7 +164,7 @@ describe('sequence of play', () => {
     const g = fresh();
     const a = g.current!, b = g.next!;
     const order = CARD[a].order;
-    doAction(g, 'event', 'unshaded');
+    playEvent(g);
     g.next_ineligible = [order[2]];
     // second: Op with SA declined
     g.resources = { ARVN: 40, NVA: 40, VC: 40 };

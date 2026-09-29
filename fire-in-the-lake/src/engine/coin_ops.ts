@@ -174,34 +174,87 @@ export function assaultHits(g: Game, faction: Faction, sp: string): number {
   const c = (k: PieceKind) => count(g, sp, k);
   if (faction === 'US') {
     let n = c('us_troops') + c('us_irreg_u') + c('us_irreg_a');
-    // Highland halves damage unless a US Base is present (US Base effect).
-    if (s.terrain === 'highland' && c('us_base') === 0) n = Math.floor(n / 2);
+    if (s.terrain === 'highland') n = Math.floor(n / 2);
+    if (c('us_base') > 0) n *= 2; // a US Base doubles hits (after any Highland halving)
     return n;
   }
-  const cubes = c('arvn_troops') + c('arvn_police') + c('arvn_ranger_u') + c('arvn_ranger_a');
-  if (s.type === 'province') return Math.floor(cubes / 2);
-  return cubes;
+  let cubes = c('arvn_troops') + c('arvn_ranger_u') + c('arvn_ranger_a');
+  if (s.type === 'city' || s.type === 'loc') cubes += c('arvn_police');
+  return Math.floor(cubes / (s.terrain === 'highland' ? 3 : 2));
+}
+
+// Enemy pieces removable by Air Strike: Active Troops/Guerrillas; Bases only when no other
+// insurgent pieces remain in the space.
+export function airTargets(g: Game, sp: string): PieceKind[] {
+  const c = (k: PieceKind) => count(g, sp, k);
+  const act = (['nva_troops', 'nva_guer_a', 'vc_guer_a'] as PieceKind[]).filter((k) => c(k) > 0);
+  if (act.length) return act;
+  if (UNDERGROUND_INS.some((k) => c(k) > 0)) return [];
+  return BASE_KINDS.filter((k) => c(k) > 0);
+}
+
+function abramsKinds(g: Game, a: any, sp: string, normal: PieceKind[]): PieceKind[] {
+  if (a.faction !== 'US' || capability(g, 11) !== 'unshaded') return normal;
+  if (a.abramsSp != null && a.abramsSp !== sp) return normal;
+  const bases = BASE_KINDS.filter((k) => count(g, sp, k) > 0);
+  if (!bases.length) return normal;
+  return [...new Set([...normal, ...bases])];
 }
 
 const assaultResolver = (a: any): Resolver => ({
-  hits: (g, sp) => assaultHits(g, a.faction, sp),
-  kinds: (g, sp) => assaultTargets(g, sp),
-  apply: (g, sp, k) => { applyHit(g, sp, k); },
-  done: (g, aa) => finish(g, aa),
+  hits: (g, sp) => {
+    let h = assaultHits(g, a.faction, sp);
+    if (h <= 0) return 0;
+    const s = space(sp);
+    if (a.faction === 'US' && capability(g, 13) === 'shaded') { // Cobras (shaded)
+      const r = rollDie(g);
+      if (r <= 3) { remove(g, sp, 'us_troops', 1); log(g, `Cobras: a US Troop is lost in ${name(sp)} (roll ${r}).`); }
+    }
+    if (capability(g, 14) === 'unshaded' && (s.terrain === 'highland' || s.terrain === 'jungle') && (a.patton ?? 0) < 2) {
+      a.patton = (a.patton ?? 0) + 1; h += 2; // M-48 Patton
+    }
+    if (a.faction === 'US' && capability(g, 28) === 'unshaded' && !a.sd) { // Search and Destroy
+      const u = UNDERGROUND_INS.find((k) => count(g, sp, k) > 0);
+      if (u) { a.sd = true; remove(g, sp, u, 1); log(g, `Search and Destroy removes an Underground guerrilla in ${name(sp)}.`); }
+    }
+    if (capability(g, 28) === 'shaded' && canHaveSupport(sp)) shiftSupport(g, sp, -1);
+    return h;
+  },
+  kinds: (g, sp) => abramsKinds(g, a, sp, assaultTargets(g, sp)),
+  apply: (g, sp, k) => {
+    if (BASE_KINDS.includes(k) && !assaultTargets(g, sp).includes(k)) a.abramsSp = sp;
+    applyHit(g, sp, k);
+  },
+  done: (g, aa) => assaultDone(g, aa),
 });
+
+function assaultDone(g: Game, a: any): void {
+  // US Assault may add an ARVN Assault in one of its spaces for 3 ARVN Resources.
+  a.phase = 'arvn';
+  if (a.faction !== 'US' || a.free || !canSpend(g, 'US', 3) || arvnAddCandidates(g, a).length === 0) finish(g, a);
+}
+
+function arvnAddCandidates(g: Game, a: any): string[] {
+  return a.sel.filter((id: string) => assaultHits(g, 'ARVN', id) > 0 && assaultTargets(g, id).length > 0);
+}
 
 function assaultCandidates(g: Game, a: any): string[] {
   const out: string[] = [];
   for (const id of SPACE_IDS) {
     if (!allowed(a, id) || a.sel.includes(id)) continue;
     if (assaultHits(g, a.faction, id) <= 0) continue;
-    if (assaultTargets(g, id).length === 0) continue;
+    const sd = a.faction === 'US' && capability(g, 28) === 'unshaded' && UNDERGROUND_INS.some((k) => count(g, id, k) > 0);
+    if (!sd && abramsKinds(g, a, id, assaultTargets(g, id)).length === 0) continue;
     out.push(id);
   }
   return out;
 }
 
 function assaultCost(a: any): number { return a.free || a.faction === 'US' ? 0 : 3; }
+
+function assaultMax(g: Game, a: any): number {
+  return maxSel(a, a.faction === 'US' && capability(g, 11) === 'shaded' ? 2 : Infinity); // Abrams (shaded)
+}
 
 registerState('op_assault', {
   enter(g, a) {
@@ -218,10 +271,15 @@ registerState('op_assault', {
   prompt(g, a, p) {
     if (a.phase === 'select') {
       const cands = assaultCandidates(g, a).filter((id) => canSpend(g, a.faction, assaultCost(a)));
-      p.text(`${a.faction} Assault: select spaces (${a.sel.length}/${maxSel(a) === Infinity ? '-' : maxSel(a)}).`);
-      if (a.sel.length < maxSel(a)) for (const id of cands) p.space(id, `${name(id)} (${assaultHits(g, a.faction, id)} hits)`);
+      const mx = assaultMax(g, a);
+      p.text(`${a.faction} Assault: select spaces (${a.sel.length}/${mx === Infinity ? '-' : mx}).`);
+      if (a.sel.length < mx) for (const id of cands) p.space(id, `${name(id)} (${assaultHits(g, a.faction, id)} hits)`);
       p.select(a.sel);
       if (a.sel.length > 0 || cands.length === 0) p.action('done', undefined, 'Done');
+    } else if (a.phase === 'arvn') {
+      p.text('US Assault: add an ARVN Assault in one of these spaces for 3 ARVN Resources?');
+      for (const id of arvnAddCandidates(g, a)) p.space(id, `ARVN Assault in ${name(id)}`);
+      p.action('done', undefined, 'No');
     } else {
       resolverPrompt(g, a, p, assaultResolver(a), `${a.faction} Assault`);
     }
@@ -234,11 +292,18 @@ registerState('op_assault', {
         spend(g, a.faction, assaultCost(a));
         a.sel.push(id);
         log(g, `${a.faction} Assaults ${name(id)}.`);
-        if (a.sel.length >= maxSel(a)) beginResolve(g, a, r);
+        if (a.sel.length >= assaultMax(g, a)) beginResolve(g, a, r);
       } else if (a.sel.length === 0) finish(g, a);
       else beginResolve(g, a, r);
+    } else if (a.phase === 'arvn') {
+      if (verb === 'space') {
+        spend(g, 'US', 3);
+        a.phase = 'arvn_done';
+        push(g, 'op_assault', { faction: 'ARVN', free: true, spaces: [String(arg)], max: 1 });
+      } else finish(g, a);
     } else if (verb === 'piece') resolverAct(g, a, r, arg);
   },
+  resume(g, a) { if (a.phase === 'arvn_done') finish(g, a); },
 });
 
 // ------------------------------------------------------------------ Sweep (3.2.3)
@@ -255,9 +320,9 @@ export function sweepPower(g: Game, faction: Faction, sp: string): number {
     n = c('us_troops') + c('us_irreg_u') + c('us_irreg_a');
     if (capability(g, 18) === 'unshaded') n += c('arvn_police'); // Combined Action Platoons
   } else {
-    n = c('arvn_troops') + c('arvn_ranger_u') + c('arvn_ranger_a');
+    n = c('arvn_troops') + c('arvn_police') + c('arvn_ranger_u') + c('arvn_ranger_a');
   }
-  if (s.terrain === 'jungle' || s.terrain === 'highland') n = Math.floor(n / 2);
+  if (s.terrain === 'jungle') n = Math.floor(n / 2); // no halving in Highland
   return n;
 }
 
@@ -280,15 +345,36 @@ const sweepResolver = (a: any): Resolver => ({
     flip(g, sp, k, otherSideOf(k), 1);
     log(g, `Activated ${PIECE_NAME[k]} in ${name(sp)}.`);
   },
-  done: (g, aa) => finish(g, aa),
+  done: (g, aa) => sweepDone(g, aa),
 });
+
+// Cobras (unshaded): the first 2 Sweep spaces each remove 1 Active enemy piece.
+const cobraResolver = (a: any): Resolver => ({
+  hits: () => 1,
+  kinds: (g, sp) => (['nva_troops', 'nva_guer_a', 'vc_guer_a'] as PieceKind[]).filter((k) => count(g, sp, k) > 0),
+  apply: (g, sp, k) => { applyHit(g, sp, k); },
+  done: (g, aa) => { aa.sel = aa.sel0; finish(g, aa); },
+});
+
+function sweepDone(g: Game, a: any): void {
+  if (capability(g, 13) === 'unshaded' && !a.cobras) {
+    a.cobras = true;
+    a.sel0 = a.sel;
+    a.sel = a.sel0.slice(0, 2);
+    beginResolve(g, a, cobraResolver(a));
+    return;
+  }
+  finish(g, a);
+}
+
+const curSweep = (a: any): Resolver => (a.cobras ? cobraResolver(a) : sweepResolver(a));
 
 function sweepCost(a: any): number { return a.free || a.faction === 'US' ? 0 : 3; }
 
 function sweepCandidates(g: Game, a: any): string[] {
   const out: string[] = [];
   for (const id of SPACE_IDS) {
-    if (isLoc(id) || !allowed(a, id) || a.sel.includes(id)) continue;
+    if (isLoc(id) || space(id).country === 'north_vietnam' || !allowed(a, id) || a.sel.includes(id)) continue;
     if (!UNDERGROUND_INS.some((k) => count(g, id, k) > 0)) continue;
     const here = sweepPower(g, a.faction, id) > 0;
     const adj = space(id).adjacent.some((n) => sweepPieces(a.faction).some((k) => count(g, n, k) > 0));
@@ -332,7 +418,7 @@ registerState('op_sweep', {
       p.select([dest]);
       p.action('next', undefined, 'Next space');
     } else {
-      resolverPrompt(g, a, p, sweepResolver(a), `${a.faction} Sweep`);
+      resolverPrompt(g, a, p, curSweep(a), `${a.faction} Sweep`);
     }
   },
   act(g, a, verb, arg) {
@@ -354,7 +440,7 @@ registerState('op_sweep', {
       a.moved[`${dest}:${kind}`] = (a.moved[`${dest}:${kind}`] ?? 0) + m;
       log(g, `Moved ${m} ${PIECE_NAME[kind]} from ${name(sp)} to ${name(dest)}.`);
       if (sweepSources(g, a, dest).length === 0) { a.mi++; sweepAdvanceMove(g, a); }
-    } else if (verb === 'piece') resolverAct(g, a, sweepResolver(a), arg);
+    } else if (verb === 'piece') resolverAct(g, a, curSweep(a), arg);
   },
 });
 
@@ -401,7 +487,7 @@ const patrolResolver = (): Resolver => ({
 
 function patrolAssaultPhase(g: Game, a: any): void {
   a.phase = 'assault';
-  if (a.sel.filter((id: string) => assaultTargets(g, id).length > 0 && assaultHits(g, a.faction, id) > 0).length === 0) finish(g, a);
+  if (a.sel.filter((id: string) => assaultTargets(g, id).length > 0 && assaultHits(g, a.faction, id) > 0).length === 0) patrolFinish(g, a);
 }
 
 function patrolAdvanceMove(g: Game, a: any): void {
@@ -419,11 +505,26 @@ function patrolCandidates(g: Game, a: any): string[] {
   return out;
 }
 
+// M-48 Patton (shaded): after Patrol, NVA removes up to 2 of the moved cubes.
+function patrolFinish(g: Game, a: any): void {
+  if (capability(g, 14) === 'shaded' && a.moved) {
+    let n = 0;
+    for (const key of Object.keys(a.moved)) {
+      const [dest, kind] = key.split(':');
+      while (n < 2 && a.moved[key] > 0 && count(g, dest, kind as PieceKind) > 0) {
+        remove(g, dest, kind as PieceKind, 1); a.moved[key]--; n++;
+        log(g, `M-48 Patton: NVA removes a moved ${PIECE_NAME[kind as PieceKind]} in ${name(dest)}.`);
+      }
+    }
+  }
+  finish(g, a);
+}
+
 registerState('op_patrol', {
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.mi = 0; a.moved = {}; a.i = 0; a.hits = null; a.paid = false;
     const cost = a.free || a.faction === 'US' ? 0 : 3;
-    if (patrolCandidates(g, a).length === 0 || !canSpend(g, a.faction, cost)) finish(g, a);
+    if (patrolCandidates(g, a).length === 0 || !canSpend(g, a.faction, cost)) patrolFinish(g, a);
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
@@ -473,9 +574,9 @@ registerState('op_patrol', {
     } else if (verb === 'space') {
       a.phase = 'done';
       push(g, 'op_assault', { faction: a.faction, free: true, spaces: [String(arg)], max: 1 });
-    } else finish(g, a);
+    } else patrolFinish(g, a);
   },
-  resume(g, a) { if (a.phase === 'done') finish(g, a); },
+  resume(g, a) { if (a.phase === 'done') patrolFinish(g, a); },
 });
 
 // ------------------------------------------------------------------ Train (3.2.1)
@@ -531,6 +632,7 @@ function pacifyCandidates(g: Game, a: any): string[] {
 
 function pacCost(g: Game, a: any): number {
   if (a.free) return 0;
+  if (hasMomentum(g, 16)) return 1; // Blowtorch Komer
   return leaderEffect(g).pacifyCost;
 }
 
@@ -757,61 +859,104 @@ registerState('sa_air_lift', {
 
 // ------------------------------------------------------------------ Air Strike (US)
 
-function strikeCandidates(g: Game, a: any): string[] {
-  return SPACE_IDS.filter((id) => allowed(a, id) && !a.sel.includes(id) && assaultTargets(g, id).length > 0);
+function hasCOIN(g: Game, id: string): boolean {
+  return count(g, id, 'us_troops', 'us_base', 'us_irreg_u', 'us_irreg_a', 'arvn_troops', 'arvn_police',
+    'arvn_ranger_u', 'arvn_ranger_a', 'arvn_base') > 0;
 }
 
-const strikeResolver = (): Resolver => ({
-  hits: () => 1,
-  kinds: (g, sp) => assaultTargets(g, sp),
-  apply: (g, sp, k) => { applyHit(g, sp, k); },
-  done: (g, a) => strikeTrailPhase(g, a),
-});
+function strikeMaxSpaces(g: Game, a: any): number {
+  let m = airLimit(g, a, 6);
+  if (capability(g, 20) === 'shaded') m = Math.min(m, 2); // Laser Guided Bombs (shaded)
+  return m;
+}
 
-function trailBlocked(g: Game): boolean {
+function strikeCandidates(g: Game, a: any): string[] {
+  const arcLight = capability(g, 8) === 'unshaded'; // one space may lack COIN pieces
+  const noCoinUsed = a.sel.filter((id: string) => !hasCOIN(g, id)).length;
+  return SPACE_IDS.filter((id) => {
+    if (!allowed(a, id) || a.sel.includes(id) || airTargets(g, id).length === 0) return false;
+    if (hasCOIN(g, id)) return true;
+    return arcLight && noCoinUsed < 1;
+  });
+}
+
+function strikeTrailBlocked(g: Game): boolean {
   return hasMomentum(g, 10) || hasMomentum(g, 39) || g.trail <= 0;
 }
 
-function strikeTrailPhase(g: Game, a: any): void {
+function strikeFinishShift(g: Game, a: any): void {
+  const shaded8 = capability(g, 8) === 'shaded' && a.sel.length > 1;
+  const lgb = capability(g, 20) === 'unshaded' && a.removed === 1;
+  if (!lgb) {
+    const lv = shaded8 ? 2 : 1;
+    for (const id of a.sel) if (canHaveSupport(id)) shiftSupport(g, id, -lv);
+    if (a.sel.some((id: string) => canHaveSupport(id))) log(g, `Air Strike shifts Support ${lv} level(s) toward Opposition in struck spaces with Pop.`);
+  }
   a.phase = 'trail';
-  const remote = a.sel.some((id: string) => ['laos', 'cambodia', 'north_vietnam'].includes(space(id).country));
-  if (trailBlocked(g) || !remote) finish(g, a);
+  if (strikeTrailBlocked(g)) finish(g, a);
+}
+
+function strikePieces(g: Game, a: any): { sp: string; k: PieceKind }[] {
+  const out: { sp: string; k: PieceKind }[] = [];
+  for (const sp of a.sel) for (const k of airTargets(g, sp)) out.push({ sp, k });
+  return out;
+}
+
+function strikeResolveCheck(g: Game, a: any): void {
+  if (a.removed >= 6 || strikePieces(g, a).length === 0) strikeFinishShift(g, a);
 }
 
 registerState('sa_air_strike', {
   enter(g, a) {
-    a.sel = []; a.phase = 'select'; a.i = 0; a.hits = null;
+    a.sel = []; a.phase = 'select'; a.removed = 0;
     if (hasMomentum(g, 41)) { log(g, 'Bombing Pause: no Air Strike.'); finish(g, a); return; }
     if (strikeCandidates(g, a).length === 0) finish(g, a);
   },
   prompt(g, a, p) {
-    const lim = airLimit(g, a, 6);
+    const lim = strikeMaxSpaces(g, a);
     if (a.phase === 'select') {
-      p.text(`US Air Strike: select up to ${lim} spaces, one enemy piece removed in each (${a.sel.length} selected).`);
+      p.text(`US Air Strike: select up to ${lim} spaces; up to 6 Active enemy pieces are removed in total (${a.sel.length} selected).`);
       if (a.sel.length < lim) for (const id of strikeCandidates(g, a)) p.space(id);
       p.select(a.sel);
       if (a.sel.length > 0) p.action('done', undefined, 'Strike');
     } else if (a.phase === 'resolve') {
-      resolverPrompt(g, a, p, strikeResolver(), 'Air Strike');
+      p.text(`Air Strike: remove enemy pieces (${a.removed}/6).`);
+      for (const t of strikePieces(g, a)) p.piece(t.sp, t.k, `${PIECE_NAME[t.k]} in ${name(t.sp)}`);
+      p.select(a.sel);
+      p.action('done', undefined, 'Done removing');
     } else {
-      p.text('Air Strike in Laos/Cambodia/North Vietnam: degrade the Trail by 1?');
-      p.action('degrade', undefined, 'Degrade the Trail 1 box');
+      const two = capability(g, 4) === 'unshaded';
+      const need = capability(g, 4) === 'shaded';
+      p.text(`Air Strike: degrade the Trail${two ? ' by up to 2' : ' by 1'}${need ? ' (needs a die roll of 4-6)' : ''}?`);
+      p.action('degrade', undefined, 'Degrade the Trail');
       p.action('done', undefined, 'No');
     }
   },
   act(g, a, verb, arg) {
-    const r = strikeResolver();
     if (a.phase === 'select') {
       if (verb === 'space') {
         a.sel.push(String(arg));
-        if (a.sel.length < airLimit(g, a, 6)) return;
+        if (a.sel.length < strikeMaxSpaces(g, a)) return;
       } else if (a.sel.length === 0) { finish(g, a); return; }
       log(g, `US Air Strike on ${a.sel.map(name).join(', ')}.`);
-      beginResolve(g, a, r);
+      a.phase = 'resolve';
+      strikeResolveCheck(g, a);
     } else if (a.phase === 'resolve') {
-      if (verb === 'piece') resolverAct(g, a, r, arg);
+      if (verb === 'piece') {
+        const { sp, kind } = parsePiece(arg);
+        applyHit(g, sp, kind);
+        a.removed++;
+        strikeResolveCheck(g, a);
+      } else strikeFinishShift(g, a);
     } else {
-      if (verb === 'degrade') { setTrail(g, g.trail - 1); log(g, `Trail degraded to ${g.trail}.`); }
+      if (verb === 'degrade') {
+        const r = capability(g, 4) === 'shaded' ? rollDie(g) : 6; // Top Gun (shaded)
+        if (r >= 4) {
+          const n = capability(g, 4) === 'unshaded' ? 2 : 1;
+          setTrail(g, g.trail - n);
+          log(g, `Trail degraded to ${g.trail}.`);
+        } else log(g, `Top Gun: Trail degrade fails (roll ${r}).`);
+      }
       finish(g, a);
     }
   },
@@ -821,8 +966,8 @@ registerState('sa_air_strike', {
 
 function governCandidates(g: Game, a: any): string[] {
   return SPACE_IDS.filter((id) => {
-    if (!allowed(a, id) || a.sel.includes(id) || isLoc(id) || !canHaveSupport(id)) return false;
-    if (control(g, id) !== 'COIN') return false;
+    if (id === 'saigon' || !allowed(a, id) || a.sel.includes(id) || isLoc(id) || !canHaveSupport(id)) return false;
+    if (control(g, id) !== 'COIN' || g.spaces[id].support <= 0) return false;
     return count(g, id, 'arvn_troops', 'arvn_police') > 0;
   });
 }
@@ -846,9 +991,9 @@ registerState('sa_govern', {
   prompt(g, a, p) {
     if (a.pending) {
       const pop = space(a.pending).pop;
-      p.text(`Govern ${name(a.pending)}: take Aid (+${3 * pop} ARVN Resources) or Patronage (+${pop}).`);
-      p.action('aid', undefined, `Aid: +${3 * pop} ARVN Resources`);
-      p.action('patronage', undefined, `Patronage: +${pop}`);
+      p.text(`Govern ${name(a.pending)}: Aid +${3 * pop}, or transfer ${pop} from Aid to Patronage.`);
+      p.action('aid', undefined, `Aid +${3 * pop}`);
+      if (g.aid > 0) p.action('patronage', undefined, `Transfer ${Math.min(pop, g.aid)} Aid to Patronage`);
       p.select([a.pending]);
       return;
     }
@@ -863,11 +1008,13 @@ registerState('sa_govern', {
       const id = a.pending;
       const pp = space(id).pop;
       if (verb === 'aid') {
-        addResources(g, 'ARVN', 3 * pp);
-        log(g, `Govern ${name(id)}: ARVN Resources +${3 * pp}.`);
+        addAid(g, 3 * pp);
+        log(g, `Govern ${name(id)}: Aid +${3 * pp}.`);
       } else {
-        addPatronage(g, pp);
-        log(g, `Govern ${name(id)}: Patronage +${pp}.`);
+        const t = Math.min(pp, g.aid);
+        addAid(g, -t);
+        addPatronage(g, t);
+        log(g, `Govern ${name(id)}: Aid -${t}, Patronage +${t}.`);
       }
       a.sel.push(id);
       a.pending = null;
@@ -905,10 +1052,16 @@ const TRANSPORT_KINDS: PieceKind[] = ['arvn_troops', 'arvn_ranger_u', 'arvn_rang
 
 registerState('sa_transport', {
   enter(g, a) {
-    a.sel = []; a.phase = 'origin'; a.src = null; a.n = 0; a.moved = [];
+    a.sel = []; a.phase = 'origin'; a.src = null; a.n = 0; a.moved = []; a.dests = [];
     if (transportOrigins(g, a).length === 0) finish(g, a);
   },
   prompt(g, a, p) {
+    if (a.phase === 'cav') {
+      p.text('Armored Cavalry: free ARVN Assault in one Transport destination?');
+      for (const d of a.dests) if (assaultHits(g, 'ARVN', d) > 0 && assaultTargets(g, d).length > 0) p.space(d);
+      p.action('done', undefined, 'No');
+      return;
+    }
     if (a.phase === 'origin') {
       p.text('ARVN Transport: choose the origin space (up to 6 Troops/Rangers move along LoCs).');
       for (const id of transportOrigins(g, a)) p.space(id);
@@ -927,8 +1080,13 @@ registerState('sa_transport', {
     }
   },
   act(g, a, verb, arg) {
+    if (a.phase === 'cav') {
+      if (verb === 'space') { a.phase = 'cav_done'; push(g, 'op_assault', { faction: 'ARVN', free: true, spaces: [String(arg)], max: 1 }); }
+      else finish(g, { sel: a.moved });
+      return;
+    }
     if (a.phase === 'origin') { a.sel = [String(arg)]; a.phase = 'move'; return; }
-    if (verb === 'done') { finish(g, { sel: a.moved }); return; }
+    if (verb === 'done') { transportFinish(g, a); return; }
     if (verb === 'cancel') { a.src = null; return; }
     if (verb === 'piece') { a.src = parsePiece(arg).kind; return; }
     const origin = a.sel[0];
@@ -937,11 +1095,24 @@ registerState('sa_transport', {
     a.n++;
     if (!a.moved.includes(origin)) a.moved.push(origin);
     if (!a.moved.includes(dest)) a.moved.push(dest);
+    if (!a.dests.includes(dest)) a.dests.push(dest);
+    if (String(a.src).startsWith('arvn_ranger') && capability(g, 61) === 'shaded') { // Armored Cavalry (shaded)
+      flip(g, dest, 'arvn_ranger_u', 'arvn_ranger_a', 1);
+    }
     log(g, `Transport: ${PIECE_NAME[a.src as PieceKind]} from ${name(origin)} to ${name(dest)}.`);
     a.src = null;
-    if (a.n >= 6 || !TRANSPORT_KINDS.some((k) => count(g, origin, k) > 0)) finish(g, { sel: a.moved });
+    if (a.n >= 6 || !TRANSPORT_KINDS.some((k) => count(g, origin, k) > 0)) transportFinish(g, a);
   },
+  resume(g, a) { if (a.phase === 'cav_done') finish(g, { sel: a.moved }); },
 });
+
+function transportFinish(g: Game, a: any): void {
+  if (capability(g, 61) === 'unshaded' && a.dests.some((d: string) => assaultHits(g, 'ARVN', d) > 0 && assaultTargets(g, d).length > 0)) {
+    a.phase = 'cav';
+    return;
+  }
+  finish(g, { sel: a.moved });
+}
 
 function transportOrigins(g: Game, a: any): string[] {
   return SPACE_IDS.filter((id) => !isLoc(id) && allowed(a, id) && count(g, id, ...TRANSPORT_KINDS) > 0);
