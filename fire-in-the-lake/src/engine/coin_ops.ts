@@ -27,7 +27,7 @@ import {
   addAid, addPatronage, setTrail, shiftSupport, canHaveSupport, PIECE_NAME,
 } from '../core/pieces';
 import { isMonsoon } from './sequence';
-import { CARD } from '../data/cards';
+import { leaderEffect } from './coup';
 
 // ------------------------------------------------------------------ shared helpers
 
@@ -45,11 +45,6 @@ export function spend(g: Game, f: Faction, n: number): void {
   if (n <= 0) return;
   const pool = f === 'US' ? 'ARVN' : (f as 'ARVN' | 'NVA' | 'VC');
   g.resources[pool] = Math.max(0, g.resources[pool] - n);
-}
-
-export function isMinh(g: Game): boolean {
-  if (g.leader == null) return true;
-  return /minh/i.test(CARD[g.leader]?.title ?? '');
 }
 
 const ALL_INS_GUER: PieceKind[] = ['nva_guer_u', 'nva_guer_a', 'vc_guer_u', 'vc_guer_a'];
@@ -211,7 +206,14 @@ function assaultCost(a: any): number { return a.free || a.faction === 'US' ? 0 :
 registerState('op_assault', {
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.i = 0; a.hits = null;
-    if (assaultCandidates(g, a).filter((id) => canSpend(g, a.faction, assaultCost(a))).length === 0) finish(g, a);
+    const cands = assaultCandidates(g, a).filter((id) => canSpend(g, a.faction, assaultCost(a)));
+    if (cands.length === 0) { finish(g, a); return; }
+    if (a.spaces?.length === 1 && a.max === 1) { // single forced space: select it automatically
+      spend(g, a.faction, assaultCost(a));
+      a.sel.push(a.spaces[0]);
+      log(g, `${a.faction} Assaults ${name(a.spaces[0])}.`);
+      beginResolve(g, a, assaultResolver(a));
+    }
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
@@ -304,7 +306,14 @@ registerState('op_sweep', {
   enter(g, a) {
     a.sel = []; a.phase = 'select'; a.mi = 0; a.moved = {}; a.i = 0; a.hits = null;
     if (isMonsoon(g)) { log(g, 'Monsoon: no Sweep.'); finish(g, a); return; }
-    if (sweepCandidates(g, a).filter(() => canSpend(g, a.faction, sweepCost(a))).length === 0) finish(g, a);
+    const cands = sweepCandidates(g, a).filter(() => canSpend(g, a.faction, sweepCost(a)));
+    if (cands.length === 0) { finish(g, a); return; }
+    if (a.spaces?.length === 1 && a.max === 1) {
+      spend(g, a.faction, sweepCost(a));
+      a.sel.push(a.spaces[0]);
+      log(g, `${a.faction} Sweeps ${name(a.spaces[0])}.`);
+      a.phase = 'move'; a.mi = 0; sweepAdvanceMove(g, a);
+    }
   },
   prompt(g, a, p) {
     if (a.phase === 'select') {
@@ -522,7 +531,7 @@ function pacifyCandidates(g: Game, a: any): string[] {
 
 function pacCost(g: Game, a: any): number {
   if (a.free) return 0;
-  return hasMomentum(g, 16) ? 3 : 3;
+  return leaderEffect(g).pacifyCost;
 }
 
 function pacifyMaxSteps(g: Game): number {
@@ -590,6 +599,10 @@ registerState('op_train', {
         log(g, `${a.faction} Trains in ${name(id)}.`);
         if (a.sel.length < maxSel(a)) return;
       } else if (a.sel.length === 0) { finish(g, a); return; }
+      if (a.faction === 'ARVN') {
+        const aid = leaderEffect(g).trainAid;
+        if (aid > 0) { addAid(g, aid); log(g, `Leader bonus: Aid +${aid}.`); }
+      }
       a.phase = 'place';
       a.i = -1;
       trainNextSpace(g, a);
@@ -819,6 +832,12 @@ function governMax(g: Game, a: any): number {
   return maxSel(a, dflt);
 }
 
+function governFinish(g: Game, a: any): void {
+  const bonus = leaderEffect(g).governPatronage;
+  if (bonus > 0 && a.sel.length > 0) { addPatronage(g, bonus); log(g, `Leader bonus: Patronage +${bonus}.`); }
+  finish(g, a);
+}
+
 registerState('sa_govern', {
   enter(g, a) {
     a.sel = []; a.pending = null; a.bonus = false;
@@ -829,7 +848,7 @@ registerState('sa_govern', {
       const pop = space(a.pending).pop;
       p.text(`Govern ${name(a.pending)}: take Aid (+${3 * pop} ARVN Resources) or Patronage (+${pop}).`);
       p.action('aid', undefined, `Aid: +${3 * pop} ARVN Resources`);
-      p.action('patronage', undefined, `Patronage: +${pop}${isMinh(g) ? ' (+2 Minh)' : ''}`);
+      p.action('patronage', undefined, `Patronage: +${pop}`);
       p.select([a.pending]);
       return;
     }
@@ -847,33 +866,32 @@ registerState('sa_govern', {
         addResources(g, 'ARVN', 3 * pp);
         log(g, `Govern ${name(id)}: ARVN Resources +${3 * pp}.`);
       } else {
-        let n = pp;
-        if (isMinh(g) && !a.bonus) { n += 2; a.bonus = true; }
-        addPatronage(g, n);
-        log(g, `Govern ${name(id)}: Patronage +${n}.`);
+        addPatronage(g, pp);
+        log(g, `Govern ${name(id)}: Patronage +${pp}.`);
       }
       a.sel.push(id);
       a.pending = null;
-      if (a.sel.length >= governMax(g, a) || governCandidates(g, a).length === 0) finish(g, a);
+      if (a.sel.length >= governMax(g, a) || governCandidates(g, a).length === 0) governFinish(g, a);
       return;
     }
     if (verb === 'space') { a.pending = String(arg); return; }
-    finish(g, a);
+    governFinish(g, a);
   },
 });
 
 // ------------------------------------------------------------------ Transport (ARVN)
 
 export function transportDestinations(g: Game, origin: string): string[] {
+  const maxLocs = Math.min(2, leaderEffect(g).transportMaxLocs); // LoCs traversed en route
   const out = new Set<string>();
   let frontier = [origin];
   const seen = new Set<string>([origin]);
-  for (let hop = 1; hop <= 3; hop++) {
+  for (let hop = 1; hop <= maxLocs + 1; hop++) {
     const next: string[] = [];
     for (const cur of frontier) {
       for (const n of space(cur).adjacent) {
         if (seen.has(n)) continue;
-        if (isLoc(n)) { if (hop < 3) { seen.add(n); next.push(n); } }
+        if (isLoc(n)) { if (hop <= maxLocs) { seen.add(n); next.push(n); } }
         else out.add(n);
       }
     }
@@ -892,7 +910,7 @@ registerState('sa_transport', {
   },
   prompt(g, a, p) {
     if (a.phase === 'origin') {
-      p.text('ARVN Transport: choose the origin space (up to 6 Troops/Rangers move up to 3 spaces along LoCs).');
+      p.text('ARVN Transport: choose the origin space (up to 6 Troops/Rangers move along LoCs).');
       for (const id of transportOrigins(g, a)) p.space(id);
       return;
     }

@@ -3,7 +3,7 @@ import { newGame } from '../src/engine/setup';
 import '../src/engine/opmenu';
 import '../src/engine/coin_ops';
 import { isMonsoon } from '../src/engine/sequence';
-import { doAction, getView, hasState, registerState, pop, top } from '../src/core/framework';
+import { doAction, getView, hasState, registerState, pop, push, top } from '../src/core/framework';
 import { CARD, CARDS } from '../src/data/cards';
 import { PIECE_TOTALS, POOL_KINDS } from '../src/core/types';
 import type { Game } from '../src/core/types';
@@ -27,6 +27,9 @@ function fresh(): Game {
   const [a, b] = plainCards();
   g.current = a; g.next = b;
   g.deck = [];
+  g.stack = [];
+  g.log = [];
+  push(g, 'game', {}); // restart the sequence on the forced card
   return g;
 }
 
@@ -107,9 +110,10 @@ describe('sequence of play', () => {
     const order = CARD[g.current!].order;
     doAction(g, 'op');
     // finish the op menu whatever it is
-    const done = getView(g).actions.find((a) => a.verb === 'done');
-    if (done) doAction(g, 'done');
-    else return; // op menu offered nothing else (should not happen)
+    const opA = getView(g).actions.find((a) => a.verb === 'op' && a.arg === 'op_assault') ?? getView(g).actions.find((a) => a.verb === 'op');
+    if (opA) doAction(g, 'op', opA.arg);
+    expect(getView(g).actions.some((a) => a.verb === 'done')).toBe(true);
+    doAction(g, 'done');
     expect(g.acted).toEqual([order[0]]);
     const v = verbs(g);
     expect(v).toContain('limited_op');
@@ -136,8 +140,14 @@ describe('sequence of play', () => {
     const [a, b] = [g.current!, g.next!];
     const order = CARD[a].order;
     doAction(g, 'event', 'unshaded');
-    doAction(g, 'event' in {} ? 'x' : 'pass'); // 2nd passes
-    doAction(g, 'event', 'unshaded'); // 3rd faction (now 2nd eligible) may Event after 1st Event? no: only op
+    doAction(g, 'op');
+    if (verbs(g).includes('done')) doAction(g, 'done');
+    while (g.current === a && getView(g).actions.some((x) => x.verb === 'done')) doAction(g, 'done');
+    expect(g.current).toBe(b);
+    expect(g.eligible[order[0]]).toBe(false);
+    expect(g.eligible[order[1]]).toBe(false);
+    expect(g.eligible[order[2]]).toBe(true);
+    expect(g.eligible[order[3]]).toBe(true);
   });
 
   it('applies next_ineligible / next_eligible at end of card', () => {
@@ -149,8 +159,7 @@ describe('sequence of play', () => {
     // second: Op with SA declined
     g.resources = { ARVN: 40, NVA: 40, VC: 40 };
     doAction(g, 'op');
-    const v = verbs(g);
-    if (v.includes('done')) doAction(g, 'done');
+    while (g.current === a && getView(g).actions.some((x) => x.verb === 'done')) doAction(g, 'done');
     expect(g.current).toBe(b);
     expect(g.discard[g.discard.length - 1]).toBe(a);
     expect(g.eligible[order[0]]).toBe(false);
