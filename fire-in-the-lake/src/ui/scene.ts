@@ -18,19 +18,20 @@ export class Stage {
   tweens: { t: number; dur: number; fn: (k: number) => void; done?: () => void }[] = [];
   speed = 1; // tween speed multiplier (fast forward)
   el: HTMLElement;
-  private clock = new THREE.Clock();
+  private last = performance.now();
+  private elapsed = 0;
   private sea!: THREE.Mesh;
   private seaTex!: THREE.CanvasTexture;
-  private needsRender = true;
+  private zoomed = false;
 
   constructor(el: HTMLElement) {
     this.el = el;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMappingExposure = 0.9;
     el.appendChild(this.renderer.domElement);
 
     this.labels = new CSS2DRenderer();
@@ -63,7 +64,7 @@ export class Stage {
     s.background = new THREE.Color(0x0b1720);
     s.fog = new THREE.Fog(0x0b1720, 90, 190);
     s.add(new THREE.HemisphereLight(0xcfe3ff, 0x2b2a1e, 0.95));
-    const sun = new THREE.DirectionalLight(0xfff0d0, 2.4);
+    const sun = new THREE.DirectionalLight(0xfff0d0, 1.9);
     sun.position.set(-22, 46, 26);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -138,8 +139,11 @@ export class Stage {
   }
 
   private frame() {
-    const dt = Math.min(0.05, this.clock.getDelta());
-    const t = this.clock.elapsedTime;
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - this.last) / 1000);
+    this.last = now;
+    this.elapsed += dt;
+    const t = this.elapsed;
     const sdt = dt * this.speed;
     for (const tw of this.tweens) {
       tw.t += sdt;
@@ -150,6 +154,8 @@ export class Stage {
     this.tweens = this.tweens.filter((tw) => tw.t < tw.dur);
     for (const f of this.tickers) f(dt, t);
     this.seaTex.offset.set(t * 0.004, t * 0.002);
+    const zoomed = this.camera.position.distanceTo(this.controls.target) < 42;
+    if (zoomed !== this.zoomed) { this.zoomed = zoomed; this.el.classList.toggle('zoomed', zoomed); }
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
     this.labels.render(this.scene, this.camera);

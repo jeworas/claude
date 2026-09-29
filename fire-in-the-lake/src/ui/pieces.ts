@@ -17,6 +17,7 @@ const ORDER: PieceKind[] = [
 ];
 const KIND_RANK = Object.fromEntries(ORDER.map((k, i) => [k, i])) as Record<PieceKind, number>;
 
+const PS = 1.3; // global piece size multiplier
 const STACK: Partial<Record<PieceKind, number>> = {
   us_troops: 4, arvn_troops: 4, arvn_police: 4, nva_troops: 4,
   us_base: 3, arvn_base: 3, nva_base: 3, vc_base: 3, nva_tunnel: 3, vc_tunnel: 3,
@@ -199,7 +200,7 @@ export class PieceLayer {
   private refreshGlow() {
     for (const e of this.ents) {
       const gl = e.obj.getObjectByName('glow');
-      if (gl) gl.visible = this.glowing.has(`${e.space}:${e.kind}`) && e.stackIdx === 0 || (this.glowing.has(`${e.space}:${e.kind}`) && !STACK[e.kind]);
+      if (gl) gl.visible = this.glowing.has(`${e.space}:${e.kind}`);
     }
   }
 
@@ -321,13 +322,13 @@ export class PieceLayer {
     let scale = 1, cols = 3, rows: Stack[][] = [];
     for (const s of [1, 0.85, 0.72, 0.6, 0.5]) {
       scale = s;
-      const sx = 0.42 * s;
+      const sx = 0.42 * PS * s;
       cols = Math.max(2, Math.floor(width / sx));
       rows = [];
       for (const r of rowsByFaction) for (let i = 0; i < r.length; i += cols) rows.push(r.slice(i, i + cols));
-      if (rows.length * 0.42 * s <= Math.max(depth, 0.8)) break;
+      if (rows.length * 0.42 * PS * s <= Math.max(depth, 0.8)) break;
     }
-    const sx = 0.42 * scale, sz = 0.44 * scale;
+    const sx = 0.42 * PS * scale, sz = 0.44 * PS * scale;
     const slots: Slot[] = [];
     const z0 = n.center.z + (isLoc ? 0 : 0.3) - ((rows.length - 1) * sz) / 2;
     rows.forEach((row, ri) => {
@@ -335,8 +336,8 @@ export class PieceLayer {
         const x = n.center.x + (ci - (row.length - 1) / 2) * sx;
         const z = z0 + ri * sz;
         for (let i = 0; i < st.n; i++) {
-          const h = (HEIGHT[st.kind] ?? 0) * scale;
-          slots.push({ pos: new THREE.Vector3(x, n.center.y + 0.02 + i * h, z), scale, kind: st.kind, stackIdx: i });
+          const h = (HEIGHT[st.kind] ?? 0) * scale * PS;
+          slots.push({ pos: new THREE.Vector3(x, n.center.y + 0.02 + i * h, z), scale: scale * PS, kind: st.kind, stackIdx: i });
         }
       });
     });

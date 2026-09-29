@@ -111,7 +111,9 @@ export function setCapability(g: Game, c: Ctx): void {
   log(g, `${cardTitle(c.card)}: ${c.shaded ? 'shaded' : 'unshaded'} capability in effect.`);
 }
 export function setMomentum(g: Game, c: Ctx): void {
+  g.tmp = g.tmp ?? {};
   ensure(g.momentum, c.card);
+  g.tmp.momentum_side = { ...(g.tmp.momentum_side ?? {}), [c.card]: c.shaded ? 'shaded' : 'unshaded' };
   log(g, `${cardTitle(c.card)}: momentum until Coup.`);
 }
 export function stayEligible(g: Game, f: Faction): void {
@@ -273,7 +275,7 @@ registerState('ev_place', {
     if (m === 0 && a.src !== 'available') movePool(g, a.pool, 'available', a.src, 1);
     a.placed += m;
     a.counts[id] = (a.counts[id] ?? 0) + m;
-    if (m > 0) log(g, `Placed ${PIECE_NAME[a.as ?? (a.pool as any)] ?? a.pool} in ${MAP[id].name}.`);
+    if (m > 0) log(g, `Placed ${a.as ? PIECE_NAME[a.as as PieceKind] : a.pool} in ${MAP[id].name}.`);
     placeSettle(g, a);
   },
   resume(g, a) { placeSettle(g, a); },

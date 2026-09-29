@@ -5,7 +5,7 @@ import type { Game, SpaceDef, SupportLevel } from '../core/types';
 import { control } from '../core/pieces';
 import type { Stage } from './scene';
 
-export const SCALE = 0.3;
+export const SCALE = 0.4;
 export const TILE_TOP = 0.43;
 export const PLAZA_H = 0.36;
 export const ROAD_Y = 0.47;
@@ -84,7 +84,7 @@ function textures() {
       });
     }),
     highland: canvasTex((g, n) => {
-      g.fillStyle = '#8b7a4c'; g.fillRect(0, 0, n, n);
+      g.fillStyle = '#7d6d42'; g.fillRect(0, 0, n, n);
       g.lineWidth = 2;
       for (let i = 0; i < 9; i++) {
         g.strokeStyle = i % 2 ? 'rgba(60,45,20,0.35)' : 'rgba(210,190,130,0.25)';
@@ -98,7 +98,7 @@ function textures() {
       for (let i = 0; i < 40; i++) { g.fillStyle = 'rgba(50,40,20,0.18)'; g.fillRect(R() * n, R() * n, 3, 3); }
     }),
     lowland: canvasTex((g, n) => {
-      g.fillStyle = '#a3c96d'; g.fillRect(0, 0, n, n);
+      g.fillStyle = '#86b055'; g.fillRect(0, 0, n, n);
       const cell = n / 8;
       for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
         const v = R();
@@ -235,7 +235,7 @@ export class Board {
       const P = sites[i];
       const dists = sites.map((s, j) => (j === i ? 1e9 : Math.hypot(s.x - P.x, s.z - P.z))).sort((a, b) => a - b);
       const near = (dists[0] + dists[1] + (dists[2] ?? dists[1])) / 3;
-      const R = Math.max(3.4, Math.min(7.4, near * 0.66));
+      const R = Math.max(4.4, Math.min(9.5, near * 0.66));
       let poly = circlePoly(P.x, P.z, R, 40);
       const gap = 0.3;
       sites.forEach((Q, j) => {
@@ -282,7 +282,7 @@ export class Board {
     for (const d of cities) {
       const P = worldPos(d);
       const group = new THREE.Group();
-      const r = 1.55;
+      const r = 1.7;
       const base = new THREE.Mesh(new THREE.CylinderGeometry(r + 0.18, r + 0.28, 0.14, 40), new THREE.MeshStandardMaterial({ color: 0x40382c, roughness: 0.8 }));
       base.position.set(P.x, TILE_TOP + 0.07, P.z);
       const capMat = new THREE.MeshStandardMaterial({ color: 0xd9d0b8, roughness: 0.75, metalness: 0.05 });
@@ -392,7 +392,7 @@ export class Board {
       }
     }
     // pad
-    const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.9, 0.1, 28), new THREE.MeshStandardMaterial({ color: mek ? 0x3c8fd6 : 0x5a554b, roughness: 0.6 }));
+    const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.9, 0.1, 28), new THREE.MeshStandardMaterial({ color: mek ? 0x3c8fd6 : 0x77705f, roughness: 0.6 }));
     pad.position.set(P.x, ROAD_Y + 0.02, P.z);
     pad.castShadow = pad.receiveShadow = true;
     group.add(pad);
@@ -429,7 +429,7 @@ export class Board {
     el.className = `slabel ${d.type}`;
     const label = new CSS2DObject(el);
     const yOff = d.type === 'city' ? 1.3 : d.type === 'loc' ? 0.6 : 0.7;
-    const zOff = d.type === 'loc' ? 1.55 : d.type === 'city' ? 2.55 : Math.min(3.4, r * 0.95 + 1.2);
+    const zOff = d.type === 'loc' ? 1.5 : d.type === 'city' ? 2.6 : -(r * 0.8) - 0.3;
     label.position.set(center.x, center.y + yOff - 1.0, center.z + zOff);
     label.center.set(0.5, 0);
     group.add(label);
@@ -475,7 +475,7 @@ export class Board {
     const d = n.def;
     const top = n.center.y;
     const isLoc = d.type === 'loc';
-    const rowZ = isLoc ? -1.3 : d.type === 'city' ? -2.35 : -Math.max(1.5, n.r * 0.72);
+    const rowZ = isLoc ? -1.3 : d.type === 'city' ? -2.5 : Math.max(1.6, n.r * 0.78);
     const items: THREE.Object3D[] = [];
     if (!isLoc && ctl) {
       const isC = ctl === 'COIN';

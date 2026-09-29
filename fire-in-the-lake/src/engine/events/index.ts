@@ -9,7 +9,7 @@ import './cards_061_090';
 import './cards_091_120';
 import { PIVOTAL, pivotalPrecondition } from './pivotal';
 
-export { IMPL } from './helpers';
+export { IMPL, TEXT } from './helpers';
 
 function signature(g: Game): string {
   return JSON.stringify([

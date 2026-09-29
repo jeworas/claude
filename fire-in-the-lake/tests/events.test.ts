@@ -55,6 +55,7 @@ function play(g: Game, card: number, shaded: boolean, pivotal = false): number {
     let pick = acts[0];
     if (steps > 250) pick = acts.find((a) => ['done', 'pass', 'skip', 'cancel'].includes(a.verb)) ?? acts[acts.length - 1];
     doAction(g, pick.verb, pick.arg);
+    JSON.parse(JSON.stringify(g)); // state must stay serializable
   }
   return steps;
 }
@@ -105,5 +106,29 @@ describe('events (newGame)', () => {
         play(g, card, shaded);
       }
     }
+  });
+});
+
+describe('markers and playability', () => {
+  it('capability cards set their marker', () => {
+    for (const card of [4, 8, 11, 13, 14, 18, 19, 20, 28, 31, 32, 33, 34, 45, 61, 86, 101, 104, 116]) {
+      for (const shaded of [false, true]) {
+        const g = handGame(5);
+        play(g, card, shaded);
+        expect(g.capabilities[card]).toBe(shaded ? 'shaded' : 'unshaded');
+      }
+    }
+  });
+  it('momentum cards record momentum on one side', () => {
+    for (const card of [5, 7, 10, 15, 16, 17, 22, 38, 39, 41, 46, 72, 78, 115]) {
+      const on = [false, true].filter((shaded) => { const g = handGame(6); play(g, card, shaded); return g.momentum.includes(card); });
+      expect(on.length, `card ${card}`).toBe(1);
+    }
+  });
+  it('most events are playable on a populated board', () => {
+    const g = handGame(7);
+    let n = 0;
+    for (let c = 1; c <= 120; c++) for (const s of [false, true]) if (eventPlayable(g, c, s)) n++;
+    expect(n).toBeGreaterThan(200);
   });
 });

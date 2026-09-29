@@ -28,9 +28,9 @@ export const resources = (f: 'ARVN' | 'NVA' | 'VC', n: Num): Step => (g, c) => t
 export const stayEligible = (f?: Faction): Step => (g, c) => { const x = f ?? c.faction; if (!g.next_eligible.includes(x)) g.next_eligible.push(x); };
 export const makeIneligible = (f: Faction): Step => (g) => { if (!g.next_ineligible.includes(f)) g.next_ineligible.push(f); };
 
-export function placeIn(pool: PoolKind, n: Num, o: { where?: Where; per?: number; as?: PieceKind; by?: Faction; src?: 'available' | 'casualties' | 'out_of_play'; label?: string } = {}): Step {
+export function placeIn(pool: PoolKind | ((f: Faction) => PoolKind), n: Num, o: { where?: Where; per?: number; as?: PieceKind; by?: Faction; src?: 'available' | 'casualties' | 'out_of_play'; label?: string } = {}): Step {
   const f = wk(o.where);
-  return (g, c) => placePieces(g, c, { pool, n: num(n, g, c), filter: f, per: o.per, as: o.as, by: o.by, src: o.src, label: o.label });
+  return (g, c) => placePieces(g, c, { pool: typeof pool === 'function' ? pool(c.faction) : pool, n: num(n, g, c), filter: f, per: o.per, as: o.as, by: o.by, src: o.src, label: o.label });
 }
 
 export function removeUp(kinds: PieceKind[] | ((f: Faction) => PieceKind[]), n: Num, o: { where?: Where; pwhere?: (g: Game, id: string, k: PieceKind) => boolean; per?: number; dest?: 'std' | 'available' | 'casualties' | 'out_of_play'; by?: Faction; basesFirst?: boolean; label?: string } = {}): Step {
@@ -80,3 +80,7 @@ export function ifThen(cond: (g: Game, c: Ctx) => boolean, step: Step): Step {
 }
 
 export { hasState, log, push };
+
+// Pools/kinds that depend on who is executing an insurgent card.
+export const insGuer = (f: Faction): PoolKind => (f === 'NVA' ? 'nva_guer' : 'vc_guer');
+export const insBase = (f: Faction): PoolKind => (f === 'NVA' ? 'nva_base' : 'vc_base');
