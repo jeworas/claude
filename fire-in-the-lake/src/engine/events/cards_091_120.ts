@@ -1,166 +1,494 @@
-// Events 91-120, in the canonical Fire in the Lake deck order (titles in src/data/cards.ts).
-// Effects are reconstructed from memory of the printed cards; numbers/wording are approximations.
-// Capabilities only record the marker. Momentum is recorded in g.momentum (side in g.tmp.momentum_side).
-import { COIN_KINDS, INS_KINDS, GUER_KINDS, defCard } from './helpers';
-import { FACTION_PIECES, count, flip } from '../../core/pieces';
+// Events 91-120, implemented from the official playbook text (reference/playbook.txt) and rules section 5.
+// Unshaded = first text paragraph, shaded = second. Single-text cards (94 Tunnel Rats, 106 Binh Duong,
+// 115 Typhoon Kate) only have an unshaded side.
+//
+// Instructions to the Ops code (extras on free Ops/SAs): ignoreMonsoon, noMove (Sweep in place), noFollow (Assault
+// without the ARVN follow-up), asUS (an ARVN-executed Assault counts ARVN Troops like US Troops), noTrail (Air
+// Strike may not Degrade the Trail), guerOnly + ambush + ambushAny + ambushMax (insurgent March with free Ambush).
+// Capabilities/momentum only record the marker (their effects are read by coin_ops.ts / insurgent_ops.ts / coup.ts).
+import type { Faction, Game, PieceKind, PoolKind } from '../../core/types';
+import {
+  INS_KINDS, K, choose, defCard, flipAll, freeOp as freeOpHelper, log, pickSpaces, removePieces, rollDie, track, transferPieces,
+} from './helpers';
+import type { Ctx, Step, XferRule } from './helpers';
+import {
+  FACTION_PIECES, control, count, countBases, countFaction, place, remove, setSupport, shiftSupport,
+} from '../../core/pieces';
 import { MAP, SPACE_IDS } from '../../data/map';
-import { aid, cap, freeOp, insBase, insGuer, mom, patronage, pick, placeIn, poolMove, removeUp, resources, run, shift, stayEligible, trail } from './dsl';
+import {
+  aid, anyOf, cap, chooseFaction, eachOf, either, freeOp, makeIneligible, mom, patronage, pick, placeIn, poolMove, removeUp,
+  resources, run, selectInto, shift, stayEligible, xfer,
+} from './dsl';
 import * as W from './wh';
 
-const US_TROOPS = ['us_troops'] as const;
-const IRREG = ['us_irreg_u', 'us_irreg_a'] as const;
-const RANGERS = ['arvn_ranger_u', 'arvn_ranger_a'] as const;
-const VC_K = FACTION_PIECES.VC;
-const VC_G = ['vc_guer_u', 'vc_guer_a'] as const;
-const NVA_K = FACTION_PIECES.NVA;
-const NVA_TROOPS = ['nva_troops'] as const;
-const usDest = 'casualties' as const;
-const ids = (...x: string[]) => x;
-const laosIds = ['central_laos', 'southern_laos'];
-const highlandProvs = () => SPACE_IDS.filter((id) => MAP[id].type === 'province' && MAP[id].terrain === 'highland' && MAP[id].country === 'south_vietnam');
+const US_POOLS: PoolKind[] = ['us_troops', 'us_base', 'us_irreg'];
+const ARVN_KINDS: PieceKind[] = FACTION_PIECES.ARVN;
+const VC_ANY: PieceKind[] = ['vc_guer_u', 'vc_guer_a', 'vc_base', 'vc_tunnel'];
+const ALL_GUER: PieceKind[] = ['nva_guer_u', 'nva_guer_a', 'vc_guer_u', 'vc_guer_a'];
+const CUBES: PieceKind[] = ['us_troops', 'arvn_troops', 'arvn_police'];
+const CAN_THO = 'can_tho';
+const MAX_TUNNELS = 6;
 
-defCard(91, 'Aid +4. Move up to 2 US Troops from Casualties to Available.', 'Move up to 2 US Troops from Available to Out of Play.', () => ({
-  u: [aid(4), poolMove('us_troops', 'casualties', 'available', 2)],
-  s: [poolMove('us_troops', 'available', 'out_of_play', 2)],
-}));
+const casualtyPieces = (g: Game) => g.casualties.us_troops + g.casualties.us_base + g.casualties.us_irreg;
+const leaderCards = (g: Game) => g.leader_box.length + (g.leader !== null ? 1 : 0);
+const tunnelsOnMap = (g: Game) => SPACE_IDS.reduce((n, id) => n + count(g, id, 'nva_tunnel', 'vc_tunnel'), 0);
+const insBaseIn = (g: Game, id: string) => count(g, id, 'nva_base', 'vc_base') > 0;
+const nonBaseMove = (x: PoolKind[]) => x;
+void nonBaseMove;
 
-defCard(92, 'Remove up to 3 NVA/VC pieces from coastal spaces (Bases last).', 'Place up to 3 of your Guerrillas in coastal spaces, at most 1 per space.', () => ({
-  u: [removeUp(INS_KINDS, 3, { where: W.coastal })],
-  s: [placeIn(insGuer, 3, { where: W.coastal, per: 1 })],
-}));
+function markTunnel(g: Game, id: string): boolean {
+  if (tunnelsOnMap(g) >= MAX_TUNNELS) return false;
+  for (const [b, t] of [['nva_base', 'nva_tunnel'], ['vc_base', 'vc_tunnel']] as [PieceKind, PieceKind][]) {
+    if (count(g, id, b) > 0) {
+      g.spaces[id].pieces[b] = (g.spaces[id].pieces[b] ?? 0) - 1;
+      if (g.spaces[id].pieces[b] === 0) delete g.spaces[id].pieces[b];
+      g.spaces[id].pieces[t] = (g.spaces[id].pieces[t] ?? 0) + 1;
+      return true;
+    }
+  }
+  return false;
+}
 
-defCard(93, 'Aid +3.', 'Aid -6. Move up to 3 US Troops from Available to Out of Play.', () => ({
-  u: [aid(3)],
-  s: [aid(-6), poolMove('us_troops', 'available', 'out_of_play', 3)],
-}));
+// Insurgent pool piece placement helper for the executing insurgent Faction.
+const insPools = (f: Faction): PoolKind[] => (f === 'NVA' ? ['nva_guer', 'nva_base'] : ['vc_guer', 'vc_base']);
 
-defCard(94, 'Remove the Tunnel marker from up to 2 NVA/VC Tunneled Bases.', 'Place a Tunnel marker on up to 2 NVA/VC Bases.', () => ({
-  u: [pick(2, W.has('nva_tunnel', 'vc_tunnel'), (g, a, id) => { if (!flip(g, id, 'nva_tunnel', 'nva_base')) flip(g, id, 'vc_tunnel', 'vc_base'); }, { label: 'Remove a Tunnel marker' })],
-  s: [pick(2, W.has('nva_base', 'vc_base'), (g, a, id) => { if (!flip(g, id, 'nva_base', 'nva_tunnel')) flip(g, id, 'vc_base', 'vc_tunnel'); }, { label: 'Place a Tunnel marker' })],
-}));
-
-defCard(95, 'Place up to 4 US Troops in South Vietnam, then free US Assault.', 'Remove up to 3 US Troops from the map to Casualties.', () => ({
-  u: [placeIn('us_troops', 4, { where: W.sv }), freeOp('op_assault', { faction: 'US' })],
-  s: [removeUp([...US_TROOPS], 3)],
-}));
-
-defCard(96, 'Place up to 3 ARVN Troops in South Vietnam Cities/Provinces, then free ARVN Sweep in up to 2 spaces.', 'Remove up to 3 ARVN Troops from the map.', () => ({
-  u: [placeIn('arvn_troops', 3, { where: W.and(W.sv, W.notLoc) }), freeOp('op_sweep', { faction: 'ARVN', extra: { max: 2 } })],
-  s: [removeUp(['arvn_troops'], 3)],
-}));
-
-defCard(97, 'Shift up to 1 City 1 level toward Active Support.', 'Shift up to 2 Cities 1 level toward Active Opposition. Add 1 Terror to Saigon. Aid -3.', () => ({
-  u: [shift(1, 1, { where: W.city })],
-  s: [shift(2, -1, { where: W.city }), run((g) => { g.spaces['saigon'].terror += 1; }), aid(-3)],
-}));
-
-defCard(98, 'Remove up to 3 VC Guerrillas from South Vietnam Provinces.', 'Remove up to 2 US Troops from South Vietnam to Casualties.', () => ({
-  u: [removeUp(['vc_guer_u', 'vc_guer_a'], 3, { where: W.and(W.sv, W.prov) })],
-  s: [removeUp([...US_TROOPS], 2, { where: W.sv, dest: 'casualties' })],
-}));
-
-defCard(99, 'Free US Sweep, then free US Assault, in Binh Dinh.', 'Place up to 2 of your Guerrillas in Binh Dinh, then remove up to 2 US Troops there.', () => ({
-  u: [freeOp('op_sweep', { faction: 'US', extra: { spaces: ['binh_dinh'] } }), freeOp('op_assault', { faction: 'US', extra: { spaces: ['binh_dinh'] } })],
-  s: [placeIn(insGuer, 2, { where: W.isId('binh_dinh') }), removeUp([...US_TROOPS], 2, { where: W.isId('binh_dinh'), dest: 'casualties' })],
-}));
-
-defCard(100, 'Free ARVN Sweep, then free ARVN Assault, in the Mekong Delta (Kien Hoa-Vinh Binh, Kien Phong, Ba Xuyen, Kien Giang-An Xuyen, Can Tho).', 'Place up to 3 VC Guerrillas in the Mekong Delta spaces listed on the unshaded side.', () => {
-  const delta = ids('kien_hoa_vinh_binh', 'kien_phong', 'ba_xuyen', 'kien_giang_an_xuyen', 'can_tho');
+// -------------------------------------------------------------------------------------------------- 91 Bob Hope
+defCard(91, () => {
+  const fromKey = K((g, a, id) => a.data.ids.includes(id));
+  const kProvUS = K((g, a, id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0);
+  const kCity = K((g, a, id) => MAP[id].type === 'city');
+  const kDst = K((g, a, dst) => {
+    const { src, f } = a.data as { src: string; f: Faction };
+    if (count(g, src, 'us_troops') > 0) {
+      g.spaces[src].pieces.us_troops = (g.spaces[src].pieces.us_troops ?? 0) - 1;
+      if (!g.spaces[src].pieces.us_troops) delete g.spaces[src].pieces.us_troops;
+      g.spaces[dst].pieces.us_troops = (g.spaces[dst].pieces.us_troops ?? 0) + 1;
+      place(g, src, f === 'NVA' ? 'nva_guer' : 'vc_guer', 1);
+      log(g, `${f} moves a US Troop from ${MAP[src].name} to ${MAP[dst].name} and leaves a Guerrilla.`);
+    }
+  });
+  const kSrc = K((g, a, src) => {
+    pickSpaces(g, a, { n: 1, filter: kCity, by: a.data.f, label: 'City to move the US Troop to', data: { src, f: a.data.f }, apply: kDst });
+  });
   return {
-    u: [freeOp('op_sweep', { faction: 'ARVN', extra: { spaces: delta } }), freeOp('op_assault', { faction: 'ARVN', extra: { spaces: delta } })],
-    s: [placeIn('vc_guer', 3, { where: W.isId(...delta) })],
+    u: [
+      ...selectInto('src', 1, (g, id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0, { label: 'Province with US Troops' }),
+      ...selectInto('dst', 1, (g, id) => MAP[id].type === 'city' && control(g, id) === 'COIN', { label: 'COIN-Controlled City' }),
+      (g, c) => {
+        if (!c.d.src?.length || !c.d.dst?.length) { c.d.moved = 0; return; }
+        transferPieces(g, c, {
+          n: 99, data: { ids: c.d.src },
+          rules: [{ pool: 'us_troops', from: 'map', to: 'map', fromWhere: fromKey, toSpace: c.d.dst[0], label: 'Move a US Troop' }],
+        });
+      },
+      run((g, c) => { c.d.moved = c.last?.moved ?? c.d.moved ?? 0; }),
+      xfer(anyOf(US_POOLS, 'casualties', 'available'), (g, c) => Math.floor((c.d.moved ?? 0) / 2), { label: 'Casualty piece to Available' }),
+    ],
+    s: [
+      // NVA or VC move up to 3 US Troops from Provinces to Cities, placing a Guerrilla where each Troop was.
+      eachOf(() => ['1', '2', '3'], (g, a) => {
+        const f: Faction = a.faction === 'NVA' ? 'NVA' : 'VC';
+        pickSpaces(g, a, { n: 1, filter: kProvUS, by: f, label: 'Province with a US Troop', data: { f }, apply: kSrc });
+      }),
+    ],
   };
 });
 
-defCard(101, 'Capability: Booby Traps are neutralised - no extra COIN losses.', 'Capability: Booby Traps - when COIN Sweeps or Assaults a space with Underground Guerrillas, roll a die; on 1-3 remove 1 COIN cube there.', () => ({ u: [cap()], s: [cap()] }));
+// -------------------------------------------------------------------------------------------------- 92 SEALORDS
+defCard(92, () => {
+  const adj = () => MAP[CAN_THO].adjacent;
+  const sweepOrAssault = (f: 'ARVN' | 'US'): Step => either(['Sweep in place', 'Assault'], [
+    freeOp('op_sweep', { faction: f, extra: () => ({ spaces: adj(), noMove: true, ignoreMonsoon: true }) }),
+    freeOp('op_assault', { faction: f, extra: () => ({ spaces: adj() }) }),
+  ], { by: f, text: `${f}: free Sweep in place or Assault in the spaces adjacent to Can Tho` });
+  return {
+    u: [sweepOrAssault('ARVN'), sweepOrAssault('US')],
+    s: [xfer((['NVA', 'VC'] as Faction[]).flatMap((f) => insPools(f).map((pool): any => ({
+      pool, from: 'map', to: 'map', when: (g: Game, c: Ctx) => c.faction === f,
+      fromWhere: (g: Game, id: string) => MAP[id].country === 'cambodia' || id === 'tay_ninh',
+      toWhere: (g: Game, id: string) => MAP[CAN_THO].adjacent.includes(id),
+    }))), 99, { label: 'Move Insurgent pieces to spaces adjacent to Can Tho' })],
+  };
+});
 
-defCard(102, 'Free ARVN Assault in Tay Ninh and Saigon.', 'Place 1 Tunneled VC Base and up to 2 VC Guerrillas in Tay Ninh.', () => ({
-  u: [freeOp('op_assault', { faction: 'ARVN', extra: { spaces: ['tay_ninh', 'saigon'] } })],
-  s: [placeIn('vc_base', 1, { where: W.isId('tay_ninh'), as: 'vc_tunnel', by: 'VC' }), placeIn('vc_guer', 2, { where: W.isId('tay_ninh'), by: 'VC' })],
+// -------------------------------------------------------------------------------------------------- 93 Senator Fulbright
+defCard(93, () => ({
+  u: [xfer(anyOf(US_POOLS, 'map', 'available'), 4, { label: 'US pieces from the map to Available' })],
+  s: [poolMove('us_base', 'available', 'out_of_play', 1), aid(-9)],
 }));
 
-defCard(103, 'Aid +3.', 'Remove up to 3 US Troops from the map to Out of Play. Aid -3.', () => ({
-  u: [aid(3)],
-  s: [removeUp([...US_TROOPS], 3, { dest: 'out_of_play' }), aid(-3)],
+// -------------------------------------------------------------------------------------------------- 94 Tunnel Rats
+defCard(94, () => ({
+  u: [either(['Tunnel markers in 2 Provinces', 'Remove a Tunneled Base near US Troops'], [
+    pick(2, (g, id) => MAP[id].type === 'province' && insBaseIn(g, id) && tunnelsOnMap(g) < MAX_TUNNELS, (g, a, id) => { markTunnel(g, id); log(g, `Tunnel marker placed in ${MAP[id].name}.`); }, { label: 'Province with an Insurgent Base' }),
+    removeUp(['nva_tunnel', 'vc_tunnel'], 1, { where: (g, id) => count(g, id, 'us_troops') > 0, tunnels: true, label: 'Tunneled Base in a space with US Troops' }),
+  ])],
+  s: [],
 }));
 
-defCard(104, 'Capability: Main Force Bns are neutralised - no extra insurgent Attack strength.', 'Capability: Main Force Bns - Guerrilla Attack in a space with 3+ Guerrillas removes 1 extra piece.', () => ({ u: [cap()], s: [cap()] }));
+// -------------------------------------------------------------------------------------------------- 95 Westmoreland
+defCard(95, () => {
+  const each = K((g, a, i) => {
+    const sp = a.data.sp as string;
+    freeOpHelper(g, i === 0 ? 'op_sweep' : 'op_assault', 'US', i === 0
+      ? { spaces: [sp], max: 1, noMove: true, ignoreMonsoon: true } : { spaces: [sp], max: 1, noFollow: true });
+  });
+  return {
+    u: [
+      freeOp('sa_air_lift', { faction: 'US' }),
+      ...selectInto('sp', 2, undefined, { label: 'Space for a free Sweep (no moves) or Assault (no ARVN)' }),
+      eachOf((g, c) => c.d.sp ?? [], (g, a, sp) => {
+        choose(g, a, { by: 'US', opts: ['Sweep (no moves)', 'Assault (no ARVN)'], fn: each, data: { sp }, text: `US free Operation in ${MAP[sp].name}` });
+      }, { by: 'US' }),
+      freeOp('sa_air_strike', { faction: 'US' }),
+    ],
+    s: [pick(3, (g, id) => MAP[id].type === 'province' && MAP[id].pop > 0 && count(g, id, 'arvn_police') === 0 && g.spaces[id].support > -2,
+      (g, a, id) => { shiftSupport(g, id, -2); log(g, `Support shifted -2 in ${MAP[id].name}.`); }, { label: 'Province with no Police: shift 2 levels toward Active Opposition' })],
+  };
+});
 
-defCard(105, 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [shift(2, 1, { where: W.sv })],
-  s: [shift(2, -1, { where: W.sv })],
+// -------------------------------------------------------------------------------------------------- 96 APC
+function pacifyLike(f: 'US' | 'ARVN'): Step[] {
+  const apply = K((gg, a, id) => {
+    if (gg.spaces[id].terror > 0) gg.spaces[id].terror = 0;
+    if (MAP[id].pop > 0 && gg.spaces[id].support < 2) shiftSupport(gg, id, 1);
+    log(gg, `${a.by} Pacification in ${MAP[id].name} (free).`);
+  });
+  return [
+    (g: Game, c: Ctx) => {
+      const used: string[] = c.d.used ?? (c.d.used = []);
+      if (used.length >= 4) return;
+      const troops: PieceKind = f === 'US' ? 'us_troops' : 'arvn_troops';
+      const cands = SPACE_IDS.filter((id) => !used.includes(id) && MAP[id].type !== 'loc' && control(g, id) === 'COIN'
+        && count(g, id, troops) > 0 && count(g, id, 'arvn_police') > 0 && (g.spaces[id].terror > 0 || (MAP[id].pop > 0 && g.spaces[id].support < 2)));
+      if (cands.length === 0) return;
+      pickSpaces(g, c, { n: 4 - used.length, by: f, label: `${f} Pacification (cost 0, 1 level per space)`, data: { ids: cands }, filter: PACIFY_FILTER, apply });
+    },
+    (g: Game, c: Ctx) => { for (const id of c.last?.spaces ?? []) (c.d.used ??= []).push(id); c.last = null; },
+  ];
+}
+const CITY_KEY = K((g, a, id) => MAP[id].type === 'city');
+const PACIFY_FILTER = K((g, a, id) => a.data.ids.includes(id));
+
+defCard(96, () => ({
+  u: [...pacifyLike('US'), ...pacifyLike('ARVN')],
+  s: [(g, c) => {
+    if (g.pivotal_played.includes('VC')) {
+      g.pivotal_played = g.pivotal_played.filter((f) => f !== 'VC');
+      if (!g.pivotal_available.includes('VC')) g.pivotal_available.push('VC');
+      log(g, 'Tet Offensive is returned to the VC.');
+      return;
+    }
+    // General uprising (Tet Offensive text, without using the card): Terror, 6 VC pieces in Cities, VC+NVA Attack.
+    freeOpHelper(g, 'op_terror', 'VC', { spaces: SPACE_IDS.filter((id) => count(g, id, 'vc_guer_u') > 0) });
+    c.d.uprising = true;
+  },
+  (g, c) => {
+    if (!c.d.uprising) return;
+    transferPieces(g, c, { n: 6, by: 'VC', rules: (['vc_guer', 'vc_base'] as PoolKind[]).map((pool): XferRule => ({ pool, from: 'available', to: 'map', toWhere: CITY_KEY })), label: 'Place VC pieces in Cities' });
+  },
+  (g, c) => {
+    if (!c.d.uprising) return;
+    freeOpHelper(g, 'op_attack', 'VC', { guerOnly: true, ambush: false, spaces: SPACE_IDS.filter((id) => count(g, id, 'vc_guer_u', 'vc_guer_a') > 0 && count(g, id, 'us_troops', 'us_base', 'us_irreg_u', 'us_irreg_a', 'arvn_troops', 'arvn_police', 'arvn_ranger_u', 'arvn_ranger_a', 'arvn_base') > 0) });
+    freeOpHelper(g, 'op_attack', 'NVA', { guerOnly: true, ambush: false, spaces: SPACE_IDS.filter((id) => count(g, id, 'nva_guer_u', 'nva_guer_a') > 0 && count(g, id, 'us_troops', 'us_base', 'us_irreg_u', 'us_irreg_a', 'arvn_troops', 'arvn_police', 'arvn_ranger_u', 'arvn_ranger_a', 'arvn_base') > 0) });
+  }],
 }));
 
-defCard(106, 'Free US Sweep, then free US Assault, in Tay Ninh and An Loc.', 'Place up to 3 VC Guerrillas in Tay Ninh, An Loc and/or Phuoc Long.', () => ({
-  u: [freeOp('op_sweep', { faction: 'US', extra: { spaces: ['tay_ninh', 'an_loc'] } }), freeOp('op_assault', { faction: 'US', extra: { spaces: ['tay_ninh', 'an_loc'] } })],
-  s: [placeIn('vc_guer', 3, { where: W.isId('tay_ninh', 'an_loc', 'phuoc_long') })],
+// -------------------------------------------------------------------------------------------------- 97 Brinks Hotel
+defCard(97, () => ({
+  u: [
+    either(['Aid +10', 'Transfer 4 Patronage to ARVN Resources'], [
+      aid(10),
+      run((g) => { const n = Math.min(4, g.patronage); track(g, 'patronage', -n); track(g, 'ARVN', n); }),
+    ]),
+    run((g) => {
+      // Flip the current RVN leader card: its text is ignored (no effect on Minh or Failed Attempt).
+      if (g.leader !== null) { g.tmp = g.tmp ?? {}; g.tmp.leader_ignored = g.leader; log(g, 'The RVN leader card is flipped: its text is ignored.'); }
+    }),
+  ],
+  s: [pick(1, (g, id) => MAP[id].type === 'city' && count(g, id, ...VC_ANY) > 0, (g, a, id) => {
+    shiftSupport(g, id, -2);
+    if (SPACE_IDS.reduce((n, x) => n + g.spaces[x].terror, 0) < 15) g.spaces[id].terror += 1;
+    log(g, `${MAP[id].name}: shifted 2 toward Active Opposition and Terror added.`);
+  }, { label: 'City with VC' })],
 }));
 
-defCard(107, 'Patronage +3. Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition. Patronage -3.', () => ({
-  u: [patronage(3), shift(1, 1, { where: W.sv })],
-  s: [shift(1, -1, { where: W.sv }), patronage(-3)],
+// -------------------------------------------------------------------------------------------------- 98 Long Tan
+defCard(98, () => ({
+  u: [either(['Place 2 out of play US Troops in a Province', 'Remove all Guerrillas from all Jungle with US Troops'], [
+    xfer([{ pool: 'us_troops', from: 'out_of_play', to: 'map', toWhere: W.prov, label: 'US Troop to a Province' }], 2),
+    run((g) => {
+      for (const id of SPACE_IDS) {
+        if (MAP[id].terrain !== 'jungle' || count(g, id, 'us_troops') === 0) continue;
+        for (const k of ALL_GUER) remove(g, id, k, count(g, id, k));
+      }
+      log(g, 'All Guerrillas removed from Jungle spaces with US Troops.');
+    }),
+  ])],
+  s: [
+    ...selectInto('sp', 1, (g, id) => MAP[id].terrain === 'jungle' && count(g, id, 'vc_guer_u', 'vc_guer_a') >= 2 && count(g, id, 'us_troops', 'us_base') > 0, { label: 'Jungle with 2+ VC Guerrillas and US pieces' }),
+    run((g, c) => {
+      for (const id of c.d.sp ?? []) {
+        remove(g, id, 'us_base', 1);
+        remove(g, id, 'us_troops', 1);
+        log(g, `US Base and Troop to Casualties in ${MAP[id].name}.`);
+      }
+    }),
+  ],
 }));
 
-defCard(108, 'Move up to 3 US Troops from Out of Play to Available.', 'Move up to 3 US Troops from Available to Out of Play.', () => ({
-  u: [poolMove('us_troops', 'out_of_play', 'available', 3)],
-  s: [poolMove('us_troops', 'available', 'out_of_play', 3)],
+// -------------------------------------------------------------------------------------------------- 99 Masher / White Wing
+defCard(99, () => ({
+  u: [
+    ...chooseFaction('f', ['US', 'ARVN'], { text: 'US or ARVN executes the Sweep and Assault' }),
+    ...selectInto('sp', 1, (g, id) => MAP[id].terrain !== 'jungle' && MAP[id].type !== 'loc' && count(g, id, 'us_troops') > 0 && count(g, id, 'arvn_troops') > 0, { label: 'Non-Jungle space with US and ARVN Troops' }),
+    freeOp('op_sweep', { faction: (g, c) => c.d.f, extra: (g, c) => (c.d.sp?.length ? { spaces: c.d.sp, max: 1, ignoreMonsoon: true } : false) }),
+    freeOp('op_assault', { faction: (g, c) => c.d.f, extra: (g, c) => (c.d.sp?.length ? { spaces: c.d.sp, max: 1, asUS: true } : false) }),
+  ],
+  s: [
+    ...chooseFaction('f', ['VC', 'NVA'], { text: 'VC or NVA executes the March and Ambush' }),
+    freeOp('op_march', { faction: (g, c) => c.d.f, extra: { max: 3, guerOnly: true, ignoreMonsoon: true, ambush: true, ambushAny: true, ambushMax: 3 } }),
+  ],
 }));
 
-defCard(109, 'Remove up to 3 VC pieces from Provinces (Bases last).', 'Place up to 3 VC Guerrillas in South Vietnam. VC Resources +3.', () => ({
-  u: [removeUp(FACTION_PIECES.VC, 3, { where: W.prov })],
-  s: [placeIn('vc_guer', 3, { where: W.sv }), resources('VC', 3)],
+// -------------------------------------------------------------------------------------------------- 100 Rach Ba Rai
+defCard(100, () => ({
+  u: [
+    ...selectInto('sp', 1, (g, id) => MAP[id].terrain === 'lowland' && MAP[id].type === 'province' && count(g, id, 'us_troops') > 0, { label: 'Lowland with US Troops' }),
+    either(['Remove all VC', 'Remove all non-Troop NVA'], [
+      run((g, c) => { for (const id of c.d.sp ?? []) for (const k of ['vc_guer_u', 'vc_guer_a', 'vc_base'] as PieceKind[]) remove(g, id, k, count(g, id, k)); }),
+      run((g, c) => { for (const id of c.d.sp ?? []) for (const k of ['nva_guer_u', 'nva_guer_a', 'nva_base'] as PieceKind[]) remove(g, id, k, count(g, id, k)); }),
+    ]),
+  ],
+  s: [
+    ...selectInto('sp', 1, (g, id) => MAP[id].terrain === 'lowland' && MAP[id].type === 'province' && count(g, id, ...VC_ANY) > 0, { label: 'Lowland with any VC' }),
+    removeUp(CUBES, (g) => { const n = rollDie(g); log(g, `Rach Ba Rai: die roll ${n}.`); return n; }, { ids: (g, c) => c.d.sp ?? [], label: 'Remove US/ARVN cubes' }),
+    xfer(anyOf(['vc_guer', 'vc_base'], 'available', 'map', { toSpace: undefined }).map((r) => ({ ...r, toSpace: (g: Game, c: Ctx) => c.d.sp?.[0] })), 1, { by: 'VC', label: 'Place 1 VC piece' }),
+  ],
 }));
 
-defCard(110, 'Remove up to 3 Guerrillas from Provinces.', 'Free NVA or VC Ambush (whichever executes).', () => ({
-  u: [removeUp(GUER_KINDS, 3, { where: W.prov })],
-  s: [(g, c) => freeOp('sa_ambush', { faction: c.faction === 'NVA' ? 'NVA' : 'VC' })(g, c)],
+// -------------------------------------------------------------------------------------------------- 101 Booby Traps
+defCard(101, () => ({ u: [cap()], s: [cap()] }));
+
+// -------------------------------------------------------------------------------------------------- 102 Cu Chi
+defCard(102, () => ({
+  u: [
+    ...selectInto('sp', 1, (g, id) => W.tunneled(g, id) && control(g, id) === 'COIN', { label: 'Space with a Tunnel and COIN Control' }),
+    run((g, c) => { for (const id of c.d.sp ?? []) for (const k of ALL_GUER) remove(g, id, k, count(g, id, k)); log(g, 'All Guerrillas removed.'); }),
+  ],
+  s: [
+    ...selectInto('sp', 1, (g, id) => MAP[id].type === 'province' && insBaseIn(g, id), { label: 'Province with an Insurgent Base' }),
+    run((g, c) => {
+      for (const id of c.d.sp ?? []) {
+        while (count(g, id, 'nva_base', 'vc_base') > 0 && markTunnel(g, id)) { /* every Base */ }
+        place(g, id, 'nva_guer', 1);
+        place(g, id, 'vc_guer', 1);
+        log(g, `Tunnel markers placed in ${MAP[id].name}; 1 NVA and 1 VC Guerrilla placed.`);
+      }
+    }),
+  ],
 }));
 
-defCard(111, 'Remove up to 3 Guerrillas from Jungle spaces.', 'Place up to 3 of your Guerrillas in Jungle spaces, at most 1 per space.', () => ({
-  u: [removeUp(GUER_KINDS, 3, { where: W.jungle })],
-  s: [placeIn(insGuer, 3, { where: W.jungle, per: 1 })],
+// -------------------------------------------------------------------------------------------------- 103 Kent State
+defCard(103, () => ({
+  u: [
+    xfer(anyOf(US_POOLS, 'casualties', 'available'), 2, { label: 'US Casualties to Available' }),
+    freeOp('op_menu', { faction: 'US', extra: { limited: true, sa: false, free: true } }),
+    stayEligible('US'),
+  ],
+  s: [xfer([{ pool: 'us_troops', from: 'casualties', to: 'out_of_play' }], 3, { label: 'US Troop Casualties out of play' }), aid(-6), makeIneligible('US')],
 }));
 
-defCard(112, 'Place up to 2 ARVN Police in South Vietnam Provinces, then shift 1 Province 1 level toward Active Support.', 'Remove up to 2 ARVN Police from the map. Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [placeIn('arvn_police', 2, { where: W.and(W.sv, W.prov) }), shift(1, 1, { where: W.prov })],
-  s: [removeUp(['arvn_police'], 2), shift(1, -1, { where: W.sv })],
+// -------------------------------------------------------------------------------------------------- 104 Main Force Bns
+defCard(104, () => ({ u: [cap()], s: [cap()] }));
+
+// -------------------------------------------------------------------------------------------------- 105 Rural Pressure
+defCard(105, () => ({
+  u: [shift(4, 1, { where: (g, id) => MAP[id].type === 'province' && count(g, id, ...VC_ANY) > 0, label: 'Province with VC' })],
+  s: [
+    shift(3, -1, { where: (g, id) => MAP[id].type === 'province' && count(g, id, 'arvn_police') > 0, label: 'Province with Police' }),
+    either(['Patronage +6', 'Patronage -6'], [patronage(6), patronage(-6)]),
+  ],
 }));
 
-defCard(113, 'Place up to 4 ARVN Police in South Vietnam Cities/Provinces.', 'Remove up to 4 ARVN Police from the map.', () => ({
-  u: [placeIn('arvn_police', 4, { where: W.and(W.sv, W.notLoc) })],
-  s: [removeUp(['arvn_police'], 4)],
+// -------------------------------------------------------------------------------------------------- 106 Binh Duong
+defCard(106, () => {
+  const opts = ['Shift toward Support, place a VC Guerrilla', 'Shift toward Support, place Police', 'Shift toward Opposition, place a VC Guerrilla', 'Shift toward Opposition, place Police'];
+  const apply = K((g, a, i) => {
+    const id = a.data.id as string;
+    shiftSupport(g, id, i < 2 ? 1 : -1);
+    place(g, id, i % 2 === 0 ? 'vc_guer' : 'arvn_police', 1);
+    log(g, `Binh Duong: ${MAP[id].name} shifted, piece placed.`);
+  });
+  return {
+    u: [pick(2, (g, id) => MAP[id].type === 'province' && MAP[id].adjacent.includes('saigon'), (g, a, id) => {
+      choose(g, a, { by: a.faction, opts, fn: apply, data: { id }, text: `Binh Duong in ${MAP[id].name}` });
+    }, { label: 'Province adjacent to Saigon' })],
+    s: [],
+  };
+});
+
+// -------------------------------------------------------------------------------------------------- 107 Burning Bonze
+defCard(107, () => ({
+  u: [patronage((g) => (g.spaces['saigon'].support === 2 ? 6 : 3))],
+  s: [run((g) => { shiftSupport(g, 'saigon', -1); }), aid(-12)],
 }));
 
-defCard(114, 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [shift(2, 1, { where: W.sv })],
-  s: [shift(2, -1, { where: W.sv })],
+// -------------------------------------------------------------------------------------------------- 108 Draft Dodgers
+defCard(108, () => ({
+  u: [poolMove('us_troops', 'out_of_play', 'available', (g) => (casualtyPieces(g) < 3 ? 3 : 0))],
+  s: [poolMove('us_troops', 'available', 'out_of_play', (g) => Math.min(3, casualtyPieces(g)))],
 }));
 
-defCard(115, 'Momentum (until Coup): Typhoon Kate - no US Air Lift.', 'NVA Resources +3.', () => ({
-  u: [mom()],
-  s: [resources('NVA', 3)],
+// -------------------------------------------------------------------------------------------------- 109 Nguyen Huu Tho
+defCard(109, () => ({
+  u: [run((g) => {
+    for (const id of SPACE_IDS) if (MAP[id].type === 'city' && count(g, id, ...VC_ANY) > 0) shiftSupport(g, id, 1);
+    log(g, 'Each City with VC shifted 1 level toward Active Support.');
+  })],
+  s: [run((g) => {
+    if (countBases(g, 'saigon') < 2) place(g, 'saigon', 'vc_base', 1);
+    place(g, 'saigon', 'vc_guer', 1);
+    log(g, 'VC place a Base and a Guerrilla in Saigon.');
+  }), stayEligible()],
 }));
 
-defCard(116, 'Capability: Cadres are neutralised - no extra insurgent Terror/Rally effect.', 'Capability: Cadres - VC Rally and Terror may each select 1 additional space.', () => ({ u: [cap()], s: [cap()] }));
-
-defCard(117, 'Patronage +5. Place up to 2 ARVN Rangers in South Vietnam.', 'Patronage -5.', () => ({
-  u: [patronage(5), placeIn('arvn_ranger', 2, { where: W.sv })],
-  s: [patronage(-5)],
+// -------------------------------------------------------------------------------------------------- 110 No Contact
+defCard(110, () => ({
+  u: [
+    xfer(anyOf(US_POOLS, 'casualties', 'map'), 2, { label: 'Place a Casualty on the map' }),
+    run((g) => { for (const id of SPACE_IDS) flipAll(g, id, 'underground', ['us_irreg_a', 'arvn_ranger_a']); log(g, 'All Rangers and Irregulars Underground.'); }),
+  ],
+  s: [run((g) => { for (const id of SPACE_IDS) flipAll(g, id, 'underground', ['nva_guer_a', 'vc_guer_a']); log(g, 'All VC and NVA Guerrillas Underground.'); })],
 }));
 
-defCard(118, 'NVA Resources -3. Trail -1.', 'NVA Resources +3. VC Resources +3.', () => ({
-  u: [resources('NVA', -3), trail(-1)],
-  s: [resources('NVA', 3), resources('VC', 3)],
+// -------------------------------------------------------------------------------------------------- 111 Agent Orange
+defCard(111, () => ({
+  u: [
+    run((g) => { for (const id of SPACE_IDS) if (MAP[id].terrain === 'jungle') flipAll(g, id, 'active', ['nva_guer_u', 'vc_guer_u']); log(g, 'All Insurgents in Jungle go Active.'); }),
+    freeOp('sa_air_strike', { faction: 'US', extra: () => ({ spaces: SPACE_IDS.filter((id) => MAP[id].terrain === 'jungle'), max: 2, noTrail: true }) }),
+  ],
+  s: [run((g) => {
+    for (const id of SPACE_IDS) {
+      const m = MAP[id];
+      if (m.type === 'province' && (m.terrain === 'jungle' || m.terrain === 'highland') && countFaction(g, id, 'NVA') + countFaction(g, id, 'VC') > 0) shiftSupport(g, id, -1);
+    }
+    log(g, 'Each Jungle and Highland with Insurgents shifted 1 level toward Active Opposition.');
+  })],
 }));
 
-defCard(119, 'Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition. Aid -3.', () => ({
-  u: [shift(1, 1, { where: W.sv })],
-  s: [shift(2, -1, { where: W.sv }), aid(-3)],
+// -------------------------------------------------------------------------------------------------- 112 Colonel Chau
+defCard(112, () => ({
+  u: [placeIn('arvn_police', 6, { where: W.prov, per: 1, label: 'Police into a Province' })],
+  s: [pick(3, (g, id) => MAP[id].type === 'province' && countFaction(g, id, 'ARVN') > 0, (g, a, id) => {
+    if (MAP[id].pop > 0) shiftSupport(g, id, -1);
+    place(g, id, 'vc_guer', 1);
+    log(g, `${MAP[id].name}: shifted toward Active Opposition and a VC Guerrilla placed.`);
+  }, { label: 'Province with ARVN' })],
 }));
 
-defCard(120, 'Shift up to 2 Cities/Provinces with Population in South Vietnam 1 level toward Active Support.', 'VC Resources +3. Shift up to 1 Cities/Provinces with Population in South Vietnam 1 level toward Active Opposition.', () => ({
-  u: [shift(2, 1, { where: W.sv })],
-  s: [resources('VC', 3), shift(1, -1, { where: W.sv })],
+// -------------------------------------------------------------------------------------------------- 113 Ruff Puff
+defCard(113, () => ({
+  u: [placeIn('arvn_police', 8, { where: W.sv, label: 'Police in the South' })],
+  s: [removeUp(['arvn_police'], 5, {
+    where: (g, id) => MAP[id].type !== 'city', label: 'Police outside Cities to replace with VC pieces',
+    then: (g, a) => {
+      let base = true;
+      for (const [id, n] of Object.entries(a.counts as Record<string, number>)) {
+        for (let i = 0; i < n; i++) {
+          if (base && MAP[id].type !== 'loc' && countBases(g, id) < 2 && g.available.vc_base > 0) { place(g, id, 'vc_base', 1); base = false; }
+          else place(g, id, 'vc_guer', 1);
+        }
+      }
+      log(g, 'VC pieces replace the Police (at most 1 Base).');
+    },
+  })],
 }));
 
-void [COIN_KINDS, INS_KINDS, GUER_KINDS, count, flip, insBase, mom, patronage, pick, run, stayEligible, RANGERS, VC_K, VC_G, NVA_K, NVA_TROOPS, usDest, ids, laosIds, highlandProvs, IRREG, US_TROOPS, cap, poolMove, trail, resources, shift, aid];
+// -------------------------------------------------------------------------------------------------- 114 Tri Quang
+defCard(114, () => ({
+  u: [pick(3, (g, id) => MAP[id].type === 'city' && MAP[id].pop > 0 && g.spaces[id].support <= 0, (g, a, id) => { setSupport(g, id, 1); log(g, `${MAP[id].name} set to Passive Support.`); }, { label: 'Neutral or Opposition City' })],
+  s: [
+    run((g) => { for (const id of ['hue', 'da_nang', 'saigon']) shiftSupport(g, id, -1); }),
+    xfer(anyOf(['vc_guer', 'vc_base'], 'available', 'map', { toSpace: 'saigon' }), 1, { by: 'VC', label: 'Place a VC piece in Saigon' }),
+  ],
+}));
+
+// -------------------------------------------------------------------------------------------------- 115 Typhoon Kate
+defCard(115, () => ({ u: [stayEligible(), mom()], s: [] }));
+
+// -------------------------------------------------------------------------------------------------- 116 Cadres
+defCard(116, () => ({ u: [cap()], s: [cap()] }));
+
+// -------------------------------------------------------------------------------------------------- 117 Corps Commanders
+defCard(117, () => ({
+  u: [
+    ...selectInto('a', 1, (g, id) => MAP[id].type !== 'loc', { by: 'ARVN', label: 'First space for ARVN Troops' }),
+    ...selectInto('b', 1, undefined, { by: 'ARVN', ids: (g, c) => (c.d.a?.length ? MAP[c.d.a[0]].adjacent.filter((x) => MAP[x].type !== 'loc') : []), label: 'Optional second adjacent space (Done to skip)' }),
+    xfer(['available', 'out_of_play'].flatMap((from) => ['a', 'b'].map((key): any => ({
+      pool: 'arvn_troops', from, to: 'map', label: `Place ARVN Troops (${key === 'a' ? '1st' : '2nd'} space)`,
+      toSpace: (g: Game, c: Ctx) => c.d[key]?.[0],
+    }))), 3, { by: 'ARVN', label: 'ARVN places 3 Troops' }),
+    freeOp('op_sweep', { faction: 'ARVN', extra: (g, c) => { const sp = [...(c.d.a ?? []), ...(c.d.b ?? [])]; return sp.length ? { spaces: sp } : false; } }),
+  ],
+  s: [
+    ...selectInto('a', 1, (g, id) => count(g, id, ...ARVN_KINDS) > 0, { label: 'First space to remove ARVN pieces from' }),
+    ...selectInto('b', 1, undefined, { ids: (g, c) => (c.d.a?.length ? MAP[c.d.a[0]].adjacent.filter((x) => count(g, x, ...ARVN_KINDS) > 0) : []), label: 'Optional second adjacent space (Done to skip)' }),
+    removeUp(ARVN_KINDS, (g) => { const n = rollDie(g); log(g, `Corps Commanders: die roll ${n}.`); return n; }, { ids: (g, c) => [...(c.d.a ?? []), ...(c.d.b ?? [])], label: 'Remove ARVN pieces' }),
+    makeIneligible('ARVN'),
+  ],
+}));
+
+// -------------------------------------------------------------------------------------------------- 118 Korean War Arms
+defCard(118, () => {
+  const opts = (g: Game, id: string): PieceKind[] => {
+    const out: PieceKind[] = ['vc_guer_u'];
+    if (countBases(g, id) < 2 && MAP[id].type !== 'loc' && g.available.vc_base > 0) out.push('vc_base');
+    return out;
+  };
+  const place1 = K((g, a, i) => {
+    const k = a.data.kinds[i] as PieceKind;
+    place(g, a.data.id, k === 'vc_base' ? 'vc_base' : 'vc_guer', 1);
+  });
+  return {
+    u: [run((g) => {
+      // VC remove 1 VC Guerrilla (Active first) from each space with at least 2 and no NVA Base.
+      for (const id of SPACE_IDS) {
+        if (count(g, id, 'vc_guer_u', 'vc_guer_a') >= 2 && count(g, id, 'nva_base', 'nva_tunnel') === 0) {
+          if (remove(g, id, 'vc_guer_a', 1) === 0) remove(g, id, 'vc_guer_u', 1);
+        }
+      }
+      log(g, 'VC remove 1 Guerrilla from each qualifying space.');
+    })],
+    s: [pick(3, undefined, (g, a, id) => {
+      const kinds = opts(g, id);
+      if (g.available.vc_guer <= 0 && !kinds.includes('vc_base')) return;
+      choose(g, a, { by: 'VC', opts: kinds.map((k) => (k === 'vc_base' ? 'VC Base' : 'VC Guerrilla')), fn: place1, data: { id, kinds }, text: `Place a VC piece in ${MAP[id].name}` });
+    }, { by: 'VC', label: 'Space for a VC piece' })],
+  };
+});
+
+// -------------------------------------------------------------------------------------------------- 119 My Lai
+defCard(119, () => ({
+  u: [poolMove('us_troops', 'available', 'out_of_play', 2), patronage(2)],
+  s: [
+    pick(1, (g, id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0, (g, a, id) => {
+      if (MAP[id].pop > 0) setSupport(g, id, -2);
+      if (countBases(g, id) < 2) place(g, id, 'vc_base', 1);
+      place(g, id, 'vc_guer', 1);
+      log(g, `My Lai: ${MAP[id].name} set to Active Opposition; VC Base and Guerrilla placed.`);
+    }, { label: 'Province with US Troops' }),
+    aid(-6),
+  ],
+}));
+
+// -------------------------------------------------------------------------------------------------- 120 US Press Corps
+defCard(120, () => ({
+  u: [xfer(anyOf(US_POOLS, 'out_of_play', 'map'), (g) => { const n = leaderCards(g); return n <= 2 ? 4 : n <= 5 ? 2 : 0; }, { label: 'US pieces from Out of Play to the map' })],
+  s: [
+    poolMove('us_troops', 'casualties', 'out_of_play', (g) => Math.min(leaderCards(g), g.casualties.us_troops)),
+    poolMove('us_base', 'casualties', 'out_of_play', (g) => g.casualties.us_base),
+  ],
+}));
+
+void [INS_KINDS, removePieces, resources, shift, placeIn, cap, patronage, insPools, W];

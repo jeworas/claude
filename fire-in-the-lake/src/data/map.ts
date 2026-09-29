@@ -96,9 +96,9 @@ const LOCS: [string, string, number, string[], string[], boolean][] = [
   ['loc_saigon_cam_ranh', 'Saigon–Cam Ranh', 1, ['saigon', 'cam_ranh'], ['binh_tuy_binh_tuy', 'khanh_hoa'], false],
   ['loc_saigon_da_lat', 'Saigon–Da Lat', 1, ['saigon', 'da_lat'], ['quang_duc_long_khanh', 'binh_tuy_binh_tuy'], false],
   ['loc_saigon_an_loc_ban_me_thuot', 'Saigon–An Loc–Ban Me Thuot', 1, ['saigon', 'an_loc', 'ban_me_thuot'], ['tay_ninh', 'phuoc_long', 'quang_duc_long_khanh'], false],
-  ['loc_saigon_can_tho', 'Saigon–Can Tho', 2, ['saigon', 'can_tho'], ['kien_hoa_vinh_binh'], true],
+  ['loc_saigon_can_tho', 'Saigon–Can Tho', 2, ['saigon', 'can_tho'], ['kien_phong', 'kien_hoa_vinh_binh'], true],
   ['loc_can_tho_chau_doc', 'Can Tho–Chau Doc', 1, ['can_tho', 'chau_doc'], ['kien_phong', 'kien_giang_an_xuyen'], true],
-  ['loc_can_tho_bac_lieu', 'Can Tho–Bac Lieu', 1, ['can_tho', 'bac_lieu'], ['ba_xuyen', 'kien_giang_an_xuyen'], true],
+  ['loc_can_tho_bac_lieu', 'Can Tho–Bac Lieu', 1, ['can_tho', 'bac_lieu'], ['ba_xuyen', 'kien_giang_an_xuyen'], false],
   ['loc_can_tho_long_phu', 'Can Tho–Long Phu', 1, ['can_tho', 'long_phu'], ['ba_xuyen'], true],
 ];
 

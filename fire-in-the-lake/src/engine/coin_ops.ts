@@ -1216,7 +1216,7 @@ export function transportReach(g: Game, origin: string): string[] {
     for (const n of space(node).adjacent) {
       if (isLoc(n)) { if (locs + 1 <= maxLocs) enter(n, locs + 1); }
       else if (space(n).type === 'city') enter(n, locs);
-      if (!isNV(n) && n !== origin) out.add(n);
+      if (!isLoc(n) && !isNV(n) && n !== origin) out.add(n);
     }
   }
   return [...out];

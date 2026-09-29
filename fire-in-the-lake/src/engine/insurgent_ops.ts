@@ -317,10 +317,12 @@ registerState('op_rally', {
 
 // ================================================================= MARCH (3.3.2)
 
-const MOVERS: Record<Ins, PieceKind[]> = {
+const MOVERS_ALL: Record<Ins, PieceKind[]> = {
   NVA: ['nva_guer_u', 'nva_guer_a', 'nva_troops'],
   VC: ['vc_guer_u', 'vc_guer_a'],
 };
+// args.guerOnly (Events): only Guerrillas march.
+const moversOf = (f: Ins, a: any): PieceKind[] => (a.guerOnly ? MOVERS_ALL[f].filter((k) => k !== 'nva_troops') : MOVERS_ALL[f]);
 
 // Marching pieces move only into adjacent spaces; the Trail lets NVA continue (see finishDest).
 export function marchSources(_g: Game, _f: Ins, dest: string): string[] {
@@ -350,7 +352,7 @@ function marchCands(g: Game, a: any): string[] {
   const f = facOf(g, a);
   return SPACE_IDS.filter((id) => {
     if (!openSpace(a, id)) return false;
-    return allowedSources(g, a, f, id).some((s) => MOVERS[f].some((k) => movable(g, a, s, k) > 0));
+    return allowedSources(g, a, f, id).some((s) => moversOf(f, a).some((k) => movable(g, a, s, k) > 0));
   });
 }
 
@@ -361,7 +363,8 @@ function noteMoved(a: any, src: string, k: PieceKind, n: number): void {
   c.count += n;
 }
 
-const ambushMax = (g: Game) => (cap(g, 101) === 'unshaded' ? 1 : 2);
+// Booby Traps (101) unshaded and Typhoon Kate (115) limit Ambush to 1 space; events may set args.ambushMax.
+const ambushMax = (g: Game, a: any) => a.ambushMax ?? (cap(g, 101) === 'unshaded' || hasMomentum(g, 115) ? 1 : 2);
 
 // Enemy targets for an Ambush in `id`: the space itself, or (LoC) any adjacent space; Bases last is handled on removal.
 function ambushTargets(g: Game, id: string): string[] {
@@ -374,8 +377,8 @@ function ambushTargets(g: Game, id: string): string[] {
 function ambushAllowed(g: Game, a: any, f: Ins, id: string): boolean {
   if (a.ambush === false && !a.saOnly) return false;
   if (momSide(g, 17) === 'unshaded') return false; // Claymores
-  if ((a.ambushes ?? 0) >= ambushMax(g)) return false;
-  if (gU(g, id, f) < 1) return false;
+  if ((a.ambushes ?? 0) >= ambushMax(g, a)) return false;
+  if ((a.ambushAny ? gTot(g, id, f) : gU(g, id, f)) < 1) return false; // ambushAny: Event allows Active Guerrillas
   return ambushTargets(g, id).length > 0;
 }
 
@@ -419,7 +422,7 @@ function finishDest(g: Game, a: any): void {
   log(g, `${f} March: ${a.cur.count} piece(s) into ${nm(D)}${fu > 0 ? ' (Guerrillas activated)' : ''}.`);
   a.done.push(D);
   a.cur = { dest: D, uMoved: mu - fu };
-  if (a.ambush !== false && (mu - fu) > 0 && ambushAllowed(g, a, f, D)) {
+  if (a.ambush !== false && (a.ambushAny || (mu - fu) > 0) && ambushAllowed(g, a, f, D)) {
     a.phase = 'ambushq';
     return;
   }
@@ -505,7 +508,7 @@ registerState('op_march', {
     p.select([D]);
     for (const s of allowedSources(g, a, f, D)) {
       let any = false;
-      for (const k of MOVERS[f]) if (movable(g, a, s, k) > 0) { p.piece(s, k); any = true; }
+      for (const k of moversOf(f, a)) if (movable(g, a, s, k) > 0) { p.piece(s, k); any = true; }
       if (any) p.action('all', s, `Move all from ${nm(s)}`, { space: s });
     }
     if (a.cur.count > 0) p.action('done', undefined, 'Finish this destination');
@@ -532,7 +535,7 @@ registerState('op_march', {
     if (verb === 'done') return finishDest(g, a);
     if (verb === 'all') {
       const s = String(arg);
-      for (const k of MOVERS[f]) {
+      for (const k of moversOf(f, a)) {
         const n = movable(g, a, s, k);
         if (n > 0) { move(g, s, D, k, n); noteMoved(a, s, k, n); }
       }
@@ -552,7 +555,7 @@ function attackOpts(g: Game, a: any, f: Ins, id: string): { key: string; label: 
   if (!a.saOnly && coin) {
     if (gTot(g, id, f) > 0) out.push({ key: 'attack', label: 'Attack with Guerrillas' });
     const per = f === 'NVA' && cap(g, 45) === 'shaded' && !a.ptUsed ? 1 : 2;
-    if (f === 'NVA' && count(g, id, 'nva_troops') >= per) out.push({ key: 'troops', label: 'Attack with NVA Troops' });
+    if (f === 'NVA' && !a.guerOnly && count(g, id, 'nva_troops') >= per) out.push({ key: 'troops', label: 'Attack with NVA Troops' });
   }
   if (ambushAllowed(g, a, f, id)) out.push({ key: 'ambush', label: a.saOnly ? 'Ambush' : 'Ambush (Special Activity)' });
   return out;
@@ -623,7 +626,7 @@ function attackDef(saOnly: boolean) {
       a.ambushes = 0;
       a.saOnly = saOnly;
       a.ctx = 'attack';
-      if (saOnly) a.max = Math.min(a.max ?? Infinity, ambushMax(g));
+      if (saOnly) a.max = Math.min(a.max ?? Infinity, ambushMax(g, a));
       if (attackCands(g, a).length === 0) { log(g, saOnly ? 'No legal Ambush.' : 'No legal Attack.'); finish(g, a); }
     },
     prompt(g: Game, a: any, p: Prompt) {
@@ -727,7 +730,7 @@ registerState('sa_infiltrate', {
     initArgs(a);
     a.faction = 'NVA';
     if (hasMomentum(g, 38)) { log(g, 'McNamara Line: no Infiltrate.'); return finish(g, a); }
-    a.max = Math.min(a.max ?? Infinity, 2);
+    a.max = Math.min(a.max ?? Infinity, hasMomentum(g, 115) ? 1 : 2); // Typhoon Kate: SAs max 1 space
     if (momSide(g, 46) === 'unshaded') a.max = 1; // 559th Transport Grp
     a.left = 0;
     if (infiltrateCands(g, a).length === 0) { log(g, 'No legal Infiltrate spaces.'); finish(g, a); }
@@ -816,6 +819,7 @@ registerState('sa_bombard', {
   enter(g, a) {
     initArgs(a);
     a.faction = 'NVA';
+    if (hasMomentum(g, 115)) { log(g, 'Typhoon Kate: no Bombard.'); return finish(g, a); }
     a.max = Math.min(a.max ?? Infinity, 2);
     if (bombardCands(g, a).length === 0) { log(g, 'No legal Bombard targets.'); finish(g, a); }
   },
@@ -845,7 +849,7 @@ registerState('sa_tax', {
   enter(g, a) {
     initArgs(a);
     a.faction = 'VC';
-    a.max = Math.min(a.max ?? Infinity, 4);
+    a.max = Math.min(a.max ?? Infinity, hasMomentum(g, 115) ? 1 : 4);
     if (taxCands(g, a).length === 0) { log(g, 'No legal Tax spaces.'); finish(g, a); }
   },
   prompt(g, a, p) { selectPrompt(a, p, taxCands(g, a), `Tax: select up to ${limitOf(a)} spaces (${a.done.length} done).`); },
@@ -877,7 +881,7 @@ registerState('sa_subvert', {
     initArgs(a);
     a.faction = 'VC';
     a.subPieces = 0;
-    a.max = Math.min(a.max ?? Infinity, 2);
+    a.max = Math.min(a.max ?? Infinity, hasMomentum(g, 115) ? 1 : 2);
     if (subvertCands(g, a).length === 0) { log(g, 'No legal Subvert spaces.'); finish(g, a); }
   },
   prompt(g, a, p) {

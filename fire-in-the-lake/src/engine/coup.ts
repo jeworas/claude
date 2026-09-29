@@ -41,6 +41,10 @@ const momSide = (g: Game, n: number): string | undefined => (g.momentum.includes
  */
 export interface LeaderEffect { trainAid: number; transportMaxLocs: number; governPatronage: number; pacifyCost: number }
 export function leaderEffect(g: Game): LeaderEffect {
+  // Brinks Hotel (97, unshaded) flips the current leader card: its text is ignored.
+  if (g.leader !== null && g.tmp?.leader_ignored === g.leader) {
+    return { trainAid: 0, transportMaxLocs: Infinity, governPatronage: 0, pacifyCost: 3 };
+  }
   const minhActive = g.leader === null && !g.leader_box.some((id) => id === 129 || id === 130);
   return {
     trainAid: minhActive ? 5 : 0,

@@ -141,7 +141,7 @@ export function flipUp(kinds: PieceKind[] | undefined, n: Num, mode: FlipMode, o
 }
 
 // Grant a free Op / Special Activity. extra may return false to skip (nothing legal).
-export function freeOp(state: string, o: { faction?: Faction | ((g: Game, c: Ctx) => Faction); extra?: any | ((g: Game, c: Ctx) => any) } = {}): Step {
+export function freeOp(state: string, o: { faction?: Faction | ((g: Game, c: Ctx) => Faction); extra?: Record<string, any> | false | ((g: Game, c: Ctx) => Record<string, any> | false) } = {}): Step {
   return (g, c) => {
     const extra = typeof o.extra === 'function' ? o.extra(g, c) : o.extra ?? {};
     const f = typeof o.faction === 'function' ? o.faction(g, c) : o.faction ?? c.faction;
@@ -163,6 +163,20 @@ export function chooseFaction(key: string, factions: Faction[], o: { by?: By; te
     (g, c) => { c.d[key] = factions[c.last?.choice ?? 0]; },
   ];
 }
+
+// n free Limited Operations chosen by `faction` one at a time (each may be skipped).
+export function limOps(faction: Faction, ops: [string, string][], n: number): Step[] {
+  const labels = [...ops.map((o) => o[1]), 'Skip'];
+  const branches: Step[] = ops.map(([st]) => freeOp(st, { faction, extra: { limited: true } }));
+  branches.push(() => { /* skip */ });
+  return Array.from({ length: n }, () => either(labels, branches, { by: faction, text: `${faction}: free Limited Operation` }));
+}
+export const LIMOPS: Record<Faction, [string, string][]> = {
+  US: [['op_train', 'Train'], ['op_patrol', 'Patrol'], ['op_sweep', 'Sweep'], ['op_assault', 'Assault']],
+  ARVN: [['op_train', 'Train'], ['op_patrol', 'Patrol'], ['op_sweep', 'Sweep'], ['op_assault', 'Assault']],
+  NVA: [['op_rally', 'Rally'], ['op_march', 'March'], ['op_attack', 'Attack'], ['op_terror', 'Terror']],
+  VC: [['op_rally', 'Rally'], ['op_march', 'March'], ['op_attack', 'Attack'], ['op_terror', 'Terror']],
+};
 
 export function ifThen(cond: (g: Game, c: Ctx) => boolean, step: Step): Step {
   return (g, c) => { if (cond(g, c)) step(g, c); };

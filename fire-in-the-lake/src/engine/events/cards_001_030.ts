@@ -131,35 +131,34 @@ defCard(18, () => ({ u: [cap()], s: [cap()] }));
 defCard(19, () => ({ u: [cap()], s: [cap()] }));
 defCard(20, () => ({ u: [cap()], s: [cap()] }));
 
-defCard(21, () => ({
-  u: [
-    ...selectInto('dst', 1, undefined, { label: 'Destination space (or Done for Available)' }),
-    xfer([
-      { pool: 'us_troops', from: 'map', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
-      { pool: 'us_troops', from: 'map', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
-      { pool: 'us_troops', from: 'out_of_play', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
-      { pool: 'us_troops', from: 'out_of_play', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
-    ], 4, { label: 'Move US Troops' }),
-  ],
-  s: [(g, c) => {
-    // Provinces with US Troops, VC and that could be set to Active Opposition must be chosen first.
-    const hasVCpiece = (id: string) => count(g, id, 'vc_guer_u', 'vc_guer_a', 'vc_base') > 0;
-    const settable = (id: string) => MAP[id].pop > 0 && g.spaces[id].support !== -2;
-    const provs = SPACE_IDS.filter((id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0);
-    const first = provs.filter((id) => hasVCpiece(id) && settable(id));
-    c.d.cands = first.length ? first : provs;
-    void c;
-  }, ...americalPick()],
-}));
-function americalPick() {
-  const st = pick(2, undefined, (g, a, id) => {
-    removePieces(g, a, {
-      n: 1, kinds: ['vc_guer_u', 'vc_guer_a', 'vc_base'], filter: K((gg, aa, i) => i === id), by: a.by, data: {}, label: 'Remove a VC piece',
-      then: K((gg, aa, res) => { if (res.removed > 0 && MAP[id].pop > 0) setSupport(gg, id, -2); }),
-    });
-  }, { label: 'Province with US Troops', ids: (g, c) => c.d.cands ?? [] });
-  return [st];
-}
+defCard(21, () => {
+  const only = K((g, a, i) => i === a.data.sp);
+  const afterRemove = K((g, a, res) => { if (res.removed > 0 && MAP[a.data.sp].pop > 0) setSupport(g, a.data.sp, -2); });
+  return {
+    u: [
+      ...selectInto('dst', 1, undefined, { label: 'Destination space (or Done for Available)' }),
+      xfer([
+        { pool: 'us_troops', from: 'map', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
+        { pool: 'us_troops', from: 'map', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
+        { pool: 'us_troops', from: 'out_of_play', to: 'map', max: 2, toSpace: (g, c) => c.d.dst?.[0], when: (g, c) => !!c.d.dst?.length },
+        { pool: 'us_troops', from: 'out_of_play', to: 'available', max: 2, when: (g, c) => !c.d.dst?.length },
+      ], 4, { label: 'Move US Troops' }),
+    ],
+    s: [
+      (g, c) => {
+        // Provinces with US Troops, VC and that could be set to Active Opposition must be chosen first.
+        const hasVCpiece = (id: string) => count(g, id, 'vc_guer_u', 'vc_guer_a', 'vc_base') > 0;
+        const settable = (id: string) => MAP[id].pop > 0 && g.spaces[id].support !== -2;
+        const provs = SPACE_IDS.filter((id) => MAP[id].type === 'province' && count(g, id, 'us_troops') > 0);
+        const first = provs.filter((id) => hasVCpiece(id) && settable(id));
+        c.d.cands = first.length ? first : provs;
+      },
+      pick(2, undefined, (g, a, id) => {
+        removePieces(g, a, { n: 1, kinds: ['vc_guer_u', 'vc_guer_a', 'vc_base'], filter: only, by: a.by, data: { sp: id }, then: afterRemove, label: 'Remove a VC piece' });
+      }, { label: 'Province with US Troops', ids: (g, c) => c.d.cands ?? [] }),
+    ],
+  };
+});
 
 defCard(22, () => ({
   u: [xfer([
@@ -252,15 +251,18 @@ defCard(29, () => ({
   ],
 }));
 
-defCard(30, () => ({
-  u: [
-    ...chooseFaction('f', ['US', 'ARVN'], { text: 'US or ARVN Air Strikes' }),
-    pick(3, W.coastal, (g, a, id) => {
-      removePieces(g, a, { n: 2, kinds: INS_KINDS, filter: K((gg, aa, i) => i === id), air: true, by: a.by, data: {}, label: 'Fire support: remove up to 2 pieces' });
-    }, { by: (g, c) => c.d.f, label: 'Coastal space to strike' }),
-    run((g, c) => { for (const id of c.last?.touched ?? []) if (MAP[id].type !== 'loc' && MAP[id].pop > 0) shiftSupport(g, id, -1); }),
-  ],
-  s: [shift(2, -2, { where: (g, id) => MAP[id].type === 'province' && MAP[id].coastal && count(g, id, 'us_troops') > 0, label: 'Coastal Province with US Troops' })],
-}));
+defCard(30, () => {
+  const only = K((g, a, i) => i === a.data.sp);
+  return {
+    u: [
+      ...chooseFaction('f', ['US', 'ARVN'], { text: 'US or ARVN Air Strikes' }),
+      pick(3, W.coastal, (g, a, id) => {
+        removePieces(g, a, { n: 2, kinds: INS_KINDS, filter: only, air: true, by: a.by, data: { sp: id }, label: 'Fire support: remove up to 2 pieces' });
+      }, { by: (g, c) => c.d.f, label: 'Coastal space to strike' }),
+      run((g, c) => { for (const id of c.last?.touched ?? []) if (MAP[id].type !== 'loc' && MAP[id].pop > 0) shiftSupport(g, id, -1); }),
+    ],
+    s: [shift(2, -2, { where: (g, id) => MAP[id].type === 'province' && MAP[id].coastal && count(g, id, 'us_troops') > 0, label: 'Coastal Province with US Troops' })],
+  };
+});
 
 void [trail, patronage, setSupport, SPACE_IDS];

@@ -240,8 +240,9 @@ registerState('card_choice', {
     else if (fa === 'event') { op = opOk; opsa = opOk; }
     else if (fa === 'limited_op') { lim = opOk; }
     if (event) {
-      p.action('event', 'unshaded', `Event (unshaded): ${card?.unshaded ?? ''}`.slice(0, 200));
-      if (card && card.shaded) p.action('event', 'shaded', `Event (shaded): ${card.shaded}`.slice(0, 200));
+      const single = !card || card.dual || !card.shaded;
+      p.action('event', 'unshaded', `Event${single ? '' : ' (unshaded)'}: ${card?.unshaded ?? ''}`.slice(0, 200));
+      if (card && card.shaded && !card.dual) p.action('event', 'shaded', `Event (shaded): ${card.shaded}`.slice(0, 200));
     }
     if (op) p.action('op', undefined, 'Operation only');
     if (opsa) p.action('op_sa', undefined, 'Operation + Special Activity');

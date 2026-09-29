@@ -25,6 +25,16 @@ function playEvent(g: Game) {
   }
 }
 
+// Drive the current Op menu (and whatever it pushes) to completion: prefer finishing verbs, else the first action.
+function finishOp(g: Game, card?: number) {
+  for (let i = 0; i < 400 && top(g) && top(g)!.state !== 'card_choice' && top(g)!.state !== 'game' && (card == null || g.current === card); i++) {
+    const v = getView(g).actions.filter((a) => a.verb !== 'undo');
+    if (!v.length) break;
+    const pick = ['done', 'next', 'skip'].map((x) => v.find((a) => a.verb === x)).find(Boolean) ?? v[0];
+    doAction(g, pick!.verb, pick!.arg);
+  }
+}
+
 const verbs = (g: Game) => getView(g).actions.map((a) => a.verb + (a.arg !== undefined ? ':' + a.arg : ''));
 
 function plainCards(): number[] {
@@ -37,6 +47,7 @@ function fresh(): Game {
   const [a, b] = plainCards();
   g.current = a; g.next = b;
   g.deck = [];
+  for (const id of SPACE_IDS) g.spaces[id].pieces = {}; // empty board: Ops find nothing to do
   g.stack = [];
   g.log = [];
   push(g, 'game', {}); // restart the sequence on the forced card
@@ -150,8 +161,7 @@ describe('sequence of play', () => {
     const order = CARD[a].order;
     playEvent(g);
     doAction(g, 'op');
-    if (verbs(g).includes('done')) doAction(g, 'done');
-    while (g.current === a && getView(g).actions.some((x) => x.verb === 'done')) doAction(g, 'done');
+    finishOp(g, g.current!);
     expect(g.current).toBe(b);
     expect(g.eligible[order[0]]).toBe(false);
     expect(g.eligible[order[1]]).toBe(false);
@@ -168,7 +178,7 @@ describe('sequence of play', () => {
     // second: Op with SA declined
     g.resources = { ARVN: 40, NVA: 40, VC: 40 };
     doAction(g, 'op');
-    while (g.current === a && getView(g).actions.some((x) => x.verb === 'done')) doAction(g, 'done');
+    finishOp(g, g.current!);
     expect(g.current).toBe(b);
     expect(g.discard[g.discard.length - 1]).toBe(a);
     expect(g.eligible[order[0]]).toBe(false);
